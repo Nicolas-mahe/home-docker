@@ -38,4 +38,5 @@ msbuild.wrn
 /vars.yml
 /inventory.yml
 .vs
-/vars_perso.yml
+/vars_rabbyt.yml
+/vars_zaula.yml

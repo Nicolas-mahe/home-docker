@@ -13,11 +13,11 @@
     loop: "{{ net }}"
 
   - name: Set IP + Netmask to Network Adaptater
-    ansible.windows.win_shell: New-Netipaddress -InterfaceAlias {{ item.interface }} -IpAddress {{ item.ip }} -PrefixLength 24
+    ansible.windows.win_shell: New-Netipaddress -InterfaceAlias "{{ item.interface }}" -IpAddress "{{ item.ip }}" -PrefixLength "{{ item.netmask }}"
     loop: "{{ net }}"
 
   - name: Set DNS to Network Adaptater
-    ansible.windows.win_shell: Set-DnsClientServerAddress -InterfaceAlias {{ item.interface }} -ServerAddresses {{ item.dns }}
+    ansible.windows.win_shell: Set-DnsClientServerAddress -InterfaceAlias "{{ item.interface }}" -ServerAddresses "{{ item.dns }}"
     loop: "{{ net }}"
     when: item.dns is defined
     
