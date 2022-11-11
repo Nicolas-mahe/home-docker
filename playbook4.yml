@@ -1,0 +1,11 @@
+- name: test
+  hosts: App
+  vars_files: ./vars.yml
+  gather_facts: false
+  tasks:
+    - name: Add Whrite Aurorize
+      ansible.windows.win_acl:
+        user: Administrator@cketuveux.io
+        path: D:\JhipsterDotNet
+        type: allow
+        rights: FullControl

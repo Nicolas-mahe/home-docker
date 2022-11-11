@@ -1,0 +1,43 @@
+- name: Set Network + AD
+  hosts: App
+  tags: BeforeAD
+  vars_files: ./vars.yml
+  gather_facts: false
+  tasks:
+  - name: Rename Network Adaptater Via MAC address
+    win_shell: Get-NetAdapter | ?{$_.MacAddress -eq "{{ item.mac }}"} | Rename-NetAdapter -NewName "{{ item.interface }}"
+    loop: "{{ net }}"
+
+  - name: Remove IP from Network Adaptater
+    win_shell: Remove-Netipaddress -InterfaceAlias "{{ item.interface }}" -Confirm:$false
+    loop: "{{ net }}"
+
+  - name: Set IP + Netmask to Network Adaptater
+    win_shell: New-Netipaddress -InterfaceAlias {{ item.interface }} -IpAddress {{ item.ip }} -PrefixLength 24
+    loop: "{{ net }}"
+
+  - name: Set DNS to Network Adaptater
+    win_shell: Set-DnsClientServerAddress -InterfaceAlias {{ item.interface }} -ServerAddresses {{ item.dns }}
+    loop: "{{ net }}"
+    when: item.dns is defined
+    
+  - name: Change the Hostname
+    win_hostname:
+      name: MM-App
+    register: hostname_state
+  - win_reboot:
+    when: hostname_state.reboot_required
+    
+  - name: Join Domain "cketuveux.io"
+    win_domain_membership:
+      dns_domain_name: cketuveux.io
+      hostname: MM-App
+      domain_admin_user: "{{ App_domain_user }}"
+      domain_admin_password: "{{ App_domain_password }}"
+      state: domain
+    register: domain_state
+  - win_reboot:
+    when: domain_state.reboot_required
+  
+  - name: Allow CredSSP
+    win_shell: winrm set winrm/config/service/auth '@{CredSSP="true"}'

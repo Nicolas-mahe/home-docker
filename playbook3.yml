@@ -1,0 +1,35 @@
+- name: test
+  hosts: App
+  vars_files: ./vars.yml
+  gather_facts: false
+  tasks:
+  - name: RemoveIP
+    win_shell: Remove-Netipaddress -InterfaceAlias "{{ item.interface }}" -Confirm:$false
+    loop: "{{ net }}"
+
+  - name: Set IP+Netmask
+    win_shell: New-Netipaddress -InterfaceAlias {{ item.interface }} -IpAddress {{ item.ip }} -PrefixLength 24
+    loop: "{{ net }}"
+
+  - name: Set DNS
+    win_shell: Set-DnsClientServerAddress -InterfaceAlias {{ item.interface }} -ServerAddresses {{ item.dns }}
+    loop: "{{ net }}"
+    
+  - name: Change the hostname
+    win_hostname:
+      name: MM-App
+    register: hostname_state
+  - win_reboot:
+    when: hostname_state.reboot_required
+      
+  - name: Join Domain
+    tags: joinAd
+    win_domain_membership:
+      dns_domain_name: cketuveux.io
+      hostname: MM-App
+      domain_admin_user: "{{ App_domain_user }}"
+      domain_admin_password: "{{ App_domain_Pwd }}"
+      state: domain
+    register: domain_state
+  - win_reboot:
+    when: domain_state.reboot_required

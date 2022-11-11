@@ -1,0 +1,83 @@
+- name: Set Network + AD
+  hosts: App
+  tags: BeforeAD
+  vars_files: ./vars.yml
+  gather_facts: true
+  tasks:
+  - name: Rename Network Adaptater Via MAC address
+    ansible.windows.win_shell: Get-NetAdapter | ?{$_.MacAddress -eq "{{ item.mac }}"} | Rename-NetAdapter -NewName "{{ item.interface }}"
+    loop: "{{ net }}"
+
+  - name: Remove IP from Network Adaptater
+    ansible.windows.win_shell: Remove-Netipaddress -InterfaceAlias "{{ item.interface }}" -Confirm:$false
+    loop: "{{ net }}"
+
+  - name: Set IP + Netmask to Network Adaptater
+    ansible.windows.win_shell: New-Netipaddress -InterfaceAlias {{ item.interface }} -IpAddress {{ item.ip }} -PrefixLength 24
+    loop: "{{ net }}"
+
+  - name: Set DNS to Network Adaptater
+    ansible.windows.win_shell: Set-DnsClientServerAddress -InterfaceAlias {{ item.interface }} -ServerAddresses {{ item.dns }}
+    loop: "{{ net }}"
+    when: item.dns is defined
+    
+  - name: Change the Hostname
+    ansible.windows.win_hostname:
+      name: MM-App
+    register: hostname_state
+  - ansible.windows.win_reboot:
+    when: hostname_state.reboot_required
+    
+  - name: Join Domain "cketuveux.io"
+    ansible.windows.win_domain_membership:
+      dns_domain_name: cketuveux.io
+      hostname: MM-App
+      domain_admin_user: "{{ App_domain_user }}"
+      domain_admin_password: "{{ App_domain_password }}"
+      state: domain
+    register: domain_state
+  - ansible.windows.win_reboot:
+    when: domain_state.reboot_required
+  
+  - name: Allow CredSSP
+    win_shell: winrm set winrm/config/service/auth '@{CredSSP="true"}'
+############################################################################################################################################
+- name: Install ".exe" + Update
+  hosts: ADApp
+  tags: AfterAD
+  vars_files: ./vars.yml
+  gather_facts: false
+  tasks:
+  - name: Touch a file (creates if not present, updates modification time if present)
+    ansible.windows.win_file:
+      path: "{{ item }}"
+      state: directory
+    loop: "{{ Path1 }}"
+  - name: autorisation chocolatey install
+    win_shell: Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
+  - name: Install Chocolatey
+    chocolatey.chocolatey.win_chocolatey:
+      name: chocolatey
+      state: present
+  - name: Set the Chocolatey Cache location
+    chocolatey.chocolatey.win_chocolatey_config:
+      name: cacheLocation
+      state: present
+      value: "{{ Path1[1] }}"
+
+  - name: Install Software
+    chocolatey.chocolatey.win_chocolatey:
+      name: "{{ item.name }}"
+      state: present
+    loop: "{{ ChocolateyInstall }}"
+    
+  - name: Install All Windows Updates
+    ansible.windows.win_updates:
+      category_names: '*'
+    register: update_state
+  - name: Reboot Host
+    ansible.windows.win_reboot:
+    when: update_state.reboot_required
+
+############################################################################################################################################
