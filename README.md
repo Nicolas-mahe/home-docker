@@ -14,6 +14,7 @@ apt-get update
 apt-get upgrade
 apt install software-properties-common
 apt install python3-pip
+pip install "pywinrm>=0.3.0"
 pip install requests-credssp
 apt install git
 add-apt-repository ppa:ansible/ansible
@@ -24,4 +25,4 @@ apt install ansible
 `ansible-galaxy collection install -r requirement.yml`
 
 3. Launch playbook :
-`ansible-playbook -i inventory.yml playbook.yml`
+`ansible-playbook -i inventory.yml playbook_rabbyt.yml`
