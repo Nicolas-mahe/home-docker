@@ -1,36 +1,27 @@
-`winrm set winrm/config/service/auth '@{Basic="true"}'`
-`winrm set winrm/config/service '@{AllowUnencrypted="true"}'`
+# Procedure
+## Windows
 
-credSSP:
+CredSSp connexion:
+`winrm set winrm/config/service '@{AllowUnencrypted="true"}'`
 `winrm set winrm/config/service/auth '@{CredSSP="true"}' `
-Sur WSL:
+
+## Server
 `pip install requests-credssp `
 
---------
-localisation fichier:
-`cd /mnt/c/Users/Nico2/Repos/Ansible-Nicolas/`
+1. Requierment for Ansible:
 
-Install or requirement of ansible:
-`
-ansible-galaxy collection install -r requirement.yml
-`
+apt-get update
+apt-get upgrade
+apt install software-properties-common
+apt install python3-pip
+pip install requests-credssp
+apt install git
+add-apt-repository ppa:ansible/ansible
+apt update
+apt install ansible
 
-Launch playbook :
-`
-ansible-playbook -i inventory.yml playbook.yml
-`
-Launch playbook with tags:
-`ansible-playbook -i inventory.yml playbook.yml -t ChangeIp
-`
-## Cmd Install ansible WSL Ubuntu 20.04
-`
-sudo apt install software-properties-common
-sudo add-apt-repository ppa:ansible/ansible
-sudo apt update
-sudo apt install ansible
+2. Install requirement package of ansible:
+`ansible-galaxy collection install -r requirement.yml`
 
-` 
-
-##Runner
-
-sudo gitlab-runner register --url https://gitlab.com --registration-token GR1348941349nyJmxv5AZ9Z_Hoscm --name poei-virtual-machine --tag-list poeirunner  --executor docker --run-untagged --docker-image ubuntu:latest
+3. Launch playbook :
+`ansible-playbook -i inventory.yml playbook.yml`
