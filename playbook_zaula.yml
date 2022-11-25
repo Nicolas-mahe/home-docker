@@ -1,23 +1,14 @@
-- name: RaBByT-Setup
-  hosts: Pc-RaBByT
-  vars_files: ./vars_rabbyt.yml
+- name: Zaula-Setup
+  hosts: Pc-Zaula
+  vars_files: ./vars_zaula.yml
   gather_facts: true
-  tasks:
-  - name: Rename Network Adaptater Via MAC address
-    ansible.windows.win_shell: Get-NetAdapter | ?{$_.MacAddress -eq "{{ item.mac }}"} | Rename-NetAdapter -NewName "{{ item.interface }}"
-    loop: "{{ net }}"
-
-- name: Chocolatey autorize 
-  hosts: Pc-RaBByT
-  vars_files: ./vars_rabbyt.yml
-  gather_facts: false
   tasks:
   - name: autorisation chocolatey install
     win_shell: Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
 - name: Choco Install
-  hosts: Pc-RaBByT
-  vars_files: ./vars_rabbyt.yml
+  hosts: Pc-Zaula
+  vars_files: ./vars_zaula.yml
   gather_facts: true
   tags: loop
   tasks:
