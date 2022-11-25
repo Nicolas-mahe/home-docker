@@ -2,8 +2,9 @@
 ## Windows
 
 CredSSp connexion:
-`winrm set winrm/config/service '@{AllowUnencrypted="true"}'`
-`winrm set winrm/config/service/auth '@{CredSSP="true"}' `
+` Enable-PSRemoting `
+` winrm set winrm/config/service '@{AllowUnencrypted="true"}' `
+` winrm set winrm/config/service/auth '@{CredSSP="true"}' `
 
 ## Server
 `pip install requests-credssp `
