@@ -12,3 +12,15 @@ mods:
 
 ## Entrer in docker
 ` docker exec -it <name> /bin/bash `
+
+
+## Ansible
+
+apt-get update && \
+    apt upgrade -y && \
+    apt -y install software-properties-common && \
+    apt install -y python3-pip && \
+    apt-add-repository --yes --update ppa:ansible/ansible && \
+    apt install -y ansible && \
+    pip install requests-credssp && \
+    apt install libz-dev libssl-dev libcurl4-gnutls-dev libexpat1-dev gettext cmake gcc -y
