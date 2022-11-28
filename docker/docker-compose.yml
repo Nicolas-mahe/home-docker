@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+  Minecraft:
+    image: itzg/minecraft-server:2022.14.0
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.minecraft_mod.rule=Host(`minecraft.laura-et-nicolas.com`)
+      - traefik.http.routers.minecraft_mod.entrypoints=web
+    container_name: Perso
+    environment:
+      EULA: "true"
+      MOTD: "Serveur Minecraft Moddé par RaBByT_Tv"
+      VERSION: 1.18.2
+      TYPE: FORGE
+      FORGE_VERSION: 40.1.60
+      MEMORY: ""
+      JVM_XX_OPTS: "-XX:MaxRAMPercentage=75"
+      MAX_PLAYERS: 10 
+      SPAWN_PROTECTION: 0 
+      VIEW_DISTANCE: 6 
+      SIMULATION_DISTANCE: 8
+      MAX_BUILD_HEIGHT: 1024
+      ENABLE_WHITELIST: TRUE
+      TZ: Europe/Paris
+      ENABLE_RCON: "false"
+    deploy:
+      resources:
+        limits:
+          memory: 50120M #10240M
+    volumes:
+      - Minecraft_perso:/data
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+    ports:
+      - 25565:25565
+volumes:
+  Minecraft_perso: {}
+  
