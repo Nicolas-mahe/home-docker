@@ -7,7 +7,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.minecraft_mod.rule=Host(`minecraft.laura-et-nicolas.com`)
       - traefik.http.routers.minecraft_mod.entrypoints=web
-    container_name: Perso
+    container_name: Minecraft_Perso
     environment:
       EULA: "true"
       MOTD: "Serveur Minecraft Moddé par RaBByT_Tv"
@@ -29,12 +29,12 @@ services:
         limits:
           memory: 50120M #10240M
     volumes:
-      - Minecraft_perso:/data
+      - Minecraft_data:/data
     stdin_open: true
     tty: true
     restart: unless-stopped
     ports:
       - 25565:25565
 volumes:
-  Minecraft_perso: {}
+  Minecraft_data: {}
   
