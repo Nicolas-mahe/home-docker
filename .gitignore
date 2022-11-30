@@ -35,8 +35,9 @@ msbuild.wrn
 
 # Visual Studio 2015
 .vs/
-/vars.yml
-/inventory.yml
+vars.yml
+inventory.yml
 .vs
-/vars_rabbyt.yml
-/vars_zaula.yml
+vars_rabbyt.yml
+vars_zaula.yml
+Secret_MariaDB
