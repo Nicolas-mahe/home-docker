@@ -40,4 +40,4 @@ inventory.yml
 .vs
 vars_rabbyt.yml
 vars_zaula.yml
-Secret_MariaDB
+Secret_MariaDB.env
