@@ -1,0 +1,36 @@
+services:
+  traefik:
+    image: traefik:v2.9
+    restart: always
+    container_name: Traefik
+    ports:
+      - "80:80" # <== http
+      - "8080:8080" # <== :8080 is where the dashboard runs on
+      - "443:443" # <== https
+    command:
+      - --api.insecure=true # <== Enabling insecure api, NOT RECOMMENDED FOR PRODUCTION
+      - --api.dashboard=true # <== Enabling the dashboard to view services, middlewares, routers, etc.
+      - --api.debug=true # <== Enabling additional endpoints for debugging and profiling
+      - --log.level=DEBUG # <== Setting the level of the logs from traefik
+      - --providers.docker=true # <== Enabling docker as the provider for traefik
+      - --providers.docker.exposedbydefault=false # <== Don't expose every container to traefik
+      - --providers.file.filename=/dynamic.yaml # <== Referring to a dynamic configuration file
+      - --providers.docker.network=web # <== Operate on the docker network named web
+      - --entrypoints.web.address=:80 # <== Defining an entrypoint for port :80 named web
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro # <== Volume for docker admin
+      - Traefik:/dynamic.yaml # <== Volume for dynamic conf file, **ref: line 27
+    networks:
+      - web # <== Placing traefik on the network named web, to access containers on this network
+    labels:
+      - "traefik.enable=true" # <== Enable traefik on itself to view dashboard and assign subdomain to$
+      - "traefik.http.routers.api.rule=Host(`monitor.laura-et-nicolas.com`)" # <== Setting the domain for the d$
+      - "traefik.http.routers.api.service=api@internal" # <== Enabling the api to be a service to acce$
+volumes:
+  Traefik:
+    external: true
+  Traefik2:
+    external: true
+networks:
+  web:
+    external: true
