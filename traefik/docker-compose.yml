@@ -3,6 +3,8 @@ services:
     image: traefik:v2.9
     restart: always
     container_name: Traefik
+    environment:
+      TZ: Europe/Paris
     ports:
       - "80:80" # <== http
       - "8080:8080" # <== :8080 is where the dashboard runs on
