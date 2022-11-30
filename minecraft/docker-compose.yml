@@ -27,14 +27,18 @@ services:
     deploy:
       resources:
         limits:
-          memory: 50120M #10240M
+          memory: 6400M #10240M
     volumes:
       - Minecraft_data:/data
     stdin_open: true
     tty: true
     restart: unless-stopped
-    ports:
-      - 25565:25565
+    #ports:
+      #- 25565:25565
 volumes:
-  Minecraft_data: {}
-  
+  Minecraft_data:
+    external: true
+networks:
+  default:
+    name: web
+    external: true
