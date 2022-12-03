@@ -1,49 +1,28 @@
 volumes:
   nextcloud:
-  nextcloud_maria:
+    external: true
 networks:
   web:
     external: true
 
 services:
-  nextcloud_maria:
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.nextcloud_maria.rule=Host(`nextcloud_maria.laura-et-nicolas.com`)
-      - traefik.http.routers.nextcloud_maria.entrypoints=web
-    image: mariadb:10.5
-    restart: always
-    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
-    volumes:
-      - nextcloud_maria:/var/lib/mysql
-    environment:
-      - MYSQL_ROOT_PASSWORD=$ROOT_PWD
-      - MYSQL_PASSWORD=$PWD
-      - MYSQL_DATABASE=$DATABASE
-      - MYSQL_USER=$USER
-      - TZ=Europe/Paris
-    networks:
-      - web
-    ports:
-      - 3306:3306
-     
   app:
     labels:
       - traefik.enable=true
-      - traefik.http.routers.nextcloud.rule=Host(`nextcloud.laura-et-nicolas.com`)
+      - traefik.http.routers.nextcloud.rule=Host(`$HOST`)
       - traefik.http.routers.nextcloud.entrypoints=web
     image: nextcloud
-    restart: always
-    links:
-      - nextcloud_maria
+    restart: unless-stopped
     volumes:
       - nextcloud:/var/www/html
     environment:
-      - MYSQL_PASSWORD=$PWD
-      - MYSQL_DATABASE=$DATABASE
-      - MYSQL_USER=$USER
-      - MYSQL_HOST=nextcloud_maria
-      - TZ=Europe/Paris
+      NEXTCLOUD_TRUSTED_DOMAINS: $HOST
+      MYSQL_PASSWORD: $PWD
+      MYSQL_DATABASE: $DATABASE
+      MYSQL_USER: $USER
+      MYSQL_HOST: maria_nextcloud
+      config_is_read_only: false
+      TZ: Europe/Paris
     networks:
       - web
     ports:
