@@ -1,0 +1,24 @@
+version: '3.9'
+
+services:
+  maria:
+    container_name: maria_nextcloud
+    image: mariadb:10.7
+    ports:
+      - 3306:3306
+    networks:
+      - web
+    volumes:
+      - nextcloud_db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: $ROOT_PWD
+      MYSQL_PASSWORD: $PWD
+      MYSQL_DATABASE: $DATABASE
+      MYSQL_USER: $USER
+      TZ: Europe/Paris
+volumes:
+  nextcloud_db: 
+    external: true
+networks:
+  web:
+    external: true
