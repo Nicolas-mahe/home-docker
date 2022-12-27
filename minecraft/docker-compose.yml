@@ -9,7 +9,7 @@ services:
       - traefik.http.routers.minecraft_mod.entrypoints=web
     container_name: Minecraft_mod
     environment:
-      EULA: "true"
+      EULA: TRUE
       MOTD: "RaBByT Season v1"
       VERSION: 1.18.2
       TYPE: FORGE
@@ -22,8 +22,20 @@ services:
       SIMULATION_DISTANCE: 12
       MAX_BUILD_HEIGHT: 512
       ENABLE_WHITELIST: TRUE
+      DIFFICULTY: Hard
+      OPS: "RaBByT_Tv"
+      ALLOW_NETHER: TRUE
+      ANNOUNCE_PLAYER_ACHIEVEMENTS: TRUE
+      GENERATE_STRUCTURES: TRUE
+      SNOOPER_ENABLED: FALSE
+      MAX_TICK_TIME: 60000
+      SPAWN_MONSTERS: TRUE
       TZ: Europe/Paris
-      ENABLE_RCON: "false"
+      ENABLE_RCON: FALSE
+      #RCON_CMDS_STARTUP:  |-
+      #  gamerule keepinventory true
+      #  gamerule playersSleepingPercentage 1
+      PROXY: Traefik:25565
     deploy:
       resources:
         limits:
