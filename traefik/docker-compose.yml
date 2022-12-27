@@ -31,8 +31,6 @@ services:
 volumes:
   Traefik:
     external: true
-  Traefik2:
-    external: true
 networks:
   web:
     external: true
