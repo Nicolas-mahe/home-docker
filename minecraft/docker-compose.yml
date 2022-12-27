@@ -7,38 +7,40 @@ services:
       - traefik.enable=true
       - traefik.http.routers.minecraft_mod.rule=Host(`minecraft.laura-et-nicolas.com`)
       - traefik.http.routers.minecraft_mod.entrypoints=web
-    container_name: Minecraft_Perso
+    container_name: Minecraft_mod
     environment:
       EULA: "true"
-      MOTD: "Serveur Minecraft Moddé par RaBByT_Tv"
+      MOTD: "RaBByT Season v1"
       VERSION: 1.18.2
       TYPE: FORGE
       FORGE_VERSION: 40.1.60
       MEMORY: ""
-      JVM_XX_OPTS: "-XX:MaxRAMPercentage=75"
+      JVM_XX_OPTS: "-XX:MaxRAMPercentage=95"
       MAX_PLAYERS: 10 
       SPAWN_PROTECTION: 0 
-      VIEW_DISTANCE: 6 
-      SIMULATION_DISTANCE: 8
-      MAX_BUILD_HEIGHT: 1024
+      VIEW_DISTANCE: 12 
+      SIMULATION_DISTANCE: 12
+      MAX_BUILD_HEIGHT: 512
       ENABLE_WHITELIST: TRUE
       TZ: Europe/Paris
       ENABLE_RCON: "false"
     deploy:
       resources:
         limits:
-          memory: 6400M #10240M
+          memory: 13056M
     volumes:
-      - Minecraft_data:/data
+      - Minecraft_mod:/data
     stdin_open: true
     tty: true
     restart: unless-stopped
-    #ports:
-      #- 25565:25565
+    ports:
+      - 26666:25565
+    networks:
+      - web
+    
 volumes:
-  Minecraft_data:
+  Minecraft_mod:
     external: true
 networks:
-  default:
-    name: web
-    external: true
+    web:
+      external: true
