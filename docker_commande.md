@@ -49,3 +49,5 @@ docker run -d \
   --my-label traefik.enable=true \
   --label traefik.http.routers.minecraft_mod.rule=Host(`vpn.laura-et-nicolas.com`) \
   --label traefik.http.routers.minecraft_mod.entrypoints=web
+
+  # `not used`
