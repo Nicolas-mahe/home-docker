@@ -1,9 +1,7 @@
-version: '3.9'
-
 services:
   bdd:
     container_name: nextcloud_bdd
-    image: mariadb:10.7
+    image: mariadb:10.5
     networks:
       - web
     ports:
@@ -16,18 +14,15 @@ services:
       MYSQL_DATABASE: $DATABASE
       MYSQL_USER: $USER
       TZ: Europe/Paris
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     restart: unless-stopped
 
   app:
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.nextcloud.rule=Host(`$HOST`)
-      - traefik.http.routers.nextcloud.entrypoints=web
     container_name: nextcloud_app
     image: nextcloud
     volumes:
       - nextcloud_app:/var/www/html
-      #- /srv/dev-disk-by-uuid-88861031-30c5-4c7f-9b3f-2f4087d6f927/Raid/Users/test:/var/www/html/data:rw
+      - /srv/dev-disk-by-uuid-88861031-30c5-4c7f-9b3f-2f4087d6f927/Raid/Users/test:/mnt/data
     networks:
       - web
     ports:
@@ -43,12 +38,16 @@ services:
     restart: unless-stopped
     links:
       - bdd
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.nextcloud.rule=Host(`$HOST`)
+      - traefik.http.routers.nextcloud.entrypoints=web
     
 volumes:
-  nextcloud_bdd: {} 
-    #external: true
-  nextcloud_app: {}
-    #external: true
+  nextcloud_bdd: 
+    external: true
+  nextcloud_app:
+    external: true
 
 networks:
   web:
