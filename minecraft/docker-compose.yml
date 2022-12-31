@@ -46,7 +46,7 @@ services:
     tty: true
     restart: unless-stopped
     ports:
-      - 26666:25565
+      - 25565:25565
     networks:
       - web
     
