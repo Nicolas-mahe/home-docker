@@ -1,0 +1,61 @@
+version: "3.8"
+
+services:
+  Minecraft:
+    image: itzg/minecraft-server:2022.14.0
+    labels:
+      - "traefik.enable=true"
+      - "traefik.tcp.routers.minecraft.rule=HostSNI(`minecraft.laura-et-nicolas.com`)"
+      - "traefik.tcp.routers.minecraft.entrypoints=minecraft"
+      - "traefik.tcp.services.minecraft.loadbalancer.server.port=25565"
+    container_name: Minecraft_mod
+    environment:
+      EULA: TRUE
+      MOTD: "RaBByT Season v1"
+      VERSION: 1.18.2
+      TYPE: FORGE
+      FORGE_VERSION: 40.1.60
+      MEMORY: ""
+      JVM_XX_OPTS: "-XX:MaxRAMPercentage=95"
+      MAX_PLAYERS: 10 
+      SPAWN_PROTECTION: 0 
+      VIEW_DISTANCE: 12 
+      SIMULATION_DISTANCE: 12
+      MAX_BUILD_HEIGHT: 512
+      ENABLE_WHITELIST: TRUE
+      DIFFICULTY: Hard
+      OPS: "RaBByT_Tv"
+      ALLOW_NETHER: TRUE
+      ANNOUNCE_PLAYER_ACHIEVEMENTS: TRUE
+      GENERATE_STRUCTURES: TRUE
+      SNOOPER_ENABLED: FALSE
+      MAX_TICK_TIME: 60000
+      SPAWN_MONSTERS: TRUE
+      TZ: Europe/Paris
+      ENABLE_RCON: FALSE
+      #RCON_CMDS_STARTUP:  |-
+      #  gamerule keepinventory true
+      #  gamerule playersSleepingPercentage 1
+      PROXY: Traefik:25565
+    deploy:
+      resources:
+        limits:
+          memory: 13056M
+    volumes:
+      - Minecraft_mod:/data
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+    ports:
+      - 26666:25565
+    expose:
+      - :25565
+    networks:
+      - web
+    
+volumes:
+  Minecraft_mod:
+    external: true
+networks:
+    web:
+      external: true
