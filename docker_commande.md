@@ -24,30 +24,3 @@ apt-get update && \
     apt install -y ansible && \
     pip install requests-credssp && \
     apt install libz-dev libssl-dev libcurl4-gnutls-dev libexpat1-dev gettext cmake gcc -y
-
-## Wireguard
-docker run -d \
-  --name=wireguard \
-  --cap-add=NET_ADMIN \
-  --cap-add=SYS_MODULE \
-  -e PUID=1000 \
-  -e PGID=1000 \
-  -e TZ=Europe/Paris \
-  -e SERVERURL=auto \
-  -e SERVERPORT=51821 \
-  -e PEERS=pc,portable \
-  -e PEERDNS=auto \
-  -e INTERNAL_SUBNET=10.192.0.0 \
-  -e ALLOWEDIPS=0.0.0.0/0 \
-  -e LOG_CONFS=true \
-  -p 51821:51820/udp \
-  -v wireguard_config:/config \
-  -v wireguard_modules:/lib/modules \
-  --sysctl="net.ipv4.conf.all.src_valid_mark=1" \
-  --restart unless-stopped \
-  lscr.io/linuxserver/wireguard \
-  --my-label traefik.enable=true \
-  --label traefik.http.routers.minecraft_mod.rule=Host(`vpn.laura-et-nicolas.com`) \
-  --label traefik.http.routers.minecraft_mod.entrypoints=web
-
-  # `not used`
