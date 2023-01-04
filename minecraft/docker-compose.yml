@@ -39,7 +39,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 13056M
+          memory: 20224M
     volumes:
       - Minecraft_mod:/data
     stdin_open: true
