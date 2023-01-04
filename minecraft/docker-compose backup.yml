@@ -3,11 +3,16 @@ version: "3.8"
 services:
   backups:
     image: itzg/mc-backup
+    container_name: Minecraft_mod2_backup
     environment:
       BACKUP_INTERVAL: "1m"
       # instead of network_mode below, could declare RCON_HOST
       RCON_HOST: Minecraft
       TZ: Europe/Paris
+      PRE_BACKUP_SCRIPT: |
+        echo "Before backup!"
+        echo "Also before backup from $$RCON_HOST to $$DEST_DIR"
+      POST_BACKUP_SCRIPT_FILE: /post-backup.sh
     volumes:
     # mount the same volume used by server, but read-only
     - Minecraft_mod2:/data:ro
@@ -15,6 +20,7 @@ services:
     # to external/cloud storage
     - ./mc-backups:/backups
     # share network namespace with server to simplify rcon access
+    - ./post-backup.sh:/post-backup.sh:ro
     network_mode: "service:Minecraft"
   Minecraft:
     image: itzg/minecraft-server:2022.14.0
