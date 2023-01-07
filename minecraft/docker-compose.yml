@@ -3,26 +3,9 @@ version: "3.8"
 #https://github.com/itzg/docker-mc-backup
 
 services:
-  backups:
-    image: itzg/mc-backup
-    environment:
-      TZ: Europe/Paris
-      INITIAL_DELAY: 2m
-      BACKUP_INTERVAL: 1m
-      PRUNE_BACKUPS_DAYS: 0.01
-      RCON_HOST: server
-      RCON_PORT: 25575
-      RCON_PASSWORD: minecraft_test
-      DEST_DIR: /backups
-      LINK_LATEST: FALSE
-      TAR_COMPRESS_METHOD: gzip
-      ZSTD_PARAMETERS: -3 --long=25 --single-thread
-    volumes:
-    - Minecraft_mod2:/data:ro
-    - Backup-MC2:/backups
-    network_mode: "service:server"
   server:
     image: itzg/minecraft-server:2022.14.0
+    command: cp /srv/dev-disk-by-uuid-88861031-30c5-4c7f-9b3f-2f4087d6f927/Raid/Users/Nicolas/Minecraft/icon-server.jpg /srv/dev-disk-by-uuid-9a8441b6-d899-4899-971f-3068a8e9c748/Ssd/Docker/volumes/minecraft_backup_mc-data/_data
     environment:
       EULA: TRUE
       MOTD: "RaBByT // test backup"
@@ -37,8 +20,8 @@ services:
       SIMULATION_DISTANCE: 5
       MAX_BUILD_HEIGHT: 512
       ENABLE_WHITELIST: TRUE
-      DIFFICULTY: easy
-      OPS: "RaBByT_Tv,Zaula"
+      DIFFICULTY: hard
+      OPS: "RaBByt_Tv,Zaula,TBMPQF"
       ALLOW_NETHER: TRUE
       ANNOUNCE_PLAYER_ACHIEVEMENTS: TRUE
       GENERATE_STRUCTURES: TRUE
@@ -58,7 +41,7 @@ services:
       SERVER_NAME: RaBByT_S1
       ICON: ./icon-server.jpg
       ENABLE_RCON: TRUE
-      RCON_PASSWORD: minecraft_test
+      RCON_PASSWORD: $RCON_PWD
       RCON_CMDS_STARTUP:  |-
         gamerule keepinventory true
         gamerule playersSleepingPercentage 1
@@ -67,7 +50,7 @@ services:
         limits:
           memory: 6400M
     volumes:
-      - Minecraft_mod2:/data
+      - data:/data
     stdin_open: true
     tty: true
     restart: unless-stopped
@@ -76,12 +59,28 @@ services:
       - 25575:25575
     networks:
       - web
+  backups:
+    image: itzg/mc-backup
+    environment:
+      TZ: Europe/Paris
+      INITIAL_DELAY: 2m
+      BACKUP_INTERVAL: 1h
+      PRUNE_BACKUPS_DAYS: 14
+      RCON_HOST: server
+      RCON_PORT: 25575
+      RCON_PASSWORD: $RCON_PWD
+      DEST_DIR: /backups
+      LINK_LATEST: FALSE
+      TAR_COMPRESS_METHOD: gzip
+      ZSTD_PARAMETERS: -3 --long=25 --single-thread
+    volumes:
+    - data:/data:ro
+    - backup:/backups
+    network_mode: "service:server"
     
 volumes:
-  Minecraft_mod2:
-    external: true
-  Backup-MC2:
-    external: true
+  data: {}
+  backup: {}
 networks:
     web:
       external: true
