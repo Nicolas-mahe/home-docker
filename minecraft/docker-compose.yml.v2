@@ -71,7 +71,7 @@ services:
       TZ: Europe/Paris
       INITIAL_DELAY: 3m
       BACKUP_INTERVAL: 5m
-      PRUNE_BACKUPS_DAYS: 1
+      PRUNE_BACKUPS_DAYS: 0.05
       RCON_HOST: server2
       RCON_PASSWORD: $RCON_PWD
       DEST_DIR: /backups
