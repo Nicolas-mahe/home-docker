@@ -40,7 +40,7 @@ services:
       PVP: TRUE
       LEVEL_TYPE: normal # type of generating world
       SERVER_NAME: RaBByT_S1
-      #ICON: ./icon-server.jpg
+      ICON: ./icon-server.jpg
       ENABLE_RCON: TRUE
       RCON_PASSWORD: $RCON_PWD
       RCON_CMDS_STARTUP:  |-
@@ -52,7 +52,9 @@ services:
           memory: 6400M
     volumes:
       - data:/data
-      - /srv/dev-disk-by-uuid-88861031-30c5-4c7f-9b3f-2f4087d6f927/Raid/Users/Nicolas/Minecraft/icon-server.jpg:/data/icon-server.jpg
+      - /srv/dev-disk-by-uuid-9a8441b6-d899-4899-971f-3068a8e9c748/Ssd/Docker/volumes/minecraft_setting/icon-server.jpg:/data/icon-server.jpg
+      - /srv/dev-disk-by-uuid-9a8441b6-d899-4899-971f-3068a8e9c748/Ssd/Docker/volumes/minecraft_setting/whitelist.json:/data/whitelist.json
+      - /srv/dev-disk-by-uuid-9a8441b6-d899-4899-971f-3068a8e9c748/Ssd/Docker/volumes/minecraft_setting/mods:/mods
     stdin_open: true
     tty: true
     restart: unless-stopped
@@ -65,9 +67,9 @@ services:
     image: itzg/mc-backup
     environment:
       TZ: Europe/Paris
-      INITIAL_DELAY: 2m
-      BACKUP_INTERVAL: 1h
-      PRUNE_BACKUPS_DAYS: 14
+      INITIAL_DELAY: 3m
+      BACKUP_INTERVAL: 1m
+      PRUNE_BACKUPS_DAYS: 0.001
       RCON_HOST: server
       RCON_PORT: 25575
       RCON_PASSWORD: $RCON_PWD
@@ -79,10 +81,12 @@ services:
     - data:/data:ro
     - backup:/backups
     network_mode: "service:server"
+    restart: unless-stopped
     
 volumes:
   data: {}
   backup: {}
+  setting: {}
 networks:
     web:
       external: true
