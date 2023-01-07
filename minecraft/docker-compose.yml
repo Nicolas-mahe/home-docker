@@ -11,7 +11,7 @@ services:
       - traefik.http.routers.minecraft_mod.entrypoints=webc748/Ssd/Docker/volumes/minecraft_data/_data
     environment:
       EULA: TRUE
-      MOTD: "RaBByT Season v1"
+      MOTD: "\u00a7b\u00a7k$\u00a7b <--- RaBByT Season v1 ---> \u00a7b\u00a7k$"
       VERSION: 1.18.2
       TYPE: FORGE
       FORGE_VERSION: 40.1.60
@@ -21,7 +21,7 @@ services:
       SPAWN_PROTECTION: 0
       VIEW_DISTANCE: 12
       SIMULATION_DISTANCE: 12
-      MAX_BUILD_HEIGHT: 512
+      MAX_BUILD_HEIGHT: 320 # only under 320
       ENABLE_WHITELIST: TRUE
       DIFFICULTY: hard
       OPS: "RaBByt_Tv,Zaula,TBMPQF"
