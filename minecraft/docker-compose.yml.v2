@@ -8,7 +8,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.minecraft_mod.rule=Host(`minecraft-creative.laura-et-nicolas.com`)
-      - traefik.http.routers.minecraft_mod.entrypoints=webc748/Ssd/Docker/volumes/minecraft_data/_data
+      - traefik.http.routers.minecraft_mod.entrypoints=web
     environment:
       EULA: TRUE
       MOTD: "RaBByT test"
