@@ -11,7 +11,7 @@ services:
       - traefik.http.routers.minecraft_mod.entrypoints=webc748/Ssd/Docker/volumes/minecraft_data/_data
     environment:
       EULA: TRUE
-      MOTD: "\u00a7b\u00a7k$\u00a7b <--- RaBByT Season v1 ---> \u00a7b\u00a7k$"
+      MOTD: "RaBByT Season v1"
       VERSION: 1.18.2
       TYPE: FORGE
       FORGE_VERSION: 40.1.60
