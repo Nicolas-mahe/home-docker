@@ -1,7 +1,7 @@
 services:
   bdd:
     container_name: nextcloud_bdd
-    image: mariadb:10.5
+    image: mariadb
     networks:
       - web
     ports:
@@ -34,6 +34,8 @@ services:
       MYSQL_USER: $USER
       MYSQL_HOST: bdd
       config_is_read_only: false
+      PUID: 1000
+      PGID: 100
       TZ: Europe/Paris
     restart: unless-stopped
     links:
