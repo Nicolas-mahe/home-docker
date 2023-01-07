@@ -1,30 +1,28 @@
 version: "3.8"
+#https://github.com/itzg/docker-minecraft-server
+#https://github.com/itzg/docker-mc-backup
 
 services:
   backups:
     image: itzg/mc-backup
-    container_name: Minecraft_mod2_backup
     environment:
-      BACKUP_INTERVAL: "1m"
-      # instead of network_mode below, could declare RCON_HOST
-      RCON_HOST: Minecraft
       TZ: Europe/Paris
-      PRE_BACKUP_SCRIPT: |
-        echo "Before backup!"
-        echo "Also before backup from $$RCON_HOST to $$DEST_DIR"
-      POST_BACKUP_SCRIPT_FILE: /post-backup.sh
+      INITIAL_DELAY: 2m
+      BACKUP_INTERVAL: 1m
+      PRUNE_BACKUPS_DAYS: 0.01
+      RCON_HOST: server
+      RCON_PORT: 25575
+      RCON_PASSWORD: minecraft_test
+      DEST_DIR: /backups
+      LINK_LATEST: FALSE
+      TAR_COMPRESS_METHOD: gzip
+      ZSTD_PARAMETERS: -3 --long=25 --single-thread
     volumes:
-    # mount the same volume used by server, but read-only
     - Minecraft_mod2:/data:ro
-    # use a host attached directory so that it in turn can be backed up
-    # to external/cloud storage
-    - Backups2:/backups
-    # share network namespace with server to simplify rcon access
-    - ./post-backup.sh:/post-backup.sh:ro
-    network_mode: "service:Minecraft"
-  Minecraft:
+    - Backup-MC2:/backups
+    network_mode: "service:server"
+  server:
     image: itzg/minecraft-server:2022.14.0
-    container_name: Minecraft_mod2
     environment:
       EULA: TRUE
       MOTD: "RaBByT // test backup"
@@ -32,30 +30,42 @@ services:
       TYPE: FORGE
       FORGE_VERSION: 40.1.60
       MEMORY: ""
-      JVM_XX_OPTS: "-XX:MaxRAMPercentage=99"
-      MAX_PLAYERS: 5
+      JVM_XX_OPTS: "-XX:MaxRAMPercentage=100"
+      MAX_PLAYERS: 3
       SPAWN_PROTECTION: 0
       VIEW_DISTANCE: 7
       SIMULATION_DISTANCE: 5
-      MAX_BUILD_HEIGHT: 256
+      MAX_BUILD_HEIGHT: 512
       ENABLE_WHITELIST: TRUE
-      DIFFICULTY: Creative
+      DIFFICULTY: easy
       OPS: "RaBByT_Tv,Zaula"
       ALLOW_NETHER: TRUE
       ANNOUNCE_PLAYER_ACHIEVEMENTS: TRUE
       GENERATE_STRUCTURES: TRUE
       SNOOPER_ENABLED: FALSE
       MAX_TICK_TIME: 60000
-      SPAWN_MONSTERS: TRUE
       TZ: Europe/Paris
-      #ENABLE_RCON: FALSE
-      #RCON_CMDS_STARTUP:  |-
-      #  gamerule keepinventory true
-      #  gamerule playersSleepingPercentage 1
+      MODE: survival # 0=survival, 1=creative, 2=adventure, 3=spectator // not sure it work
+      FORCE_GAMEMODE: TRUE # force default gamemode at connection
+      HARDCORE: FALSE
+      ALLOW_FLIGHT: TRUE
+      MAX_WORLD_SIZE: 10000000
+      SPAWN_ANIMALS: TRUE
+      SPAWN_MONSTERS: TRUE
+      SPAWN_NPCS: TRUE
+      PVP: TRUE
+      LEVEL_TYPE: normal # type of generating world
+      SERVER_NAME: RaBByT_S1
+      ICON: ./icon-server.jpg
+      ENABLE_RCON: TRUE
+      RCON_PASSWORD: minecraft_test
+      RCON_CMDS_STARTUP:  |-
+        gamerule keepinventory true
+        gamerule playersSleepingPercentage 1
     deploy:
       resources:
         limits:
-          memory: 8128M
+          memory: 6400M
     volumes:
       - Minecraft_mod2:/data
     stdin_open: true
@@ -63,13 +73,14 @@ services:
     restart: unless-stopped
     ports:
       - 25566:25565
+      - 25575:25575
     networks:
       - web
     
 volumes:
   Minecraft_mod2:
     external: true
-  Backups:
+  Backup-MC2:
     external: true
 networks:
     web:
