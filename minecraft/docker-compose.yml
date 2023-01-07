@@ -5,7 +5,8 @@ version: "3.8"
 services:
   server:
     image: itzg/minecraft-server:2022.14.0
-    command: cp /srv/dev-disk-by-uuid-88861031-30c5-4c7f-9b3f-2f4087d6f927/Raid/Users/Nicolas/Minecraft/icon-server.jpg /srv/dev-disk-by-uuid-9a8441b6-d899-4899-971f-3068a8e9c748/Ssd/Docker/volumes/minecraft_backup_mc-data/_data
+    command: 
+      - cp /srv/dev-disk-by-uuid-88861031-30c5-4c7f-9b3f-2f4087d6f927/Raid/Users/Nicolas/Minecraft/icon-server.jpg /srv/dev-disk-by-uuid-9a8441b6-d899-4899-971f-3068a8e9c748/Ssd/Docker/volumes/minecraft_data/_data
     environment:
       EULA: TRUE
       MOTD: "RaBByT // test backup"
@@ -39,7 +40,7 @@ services:
       PVP: TRUE
       LEVEL_TYPE: normal # type of generating world
       SERVER_NAME: RaBByT_S1
-      ICON: ./icon-server.jpg
+      #ICON: ./icon-server.jpg
       ENABLE_RCON: TRUE
       RCON_PASSWORD: $RCON_PWD
       RCON_CMDS_STARTUP:  |-
@@ -51,6 +52,7 @@ services:
           memory: 6400M
     volumes:
       - data:/data
+      - /srv/dev-disk-by-uuid-88861031-30c5-4c7f-9b3f-2f4087d6f927/Raid/Users/Nicolas/Minecraft/icon-server.jpg:/data/icon-server.jpg
     stdin_open: true
     tty: true
     restart: unless-stopped
