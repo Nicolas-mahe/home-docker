@@ -1,28 +1,45 @@
 version: "3.8"
 
 services:
+  backups:
+    image: itzg/mc-backup
+    container_name: Minecraft_mod2_backup
+    environment:
+      BACKUP_INTERVAL: "1m"
+      # instead of network_mode below, could declare RCON_HOST
+      RCON_HOST: Minecraft
+      TZ: Europe/Paris
+      PRE_BACKUP_SCRIPT: |
+        echo "Before backup!"
+        echo "Also before backup from $$RCON_HOST to $$DEST_DIR"
+      POST_BACKUP_SCRIPT_FILE: /post-backup.sh
+    volumes:
+    # mount the same volume used by server, but read-only
+    - Minecraft_mod2:/data:ro
+    # use a host attached directory so that it in turn can be backed up
+    # to external/cloud storage
+    - Backups2:/backups
+    # share network namespace with server to simplify rcon access
+    - ./post-backup.sh:/post-backup.sh:ro
+    network_mode: "service:Minecraft"
   Minecraft:
     image: itzg/minecraft-server:2022.14.0
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.minecraft_mod.rule=Host(`minecraft.laura-et-nicolas.com`)
-      - traefik.http.routers.minecraft_mod.entrypoints=web
-    container_name: Minecraft_mod
+    container_name: Minecraft_mod2
     environment:
       EULA: TRUE
-      MOTD: "RaBByT Season v1"
+      MOTD: "RaBByT // test backup"
       VERSION: 1.18.2
       TYPE: FORGE
       FORGE_VERSION: 40.1.60
       MEMORY: ""
       JVM_XX_OPTS: "-XX:MaxRAMPercentage=99"
-      MAX_PLAYERS: 10 
-      SPAWN_PROTECTION: 0 
-      VIEW_DISTANCE: 12 
-      SIMULATION_DISTANCE: 12
-      MAX_BUILD_HEIGHT: 512
+      MAX_PLAYERS: 5
+      SPAWN_PROTECTION: 0
+      VIEW_DISTANCE: 7
+      SIMULATION_DISTANCE: 5
+      MAX_BUILD_HEIGHT: 256
       ENABLE_WHITELIST: TRUE
-      DIFFICULTY: Hard
+      DIFFICULTY: Creative
       OPS: "RaBByT_Tv,Zaula"
       ALLOW_NETHER: TRUE
       ANNOUNCE_PLAYER_ACHIEVEMENTS: TRUE
@@ -31,27 +48,28 @@ services:
       MAX_TICK_TIME: 60000
       SPAWN_MONSTERS: TRUE
       TZ: Europe/Paris
-      ENABLE_RCON: FALSE
+      #ENABLE_RCON: FALSE
       #RCON_CMDS_STARTUP:  |-
       #  gamerule keepinventory true
       #  gamerule playersSleepingPercentage 1
-      PROXY: Traefik:25565
     deploy:
       resources:
         limits:
-          memory: 24064M
+          memory: 8128M
     volumes:
-      - Minecraft_mod:/data
+      - Minecraft_mod2:/data
     stdin_open: true
     tty: true
     restart: unless-stopped
     ports:
-      - 25565:25565
+      - 25566:25565
     networks:
       - web
     
 volumes:
-  Minecraft_mod:
+  Minecraft_mod2:
+    external: true
+  Backups:
     external: true
 networks:
     web:
