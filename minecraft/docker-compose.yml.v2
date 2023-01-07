@@ -23,7 +23,7 @@ services:
       SIMULATION_DISTANCE: 5
       MAX_BUILD_HEIGHT: 512
       ENABLE_WHITELIST: TRUE
-      DIFFICULTY: hard
+      DIFFICULTY: peaceful
       OPS: "RaBByt_Tv,Zaula,TBMPQF"
       ALLOW_NETHER: TRUE
       ANNOUNCE_PLAYER_ACHIEVEMENTS: TRUE
@@ -31,7 +31,7 @@ services:
       SNOOPER_ENABLED: FALSE
       MAX_TICK_TIME: 60000
       TZ: Europe/Paris
-      MODE: creative # 0=survival, 1=creative, 2=adventure, 3=spectator // not sure it work
+      MODE: 1 # 0=survival, 1=creative, 2=adventure, 3=spectator // not sure it work
       FORCE_GAMEMODE: FALSE # force default gamemode at connection
       HARDCORE: FALSE
       ALLOW_FLIGHT: TRUE
