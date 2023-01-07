@@ -24,7 +24,7 @@ services:
       MAX_BUILD_HEIGHT: 320
       ENABLE_WHITELIST: TRUE
       DIFFICULTY: peaceful
-      OPS: "RaBByt_Tv,Zaula,TBMPQF"
+      OPS: "RaBByt_Tv,Zaula,TBMPQF,FodVodZ"
       ALLOW_NETHER: TRUE
       ANNOUNCE_PLAYER_ACHIEVEMENTS: TRUE
       GENERATE_STRUCTURES: TRUE
@@ -70,8 +70,8 @@ services:
     environment:
       TZ: Europe/Paris
       INITIAL_DELAY: 3m
-      BACKUP_INTERVAL: 5m
-      PRUNE_BACKUPS_DAYS: 0.05
+      BACKUP_INTERVAL: 15m
+      PRUNE_BACKUPS_DAYS: 1
       RCON_HOST: server2
       RCON_PASSWORD: $RCON_PWD
       DEST_DIR: /backups
