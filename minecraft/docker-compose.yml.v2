@@ -17,10 +17,10 @@ services:
       FORGE_VERSION: 40.1.60
       MEMORY: ""
       JVM_XX_OPTS: "-XX:MaxRAMPercentage=100"
-      MAX_PLAYERS: 10
+      MAX_PLAYERS: 3
       SPAWN_PROTECTION: 0
-      VIEW_DISTANCE: 12
-      SIMULATION_DISTANCE: 12
+      VIEW_DISTANCE: 10
+      SIMULATION_DISTANCE: 5
       MAX_BUILD_HEIGHT: 512
       ENABLE_WHITELIST: TRUE
       DIFFICULTY: hard
@@ -41,8 +41,8 @@ services:
       SPAWN_NPCS: TRUE
       PVP: TRUE
       LEVEL_TYPE: normal # type of generating world
-      SERVER_NAME: RaBByT_S1
-      ICON: ./icon-server.jpg
+      SERVER_NAME: RaBByT_S1_test
+      ICON: ./icon-server2.jpg
       ENABLE_RCON: TRUE
       RCON_PASSWORD: $RCON_PWD
       RCON_CMDS_STARTUP:  |-
@@ -55,7 +55,7 @@ services:
           memory: 8196M
     volumes:
       - data:/data
-      - /srv/dev-disk-by-uuid-9a8441b6-d899-4899-971f-3068a8e9c748/Ssd/Docker/volumes/minecraft_setting/icon-server.jpg:/data/icon-server.jpg
+      - /srv/dev-disk-by-uuid-9a8441b6-d899-4899-971f-3068a8e9c748/Ssd/Docker/volumes/minecraft_setting/icon-server2.jpg:/data/icon-server2.jpg
       - /srv/dev-disk-by-uuid-9a8441b6-d899-4899-971f-3068a8e9c748/Ssd/Docker/volumes/minecraft_setting/whitelist.json:/data/whitelist.json
       - /srv/dev-disk-by-uuid-9a8441b6-d899-4899-971f-3068a8e9c748/Ssd/Docker/volumes/minecraft_setting/mods:/mods
     stdin_open: true
