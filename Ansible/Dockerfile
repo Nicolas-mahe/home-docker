@@ -8,4 +8,5 @@ RUN apt-get update && \
     apt install -y python3-pip && \
     apt-add-repository --yes --update ppa:ansible/ansible && \
     apt install -y ansible && \
-    pip install requests-credssp
+    pip install requests-credssp && \
+    apt install git -y
