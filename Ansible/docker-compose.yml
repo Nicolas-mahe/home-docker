@@ -11,7 +11,8 @@ services:
     volumes:
       - data:/Ansible-perso
     command: >
-      sh -c "git config --global --add safe.directory /Ansible-perso && \
+      sh -c "git clone https://github.com/Nicolas-mahe/Ansible-perso.git && \
+            git config --global --add safe.directory /Ansible-perso && \
             cd ./Ansible-perso/Ansible/ && \
             git pull && \
             ansible-galaxy collection install -r requirement.yml && \
