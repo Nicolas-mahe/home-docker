@@ -5,10 +5,10 @@ version: "3.8"
 services:
   server2:
     image: itzg/minecraft-server:2022.14.0
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.minecraft_mod.rule=Host(`minecraft-creative.laura-et-nicolas.com`)"
-      - "traefik.http.routers.minecraft_mod.entrypoints=web"
+    #labels:
+    #  - "traefik.enable=true"
+    #  - "traefik.http.routers.minecraft_mod.rule=Host(`minecraft-creative.laura-et-nicolas.com`)"
+    #  - "traefik.http.routers.minecraft_mod.entrypoints=web"
     environment:
       EULA: TRUE
       MOTD: "RaBByT test"
@@ -52,7 +52,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 8196M
+          memory: 8192M
     volumes:
       - data:/data
       - /srv/dev-disk-by-uuid-9a8441b6-d899-4899-971f-3068a8e9c748/Ssd/Docker/volumes/minecraft_setting/icon-server2.jpg:/data/icon-server2.jpg
