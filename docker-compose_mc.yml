@@ -6,9 +6,9 @@ services:
   server:
     image: itzg/minecraft-server:2022.14.0
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.minecraft_mod.rule=Host(`minecraft_test.laura-et-nicolas.com`)
-      - traefik.http.routers.minecraft_mod.entrypoints=web
+      - "traefik.enable=true"
+      - "traefik.http.routers.minecraft_mod.rule=Host(`minecraft_test.laura-et-nicolas.com`)"
+      - "traefik.http.routers.minecraft_mod.entrypoints=web"
     environment:
       EULA: TRUE
       MOTD: "RaBByT Season v1"
