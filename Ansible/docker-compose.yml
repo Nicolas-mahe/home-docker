@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   ansible:
-    image: rabbyt/nicolas-poei-ansible_ubuntu
+    image: rabbyt/ansible_ubuntu
     restart: "no"
     ports:
       - 5985:5985
@@ -10,11 +10,11 @@ services:
       TZ: Europe/Paris
     volumes:
       - data:/Ansible-perso
-    command:
-      - git clone https://github.com/Nicolas-mahe/Ansible-perso.git
-      - cd Ansible-perso/ansible
-      - ansible-galaxy collection install -r requirement.yml
-      - ansible-playbook -i inventory.yml playbook.yml
+    command: >
+      sh -c "git clone https://github.com/Nicolas-mahe/Ansible-perso.git && \
+            cd ./Ansible-perso/ansible && \
+            ansible-galaxy collection install -r requirement.yml && \
+            ansible-playbook -i inventory.yml playbook.yml"
 
 volumes:
   data: {}
