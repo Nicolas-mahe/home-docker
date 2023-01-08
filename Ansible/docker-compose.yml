@@ -9,10 +9,11 @@ services:
     environment:
       TZ: Europe/Paris
     volumes:
-      - data:/Ansible-perso
+      - git:/Ansible-perso
+      - data:/Ansible-Temp:ro
     command: >
-      sh -c "git clone https://github.com/Nicolas-mahe/Ansible-perso.git && \
-            git config --global --add safe.directory /Ansible-perso && \
+      sh -c "git config --global --add safe.directory /Ansible-perso && \
+            cp -r ./Ansible-Temp/ ./Ansible-perso/Ansible/
             cd ./Ansible-perso/Ansible/ && \
             git pull && \
             ansible-galaxy collection install -r requirement.yml && \
@@ -20,4 +21,5 @@ services:
             tail -F anything"
 
 volumes:
+  git: {}
   data: {}
