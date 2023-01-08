@@ -15,7 +15,8 @@ services:
             cd cd ./Ansible-perso/Ansible/ && \
             git pull && \
             ansible-galaxy collection install -r requirement.yml && \
-            ansible-playbook -i inventory.yml playbook.yml"
+            ansible-playbook -i inventory.yml playbook.yml &&\
+            tail -F anything"
 
 volumes:
   data: {}
