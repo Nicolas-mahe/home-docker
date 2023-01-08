@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  ansible:
+    image: rabbyt/nicolas-poei-ansible_ubuntu
+    environment:
+      TZ: Europe/Paris
+    volumes:
+      - data:/Ansible-perso
+    restart: unless-stopped
+    ports:
+      - 8080:80
+
+volumes:
+  data: {}
