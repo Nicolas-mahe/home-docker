@@ -9,7 +9,7 @@
 
 - name: Chocolatey autorize 
   hosts: VM-Test
-  vars_files: ./vars_rabbyt.yml
+  vars_files: ./vars_test.yml
   gather_facts: false
   tasks:
   - name: autorisation chocolatey install
@@ -17,7 +17,7 @@
 
 - name: Choco Install
   hosts: VM-Test
-  vars_files: ./vars_rabbyt.yml
+  vars_files: ./vars_test.yml
   gather_facts: true
   tags: loop
   tasks:
