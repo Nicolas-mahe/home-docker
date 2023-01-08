@@ -12,8 +12,9 @@ services:
       - git:/Ansible-perso
       - data:/Ansible-Temp:ro
     command: >
-      sh -c "git config --global --add safe.directory /Ansible-perso && \
-            cp -r ./Ansible-Temp/ ./Ansible-perso/Ansible/
+      sh -c "git reset && \
+            cp -r ./Ansible-Temp/ ./Ansible-perso/Ansible/ &&\
+            git config --global --add safe.directory /Ansible-perso && \
             cd ./Ansible-perso/Ansible/ && \
             git pull && \
             ansible-galaxy collection install -r requirement.yml && \
