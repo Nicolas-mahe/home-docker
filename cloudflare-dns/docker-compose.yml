@@ -1,12 +1,11 @@
 services:
   cloudflare-ddns:
     restart: always
-    container_name: Cloudflare-DDNS
-    image: oznu/cloudflare-ddns:latest
+    container_name: Cloudflare-DNS
+    image: oznu/cloudflare-ddns
     environment:
-      - API_KEY=cBBkaoTnXsWVpfE41j9J_0mQJHluhrpkZBAHv4JC
+      - API_KEY=$DNS_API_KEY
       - ZONE=laura-et-nicolas.com
-      # - SUBDOMAIN=monitor
       - PROXIED=true
       - TZ= Europe/Paris
     networks:
