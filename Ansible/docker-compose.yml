@@ -12,7 +12,7 @@ services:
       - data:/Ansible-perso
     command: >
       sh -c "git config --global --add safe.directory /Ansible-perso && \
-            cd cd ./Ansible-perso/Ansible/ && \
+            cd ./Ansible-perso/Ansible/ && \
             git pull && \
             ansible-galaxy collection install -r requirement.yml && \
             ansible-playbook -i inventory.yml playbook.yml &&\
