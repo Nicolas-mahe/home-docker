@@ -7,8 +7,8 @@ services:
     image: itzg/minecraft-server:2022.14.0
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.minecraft_mod.rule=Host(`minecraft.laura-et-nicolas.com`)"
-      - "traefik.http.routers.minecraft_mod.entrypoints=web"
+      - "traefik.http.routers.minecraft.rule=Host(`minecraft.laura-et-nicolas.com`)"
+      - "traefik.http.routers.minecraft.entrypoints=web"
     environment:
       EULA: TRUE
       MOTD: "RaBByT Season v1"
@@ -70,8 +70,9 @@ services:
     environment:
       TZ: Europe/Paris
       INITIAL_DELAY: 3m
-      BACKUP_INTERVAL: 1h
-      PRUNE_BACKUPS_DAYS: 14
+      BACKUP_INTERVAL: 6h
+      PRUNE_BACKUPS_DAYS: 1
+      PRUNE_RESTIC_RETENTION: --keep-within 1d
       RCON_HOST: server
       RCON_PORT: 25575
       RCON_PASSWORD: $RCON_PWD
