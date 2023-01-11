@@ -10,3 +10,5 @@ RUN apt-get update && \
     apt install -y ansible && \
     pip install requests-credssp && \
     apt install git -y
+
+CMD mkdir ./Ansible-Test 
