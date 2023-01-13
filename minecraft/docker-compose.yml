@@ -2,7 +2,7 @@ version: "3.8"
 #https://github.com/itzg/docker-minecraft-server
 #https://github.com/itzg/docker-mc-backup
 #https://www.curseforge.com/minecraft/modpacks/ragnamod-vi
-
+#C:\Users\Nico2\curseforge\minecraft\Instances\Ragnamod VI\ #path of Modpacks
 services:
   server:
     image: itzg/minecraft-server:java8
@@ -25,14 +25,14 @@ services:
       #MAX_BUILD_HEIGHT: 320
       ENABLE_WHITELIST: TRUE
       DIFFICULTY: Hard
-      #OPS: "RaBByt_Tv"
+      OPS: "RaBByt_Tv"
       ALLOW_NETHER: TRUE
       ANNOUNCE_PLAYER_ACHIEVEMENTS: TRUE
       GENERATE_STRUCTURES: TRUE
       SNOOPER_ENABLED: FALSE
       MAX_TICK_TIME: 60000
       TZ: Europe/Paris
-      MODE: 1 # 0=survival, 1=creative, 2=adventure, 3=spectator // not sure it work
+      MODE: 0 # 0=survival, 1=creative, 2=adventure, 3=spectator // not sure it work
       FORCE_GAMEMODE: TRUE # force default gamemode at connection
       HARDCORE: FALSE
       ALLOW_FLIGHT: TRUE
@@ -50,9 +50,10 @@ services:
     deploy:
       resources:
         limits:
-          memory: 26000M
+          memory: 28160M
     volumes:
       - data:/data
+      - /srv/dev-disk-by-uuid-9a8441b6-d899-4899-971f-3068a8e9c748/Ssd/Docker/volumes/minecraft_setting/modpacks:/modpacks
     stdin_open: true
     tty: true
     restart: unless-stopped
@@ -82,8 +83,7 @@ services:
     
 volumes:
   data: {}
-  backup: {}
-  setting: {}
+  #backup: {}
 networks:
     web:
       external: true
