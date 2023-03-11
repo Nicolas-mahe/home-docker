@@ -52,6 +52,7 @@ services:
         limits:
           memory: 28160M
     volumes:
+      - ./modpacks:/modpacks:ro
       - data:/data
     stdin_open: true
     tty: true
