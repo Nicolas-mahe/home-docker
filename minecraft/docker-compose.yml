@@ -83,7 +83,7 @@ services:
     
 volumes:
   data: {}
-  setting:{}
+  setting: {}
   #backup: {}
 networks:
     web:
