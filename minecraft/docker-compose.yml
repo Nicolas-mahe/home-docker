@@ -53,8 +53,6 @@ services:
           memory: 28160M
     volumes:
       - data:/data
-      - $PathMcVolumes/minecraft_setting/_data/whitelist.json:/data/whitelist.json
-      - $PathMcVolumes/minecraft_setting/_data/modpacks:/data/modpacks
     stdin_open: true
     tty: true
     restart: unless-stopped
