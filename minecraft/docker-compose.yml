@@ -44,13 +44,12 @@ services:
       LEVEL_TYPE: normal # type of generating world
       SERVER_NAME: Ragnamod6_RaBByT
       ENABLE_RCON: TRUE
-      RCON_PASSWORD: $RCON_PWD
+      # RCON_PASSWORD: $RCON_PWD
     deploy:
       resources:
         limits:
           memory: 28160M
     volumes:
-      - /srv/dev-disk-by-uuid-c3212c66-f90f-417c-a896-cec0142f67f1/Ssd/Docker/volumes/minecraft_setting/modpacks/:modpacks:ro
       - data:/data
     stdin_open: true
     tty: true
