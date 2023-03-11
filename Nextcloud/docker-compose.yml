@@ -22,7 +22,7 @@ services:
     image: nextcloud
     volumes:
       - nextcloud_app:/var/www/html
-      - /srv/dev-disk-by-uuid-88861031-30c5-4c7f-9b3f-2f4087d6f927/Raid/Users/test:/mnt/data
+      - /srv/dev-disk-by-uuid-db7c7d33-a087-41db-b3ee-272c7a0601b7/Raid/Users/test:/mnt/data
     networks:
       - web
     ports:
