@@ -53,7 +53,7 @@ services:
           memory: 28160M
     volumes:
       - data:/data
-      - /srv/dev-disk-by-uuid-9a8441b6-d899-4899-971f-3068a8e9c748/Ssd/Docker/volumes/minecraft_setting/modpacks:/modpacks
+      - setting:/data/modpacks
     stdin_open: true
     tty: true
     restart: unless-stopped
@@ -83,6 +83,7 @@ services:
     
 volumes:
   data: {}
+  setting:{}
   #backup: {}
 networks:
     web:
