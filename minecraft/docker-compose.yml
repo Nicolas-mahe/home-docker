@@ -51,6 +51,7 @@ services:
           memory: 28160M
     volumes:
       - data:/data
+      - setting:/data:ro
     stdin_open: true
     tty: true
     restart: unless-stopped
