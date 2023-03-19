@@ -45,7 +45,7 @@ services:
       - "traefik.http.routers.your_service.tls=true"
       - "traefik.http.routers.your_service.tls.certresolver=cloudflare"
     volumes:
-      - "web/index.html:/usr/share/nginx/html/index.html"
+      - "web:/usr/share/nginx/html:ro"
     networks:
       - web
 
