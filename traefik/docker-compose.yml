@@ -1,36 +1,58 @@
+version: '3'
+
 services:
-  traefik:
-    image: traefik:v2.9
-    restart: always
-    container_name: Traefik
-    environment:
-      TZ: Europe/Paris
-    ports:
-      - "80:80" # <== http
-      - "8080:8080" # <== :8080 is where the dashboard runs on
-      - "443:443" # <== https
+  TraefikV2:
+    image: traefik:v2.5
     command:
-      - --api.insecure=true # <== Enabling insecure api, NOT RECOMMENDED FOR PRODUCTION
-      - --api.dashboard=true # <== Enabling the dashboard to view services, middlewares, routers, etc.
-      - --api.debug=true # <== Enabling additional endpoints for debugging and profiling
-      - --log.level=DEBUG # <== Setting the level of the logs from traefik
-      - --providers.docker=true # <== Enabling docker as the provider for traefik
-      - --providers.docker.exposedbydefault=false # <== Don't expose every container to traefik
-      - --providers.file.filename=/dynamic.yaml # <== Referring to a dynamic configuration file
-      - --providers.docker.network=web # <== Operate on the docker network named web
-      - --entrypoints.web.address=:80 # <== Defining an entrypoint for port :80 named web
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.cloudflare.acme.email=nico200796@gmail.com"
+      - "--certificatesresolvers.cloudflare.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesresolvers.cloudflare.acme.caserver=https://acme-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.cloudflare.acme.dnschallenge.provider=cloudflare"
+      - "--certificatesresolvers.cloudflare.acme.dnschallenge.delaybeforecheck=0"
+      - "--certificatesresolvers.cloudflare.acme.dnschallenge.resolvers=1.1.1.1:53,1.0.0.1:53"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro # <== Volume for docker admin
-      - Traefik:/dynamic.yaml # <== Volume for dynamic conf file, **ref: line 27
-    networks:
-      - web # <== Placing traefik on the network named web, to access containers on this network
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "TraefikV2:/letsencrypt"
     labels:
-      - "traefik.enable=true" # <== Enable traefik on itself to view dashboard and assign subdomain to$
-      - "traefik.http.routers.api.rule=Host(`monitor.laura-et-nicolas.com`)" # <== Setting the domain for the d$
-      - "traefik.http.routers.api.service=api@internal" # <== Enabling the api to be a service to acce$
-volumes:
-  Traefik:
-    external: true
-networks:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`monitor.laura-et-nicolas.com`)"
+      - "traefik.http.routers.traefik.entrypoints=web"
+      - "traefik.http.routers.traefik.tls.certresolver=cloudflare"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.routers.http-catchall.rule=hostregexp(`{host:.+}`)"
+      - "traefik.http.routers.http-catchall.entrypoints=web"
+      - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
+      - "traefik.http.routers.http-catchall.tls=false"
+    networks:
+      - web
+
   web:
+    image: rabbyt/test-web #to build from image/dockerfile
+    container_name: web
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.your_service.rule=Host(`web.laura-et-nicolas.com`)"
+      - "traefik.http.routers.your_service.entrypoints=websecure"
+      - "traefik.http.routers.your_service.tls=true"
+      - "traefik.http.routers.your_service.tls.certresolver=cloudflare"
+    volumes:
+      - web/index.html:/usr/share/nginx/html/index.html
+    networks:
+      - web
+
+networks:
+  - web:
     external: true
+
+volumes:
+  - web:
+  - TraefikV2:
