@@ -6,11 +6,13 @@ services:
     container_name: TraefikV2
     command:
       - "--api.insecure=true"
+      - "--log.level=DEBUG"
       - "--providers.docker=true"
       - "--providers.docker.network=web" 
       - "--providers.docker.exposedbydefault=false"
       - "--providers.file.filename=/dynamic.yaml"
       - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.web.address=:80"
       - "--certificatesresolvers.cloudflare.acme.email=nico200796@gmail.com"
       - "--certificatesresolvers.cloudflare.acme.storage=/letsencrypt/acme.json"
       - "--certificatesresolvers.cloudflare.acme.caserver=https://acme-v02.api.letsencrypt.org/directory"
