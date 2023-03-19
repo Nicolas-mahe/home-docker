@@ -7,9 +7,11 @@ services:
   server:
     image: itzg/minecraft-server:java8
     labels:
-     - "traefik.enable=true"
-     - "traefik.http.routers.minecraft_test.rule=Host(`minecraft-creative.laura-et-nicolas.com`)"
-     - "traefik.http.routers.minecraft_test.entrypoints=web"
+      - "traefik.enable=true"
+      - "traefik.http.routers.minecraft.rule=Host(`minecraft.laura-et-nicolas.com`)"
+      - "traefik.http.routers.minecraft.entrypoints=websecure"
+      - "traefik.http.routers.minecraft.tls=true"
+      - "traefik.http.routers.minecraft.tls.certresolver=cloudflare"
     environment:
       EULA: TRUE
       VERSION: 1.16.5
