@@ -20,7 +20,7 @@ services:
       - "8080:8080"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "TraefikV2:/letsencrypt"
+      - "cert:/letsencrypt"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.rule=Host(`monitor.laura-et-nicolas.com`)"
@@ -45,7 +45,7 @@ services:
       - "traefik.http.routers.your_service.tls=true"
       - "traefik.http.routers.your_service.tls.certresolver=cloudflare"
     volumes:
-      - web/index.html:/usr/share/nginx/html/index.html
+      - "web/index.html:/usr/share/nginx/html/index.html"
     networks:
       - web
 
@@ -53,5 +53,5 @@ networks:
     web:
       external: true
 volumes:
-  web:
-  TraefikV2:
+  web: {}
+  cert: {}
