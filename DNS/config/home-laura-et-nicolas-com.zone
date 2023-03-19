@@ -1,0 +1,20 @@
+$TTL 2d
+
+$ORIGIN home-laura-et-nicolas-com.
+
+@           IN      SOA     ns.home-laura-et-nicolas-com. info.laura-et-nicolas-com. (
+                            2023031800  ; serial
+                            12h         ; refresh
+                            15m         ; retry
+                            3w          ; expire
+                            2h          ; minimum ttl
+                            )
+
+            IN      NS      ns.home-laura-et-nicolas-com.
+
+ns          IN      A       192.168.1.1
+
+; -- add dns records below
+
+nas         IN      A       192.168.1.1
+*.nas       IN      A       192.168.1.1
