@@ -7,6 +7,7 @@ services:
     command:
       - "--api.insecure=true"
       - "--providers.docker=true"
+      - "--providers.docker.network=web" 
       - "--providers.docker.exposedbydefault=false"
       - "--providers.file.filename=/dynamic.yaml"
       - "--entrypoints.websecure.address=:443"
@@ -30,7 +31,6 @@ services:
       - "traefik.http.routers.traefik.entrypoints=web"
       - "traefik.http.routers.traefik.tls.certresolver=cloudflare"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-      - "traefik.http.routers.http-catchall.rule=hostregexp(`{host:.+}`)"
       - "traefik.http.routers.http-catchall.entrypoints=web"
       - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
       - "traefik.http.routers.http-catchall.tls=false"
