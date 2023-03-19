@@ -50,9 +50,8 @@ services:
       - web
 
 networks:
-  - web:
-    external: true
-
+    web:
+      external: true
 volumes:
-  - web:
-  - TraefikV2:
+  web:
+  TraefikV2:
