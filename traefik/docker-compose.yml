@@ -8,6 +8,7 @@ services:
       - "--api.insecure=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
+      - "--providers.file.filename=/dynamic.yaml"
       - "--entrypoints.websecure.address=:443"
       - "--certificatesresolvers.cloudflare.acme.email=nico200796@gmail.com"
       - "--certificatesresolvers.cloudflare.acme.storage=/letsencrypt/acme.json"
@@ -22,6 +23,7 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "cert:/letsencrypt"
+      - "Traefik:/dynamic.yaml"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.rule=Host(`monitor.laura-et-nicolas.com`)"
@@ -56,3 +58,5 @@ networks:
 volumes:
   web: {}
   cert: {}
+  Traefik:
+    external: true
