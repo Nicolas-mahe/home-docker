@@ -41,10 +41,10 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.your_service.rule=Host(`web.laura-et-nicolas.com`)"
-      - "traefik.http.routers.your_service.entrypoints=websecure"
-      - "traefik.http.routers.your_service.tls=true"
-      - "traefik.http.routers.your_service.tls.certresolver=cloudflare"
+      - "traefik.http.routers.web.rule=Host(`web.laura-et-nicolas.com`)"
+      - "traefik.http.routers.web.entrypoints=websecure"
+      - "traefik.http.routers.web.tls=true"
+      - "traefik.http.routers.web.tls.certresolver=cloudflare"
     volumes:
       - "web:/usr/share/nginx/html"
     networks:
