@@ -6,7 +6,7 @@ services:
     container_name: TraefikV2
     command:
       - "--api.insecure=true"
-      - "--log.level=DEBUG"
+      #- "--log.level=DEBUG"
       - "--providers.docker=true"
       - "--providers.docker.network=web" 
       - "--providers.docker.exposedbydefault=false"
