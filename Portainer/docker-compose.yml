@@ -5,14 +5,14 @@ services:
     image: portainer/portainer-ee:2.17.1
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.minecraft.rule=Host(`minecraft.laura-et-nicolas.com`)"
+      - "traefik.http.routers.minecraft.rule=Host(`portainer.laura-et-nicolas.com`)"
       - "traefik.http.routers.minecraft.entrypoints=websecure"
       - "traefik.http.routers.minecraft.tls=true"
       - "traefik.http.routers.minecraft.tls.certresolver=cloudflare"
     restart: unless-stopped
     container_name: portainer
     ports:
-      - 37833:9443
+      - 37834:9000
     volumes:
       - data:/data
       - /var/run/docker.sock:/var/run/docker.sock
@@ -20,7 +20,7 @@ services:
       - web
 
 volumes:
-  data:
+  data: {}
 
 networks:
   web:
