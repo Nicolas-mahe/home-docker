@@ -19,10 +19,7 @@ services:
       - "--certificatesresolvers.cloudflare.acme.dnschallenge.provider=cloudflare"
       - "--certificatesresolvers.cloudflare.acme.dnschallenge.delaybeforecheck=0"
       - "--certificatesresolvers.cloudflare.acme.dnschallenge.resolvers=1.1.1.1:53,1.0.0.1:53"
-      - bash
-      - -c
-      - >
-        wget -P /data https://github.com/Nicolas-mahe/Ansible-perso/blob/56fbbe73e2a2b1dbcaadfbb9fc41403f78917808/traefik/dynamic.yaml
+      - "wget -P /data https://github.com/Nicolas-mahe/Ansible-perso/blob/56fbbe73e2a2b1dbcaadfbb9fc41403f78917808/traefik/dynamic.yaml"
     ports:
       - "80:80"
       - "443:443"
