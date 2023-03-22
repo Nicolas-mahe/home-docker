@@ -65,4 +65,4 @@ networks:
 volumes:
   # web: {}
   cert: {}
-  traefik: {}
+  data: {}
