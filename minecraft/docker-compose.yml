@@ -4,11 +4,11 @@ version: "3.8"
 #https://www.curseforge.com/minecraft/modpacks/ragnamod-vi
 #C:\Users\Nico2\curseforge\minecraft\Instances\Ragnamod VI\ #path of Modpacks
 services:
-  server:
+  minecraft:
     image: itzg/minecraft-server:java8
     labels:
      - "traefik.enable=true"
-     - "traefik.http.routers.minecraft_test.rule=Host(`minecraft-creative.laura-et-nicolas.com`)"
+     - "traefik.http.routers.minecraft_test.rule=Host(`ragnamod6.laura-et-nicolas.com`)"
      - "traefik.http.routers.minecraft_test.entrypoints=web"
     environment:
       EULA: TRUE
@@ -49,7 +49,7 @@ services:
           memory: 28160M
     volumes:
       - data:/data
-      - setting:/data:ro
+      - modpacks:/modpacks
     stdin_open: true
     tty: true
     restart: unless-stopped
@@ -60,7 +60,7 @@ services:
 
 volumes:
   data: {}
-  setting: {}
+  modpacks: {}
 networks:
     web:
       external: true
