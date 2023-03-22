@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   traefik:
-    build: rabbyt/traefik:test
+    build: .
     container_name: traefik
     command:
       - "--api.insecure=true"
