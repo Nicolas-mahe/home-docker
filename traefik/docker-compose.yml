@@ -26,7 +26,7 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "cert:/letsencrypt"
-      - "Traefik:/dynamic.yaml"
+      - "traefik:/dynamic.yaml"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.rule=Host(`monitor.laura-et-nicolas.com`)"
@@ -60,5 +60,4 @@ networks:
 volumes:
   web: {}
   cert: {}
-  Traefik:
-    external: true
+  traefik: {}
