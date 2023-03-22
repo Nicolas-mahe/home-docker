@@ -10,7 +10,7 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.network=web" 
       - "--providers.docker.exposedbydefault=false"
-      - "--providers.file.filename=/dynamic.yaml"
+      - "--providers.file.filename=/data/dynamic.yaml"
       - "--entrypoints.websecure.address=:443"
       - "--entrypoints.web.address=:80"
       - "--certificatesresolvers.cloudflare.acme.email=nico200796@gmail.com"
@@ -19,6 +19,10 @@ services:
       - "--certificatesresolvers.cloudflare.acme.dnschallenge.provider=cloudflare"
       - "--certificatesresolvers.cloudflare.acme.dnschallenge.delaybeforecheck=0"
       - "--certificatesresolvers.cloudflare.acme.dnschallenge.resolvers=1.1.1.1:53,1.0.0.1:53"
+      - bash
+      - -c
+      - >
+        wget -P /data https://github.com/Nicolas-mahe/Ansible-perso/blob/56fbbe73e2a2b1dbcaadfbb9fc41403f78917808/traefik/dynamic.yaml
     ports:
       - "80:80"
       - "443:443"
@@ -26,7 +30,7 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "cert:/letsencrypt"
-      - "traefik:./dynamic.yaml"
+      - "data:/data"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.rule=Host(`monitor.laura-et-nicolas.com`)"
@@ -38,26 +42,27 @@ services:
       - "traefik.http.routers.http-catchall.tls=false"
     networks:
       - web
+    
 
-  web:
-    image: rabbyt/test-web #to build from image/dockerfile
-    container_name: web
-    restart: unless-stopped
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.web.rule=Host(`web.laura-et-nicolas.com`)"
-      - "traefik.http.routers.web.entrypoints=websecure"
-      - "traefik.http.routers.web.tls=true"
-      - "traefik.http.routers.web.tls.certresolver=cloudflare"
-    volumes:
-      - "web:/usr/share/nginx/html"
-    networks:
-      - web
+  # web:
+  #   image: rabbyt/test-web #to build from image/dockerfile
+  #   container_name: web
+  #   restart: unless-stopped
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.web.rule=Host(`web.laura-et-nicolas.com`)"
+  #     - "traefik.http.routers.web.entrypoints=websecure"
+  #     - "traefik.http.routers.web.tls=true"
+  #     - "traefik.http.routers.web.tls.certresolver=cloudflare"
+  #   volumes:
+  #     - "web:/usr/share/nginx/html"
+  #   networks:
+  #     - web
 
 networks:
     web:
       external: true
 volumes:
-  web: {}
+  # web: {}
   cert: {}
   traefik: {}
