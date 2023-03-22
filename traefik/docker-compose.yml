@@ -1,9 +1,9 @@
-version: '3'
+version: '3.3'
 
 services:
-  TraefikV2:
+  traefik:
     image: traefik:v2.9
-    container_name: TraefikV2
+    container_name: traefik
     command:
       - "--api.insecure=true"
       #- "--log.level=DEBUG"
@@ -26,7 +26,7 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "cert:/letsencrypt"
-      - "traefik:/dynamic.yaml"
+      - "traefik:./dynamic.yaml"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.rule=Host(`monitor.laura-et-nicolas.com`)"
