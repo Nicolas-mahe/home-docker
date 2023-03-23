@@ -31,14 +31,14 @@ services:
     networks:
       - web
 
-    whoami:
-      image: "traefik/whoami"
-      labels:
+  whoami:
+    image: "traefik/whoami"
+    labels:
       - "traefik.enable=true"
       - "traefik.http.routers.whoami.rule=Host(`whoami.$PERSONAL_DOMAINE_NAME`)"
       - "traefik.http.routers.whoami.entrypoints=websecure"
       - "traefik.http.routers.whoami.tls.certresolver=myresolver"
-      networks:
+    networks:
       - web
 
 networks:
