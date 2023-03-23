@@ -5,9 +5,10 @@ services:
     image: traefik:v2.9
     command:
       - "--log.level=DEBUG"
-      - --api.insecure=true
+      - --api.insecure=false
+      - --api.dashboard=true
       - --providers.docker
-      - --providers.file.directory=/data/dynamic.yml
+      - --providers.file.directory=/data/
       - --entryPoints.web.address=:80
       - --entryPoints.websecure.address=:443
     ports:
@@ -21,8 +22,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.rule=Host(`monitor.$PERSONAL_DOMAINE_NAME`)"
-      - "traefik.http.routers.traefik.entrypoints=websecure"
-      - "traefik.http.routers.traefik.tls.certresolver=cloudflare"
+      - "traefik.http.routers.api.service=api@internal"
     networks:
       - web
 
@@ -31,8 +31,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.whoami.rule=Host(`whoami.$PERSONAL_DOMAINE_NAME`)"
-      - "traefik.http.routers.whoami.entrypoints=websecure"
-      - "traefik.http.routers.whoami.tls.certresolver=cloudflare"
+      - "traefik.http.routers.whoami.entrypoints=web"
     networks:
       - web
 
