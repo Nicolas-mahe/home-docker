@@ -1,13 +1,13 @@
 version: '3.3'
 
 services:
-  traefik:
+  app:
     image: traefik:v2.9
     command:
-      #- "--log.level=DEBUG"
+      - "--log.level=DEBUG"
       - --api.insecure=true
       - --providers.docker
-      - --providers.file.directory=/data/dynamic
+      - --providers.file.directory=/data/dynamic.yml
       - --entryPoints.web.address=:80
       - --entryPoints.websecure.address=:443
     ports:
