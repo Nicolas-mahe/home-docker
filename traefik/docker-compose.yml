@@ -5,7 +5,7 @@ services:
     image: traefik:v2.9
     command:
       - "--log.level=DEBUG"
-      - --api.insecure=false
+      - --api.insecure=true
       - --api.dashboard=true
       - --providers.docker
       - --providers.file.directory=/data/
