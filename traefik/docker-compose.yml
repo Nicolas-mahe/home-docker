@@ -5,16 +5,11 @@ services:
     image: traefik:v2.9
     command:
       #- "--log.level=DEBUG"
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--providers.docker.network=web" 
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.websecure.address=:443"
-      #- "--entrypoints.web.address=:80"
-      - "--certificatesresolvers.cloudflare.acme.tlschallenge=true"
-      - "--certificatesresolvers.cloudflare.acme.email=$CLOUDFLARE_EMAIL"
-      - "--certificatesresolvers.cloudflare.acme.storage=/letsencrypt/acme.json"
-      #- "--certificatesresolvers.cloudflare.acme.caserver=https://acme-v02.api.letsencrypt.org/directory"
+      - --api.insecure=true
+      - --providers.docker
+      - --providers.file.directory=/data/dynamic
+      - --entryPoints.web.address=:80
+      - --entryPoints.websecure.address=:443
     ports:
       - "80:80"
       - "443:443"
