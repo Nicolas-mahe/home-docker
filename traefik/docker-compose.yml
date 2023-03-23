@@ -22,7 +22,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.rule=Host(`monitor.$PERSONAL_DOMAINE_NAME`)"
-      - "traefik.http.routers.api.service=api@internal"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
     networks:
       - web
 
@@ -31,7 +31,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.whoami.rule=Host(`whoami.$PERSONAL_DOMAINE_NAME`)"
-      - "traefik.http.routers.whoami.entrypoints=web"
+      - "traefik.http.routers.whoami.entrypoints=websecure"
     networks:
       - web
 
