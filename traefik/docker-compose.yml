@@ -11,7 +11,7 @@ services:
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.websecure.address=:443"
       #- "--entrypoints.web.address=:80"
-      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.cloudflare.acme.tlschallenge=true"
       - "--certificatesresolvers.cloudflare.acme.email=$CLOUDFLARE_EMAIL"
       - "--certificatesresolvers.cloudflare.acme.storage=/letsencrypt/acme.json"
       #- "--certificatesresolvers.cloudflare.acme.caserver=https://acme-v02.api.letsencrypt.org/directory"
@@ -37,7 +37,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.whoami.rule=Host(`whoami.$PERSONAL_DOMAINE_NAME`)"
       - "traefik.http.routers.whoami.entrypoints=websecure"
-      - "traefik.http.routers.whoami.tls.certresolver=myresolver"
+      - "traefik.http.routers.whoami.tls.certresolver=cloudflare"
     networks:
       - web
 
