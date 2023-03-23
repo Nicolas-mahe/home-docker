@@ -1,24 +1,20 @@
-version: '3.8'
+version: '3.3'
 
 services:
   traefik:
-    build: .
-    container_name: traefik
+    image: traefik:v2.9
     command:
-      - "--api.insecure=true"
       #- "--log.level=DEBUG"
+      - "--api.insecure=true"
       - "--providers.docker=true"
       - "--providers.docker.network=web" 
       - "--providers.docker.exposedbydefault=false"
-      - "--providers.file.filename=/data/dynamic.yaml"
       - "--entrypoints.websecure.address=:443"
-      - "--entrypoints.web.address=:80"
-      - "--certificatesresolvers.cloudflare.acme.email=nico200796@gmail.com"
+      #- "--entrypoints.web.address=:80"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.cloudflare.acme.email=$CLOUDFLARE_EMAIL"
       - "--certificatesresolvers.cloudflare.acme.storage=/letsencrypt/acme.json"
-      - "--certificatesresolvers.cloudflare.acme.caserver=https://acme-v02.api.letsencrypt.org/directory"
-      - "--certificatesresolvers.cloudflare.acme.dnschallenge.provider=cloudflare"
-      - "--certificatesresolvers.cloudflare.acme.dnschallenge.delaybeforecheck=0"
-      - "--certificatesresolvers.cloudflare.acme.dnschallenge.resolvers=1.1.1.1:53,1.0.0.1:53"
+      #- "--certificatesresolvers.cloudflare.acme.caserver=https://acme-v02.api.letsencrypt.org/directory"
     ports:
       - "80:80"
       - "443:443"
@@ -29,20 +25,25 @@ services:
       - "data:/data"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.traefik.rule=Host(`monitor.laura-et-nicolas.com`)"
+      - "traefik.http.routers.traefik.rule=Host(`monitor.$PERSONAL_DOMAINE_NAME`)"
       - "traefik.http.routers.traefik.entrypoints=websecure"
       - "traefik.http.routers.traefik.tls.certresolver=cloudflare"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-      - "traefik.http.routers.http-catchall.entrypoints=web"
-      - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
-      - "traefik.http.routers.http-catchall.tls=false"
     networks:
+      - web
+
+    whoami:
+      image: "traefik/whoami"
+      labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`whoami.$PERSONAL_DOMAINE_NAME`)"
+      - "traefik.http.routers.whoami.entrypoints=websecure"
+      - "traefik.http.routers.whoami.tls.certresolver=myresolver"
+      networks:
       - web
 
 networks:
     web:
       external: true
 volumes:
-  # web: {}
   cert: {}
   data: {}
