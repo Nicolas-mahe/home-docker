@@ -2,15 +2,13 @@ version: "3"
 
 services:
   portainer:
+    container_name: portainer
     image: portainer/portainer-ee:2.17.1
+    restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.minecraft.rule=Host(`portainer.laura-et-nicolas.com`)"
-      - "traefik.http.routers.minecraft.entrypoints=web"
-      - "traefik.http.routers.minecraft.tls=true"
-      - "traefik.http.routers.minecraft.tls.certresolver=cloudflare"
-    restart: unless-stopped
-    container_name: portainer
+      - "traefik.http.routers.portainer.rule=Host(`portainer.laura-et-nicolas.com`)"
+      - "traefik.http.routers.portainer.entrypoints=web_secure"
     ports:
       - 37834:9000
     volumes:
