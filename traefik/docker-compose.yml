@@ -33,6 +33,7 @@ services:
       - data:/data # <== Volume for dynamic conf file, **ref: line 24, to download
     networks:
       - web # <== Placing traefik on the network named web, to access containers on this network
+      - web_secure
     labels:
       - "traefik.enable=true" # <== Enable traefik on itself to view dashboard and assign subdomain to$
       - "traefik.http.routers.api.rule=Host(`monitor.$PERSONAL_DOMAINE_NAME`)" # <== Setting the domain for the d$
@@ -55,6 +56,8 @@ volumes:
   data: {}
 networks:
   web:
+    external: true
+  web_secure:
     external: true
 # services:
 #   app:
