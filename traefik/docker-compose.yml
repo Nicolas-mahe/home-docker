@@ -1,43 +1,92 @@
-version: '3.3'
+version: '3.8'
+
 
 services:
-  app:
+  traefik:
     image: traefik:v2.9
-    command:
-      - "--log.level=DEBUG"
-      - --api.insecure=true
-      - --api.dashboard=true
-      - --providers.docker
-      - --providers.file.directory=/data/
-      - --entryPoints.web.address=:80
-      - --entryPoints.websecure.address=:443
+    restart: always
+    container_name: Traefik
+    environment:
+      TZ: Europe/Paris
     ports:
-      - "80:80"
-      - "443:443"
-      - "8080:8080"
+      - "80:80" # <== http
+      - "443:443" # <== https
+      - "8080:8080" # <== :8080 is where the dashboard runs on
+    command:
+      - "--global.sendAnonymousUsage" # <== Don't send usage informations
+      - "--api.insecure=true" # <== Enabling insecure api, NOT RECOMMENDED FOR PRODUCTION
+      - "--api.dashboard=true" # <== Enabling the dashboard to view services, middlewares, routers, etc.
+      - "--api.debug=true" # <== Enabling additional endpoints for debugging and profiling
+      - "--log.level=DEBUG" # <== Setting the level of the logs from traefik
+      - "--providers.docker=true" # <== Enabling docker as the provider for traefik
+      - "--providers.docker.endpoint=unix:///var/run/docker.sock" # <== path of docker provider
+      - "--providers.docker.exposedbydefault=false" # <== Don't expose every container to traefik
+      - "--providers.file.filename=/data/dynamic.yaml" # <== Referring to a dynamic configuration file
+      - "--providers.docker.network=web" # <== Operate on the docker network named web
+      - "--entrypoints.web.address=:80" # <== Defining an entrypoint for port :80 named web
+      - "--entrypoints.web_secure.address=:443" # <== Defining an entrypoint for port :80 named web_secure
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https" # <== redirect port http to https
+      - "--entrypoints.web.http.redirections.entrypoint.to=web_secure" # <== define  entrypoint to redirect https
+
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "cert:/letsencrypt"
-      - "data:/data"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.traefik.rule=Host(`monitor.$PERSONAL_DOMAINE_NAME`)"
-      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - /var/run/docker.sock:/var/run/docker.sock:ro # <== Volume for docker admin
+      - data:/data # <== Volume for dynamic conf file, **ref: line 24, to download
     networks:
-      - web
+      - web # <== Placing traefik on the network named web, to access containers on this network
+    labels:
+      - "traefik.enable=true" # <== Enable traefik on itself to view dashboard and assign subdomain to$
+      - "traefik.http.routers.api.rule=Host(`monitor.$PERSONAL_DOMAINE_NAME`)" # <== Setting the domain for the d$
+      - "traefik.http.routers.api.service=api@internal" # <== Enabling the api to be a service to acce$
+      - "traefik.http.routers.traefik.entrypoints=web_secure"
 
   whoami:
     image: "traefik/whoami"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.whoami.rule=Host(`whoami.$PERSONAL_DOMAINE_NAME`)"
-      - "traefik.http.routers.whoami.entrypoints=websecure"
+      - "traefik.http.routers.whoami.entrypoints=web_secure"
     networks:
       - web
+    depends_on: 
+    - traefik
 
-networks:
-    web:
-      external: true
 volumes:
   cert: {}
   data: {}
+networks:
+  web:
+    external: true
+# services:
+#   app:
+#     image: traefik:v2.9
+#     command:
+#       - "--log.level=DEBUG"
+#       - --api.insecure=true
+#       - --api.dashboard=true
+#       - --providers.docker
+#       - --providers.file.directory=/data/
+#       - --entryPoints.web.address=:80
+#       - --entryPoints.websecure.address=:443
+#     ports:
+#       - "80:80"
+#       - "443:443"
+#       - "8080:8080"
+#     volumes:
+#       - "/var/run/docker.sock:/var/run/docker.sock:ro"
+#       - "cert:/letsencrypt"
+#       - "data:/data"
+#     labels:
+#       - "traefik.enable=true"
+#       - "traefik.http.routers.traefik.rule=Host(`monitor.$PERSONAL_DOMAINE_NAME`)"
+#       - "traefik.http.routers.traefik.entrypoints=websecure"
+#     networks:
+#       - web
+
+#   whoami:
+#     image: "traefik/whoami"
+#     labels:
+#       - "traefik.enable=true"
+#       - "traefik.http.routers.whoami.rule=Host(`whoami.$PERSONAL_DOMAINE_NAME`)"
+#       - "traefik.http.routers.whoami.entrypoints=websecure"
+#     networks:
+#       - web
