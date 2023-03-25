@@ -1,6 +1,11 @@
 ## Setting up the middleware for redirect to https ##
-http:
-  middlewares:
-    redirect:
-      redirectScheme:
-        scheme: https
+tls:
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /cert/laura-et-nicolas.pem
+        keyFile: /cert/laura-et-nicolas.key
+
+  certificates:
+    - certFile: /cert/laura-et-nicolas.pem
+      keyFile: /cert/laura-et-nicolas.key
