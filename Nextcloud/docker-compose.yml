@@ -39,11 +39,11 @@ services:
     links:
       - bdd
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.nextcloud.rule=Host(`$HOST.laura-et-nicolas.com`)"
-      - "traefik.http.routers.nextcloud.entrypoints=websecure"
-      - "traefik.http.routers.nextcloud.tls=true"
-      - "traefik.http.routers.web.tls.certresolver=cloudflare"
+      traefik.enable: true
+      traefik.http.routers.cloud.tls: true
+      traefik.http.routers.cloud.entrypoints: websecure
+      traefik.http.routers.cloud.rule: Host(`cloud.$PERSONAL_DOMAINE_NAME`)
+      traefik.http.routers.cloud.tls.certresolver: traefik_certs
     
 volumes:
   nextcloud_bdd: 

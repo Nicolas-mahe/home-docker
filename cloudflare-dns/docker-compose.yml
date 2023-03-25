@@ -8,6 +8,12 @@ services:
       - ZONE=laura-et-nicolas.com
       - PROXIED=true
       - TZ= Europe/Paris
+    labels:
+      traefik.enable: true
+      traefik.http.routers.cloudflare.tls: true
+      traefik.http.routers.cloudflare.entrypoints: websecure
+      traefik.http.routers.cloudflare.rule: Host(`cloudflare.$PERSONAL_DOMAINE_NAME`)
+      traefik.http.routers.cloudflare.tls.certresolver: traefik_certs
     networks:
       - web
 networks:
