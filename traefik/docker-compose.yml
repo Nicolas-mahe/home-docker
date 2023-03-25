@@ -6,7 +6,7 @@ services:
     restart: always
     container_name: traefik
     volumes:
-      - ./certs/acme.json:/certs/acme.json
+      - /certs:/certs/
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - 80:80
@@ -32,11 +32,13 @@ services:
       - "--certificatesresolvers.traefik_certs.acme.httpchallenge=true"
     networks:
       - web
+    depends_on: 
+    - file-helper
 
   whoami:
     image: traefik/whoami:latest
     container_name: whoami
-    restart: always
+    restart: unless-stop
     labels:
       traefik.enable: true
       traefik.http.routers.whoami.tls: true
@@ -49,17 +51,17 @@ services:
       - 8090:80
     depends_on: 
     - traefik
-
-#   reverse-proxy-https-helper:
-#     image: alpine:latest
-#     command: sh -c "cd /etc/ssl/traefik
-#       && wget traefik.me/cert.pem -O cert.pem
-#       && wget treafik.me/privkey.pem -O privkey.pem"
-#     volumes:
-#       - certs:/etc/ssl/traefik
-#     networks:
-#       - web
-      
+  
+  file-helper:
+    restart: "no"
+    image: alpine:latest
+    command: sh -c "cd certs
+      && touch acme.json
+      && chmod 600 acme.json"
+    volumes:
+      - /certs:/certs/
+    networks:
+      - web
 volumes:
   certs: {}
 networks:
