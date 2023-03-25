@@ -1,53 +1,67 @@
-version: "3.8"
+version: '3.8'
 
 services:
   traefik:
-    image: traefik:v2.9
+    image: traefik:latest
     restart: always
-    container_name: Traefik
-    environment:
-      TZ: Europe/Paris
-    ports:
-      - "80:80/tcp" # <== http
-      - "8080:8080/tcp" # <== :8080 is where the dashboard runs on
-      - "443:443/tcp" # <== https
-    command:
-      - --api.insecure=true # <== Enabling insecure api, NOT RECOMMENDED FOR PRODUCTION
-      - --api.dashboard=true # <== Enabling the dashboard to view services, middlewares, routers, etc.
-      - --api.debug=true # <== Enabling additional endpoints for debugging and profiling
-      - --log.level=DEBUG # <== Setting the level of the logs from traefik
-      - --providers.docker=true # <== Enabling docker as the provider for traefik
-      - --providers.docker.exposedbydefault=false # <== Don't expose every container to traefik
-      - --providers.file.filename=/data/dynamic.yaml # <== Referring to a dynamic configuration file
-      - --providers.docker.network=web # <== Operate on the docker network named web
-      - --entrypoints.web.address=:80 # <== Defining an entrypoint for port :80 named web
-      - --entrypoints.websecure.address=:443 # <== Defining an entrypoint for port :443 named websecure
+    container_name: traefik
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro # <== Volume for docker admin
-      - data:/data # <== Volume for dynamic conf file, **ref: line 21
+      - ./certs/acme.json:/certs/acme.json
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 80:80
+      - 443:443
+      - 8080:8080
+    command:
+      - "--global.sendAnonymousUsage"
+      - "--log.level=DEBUG"
+      - "--accesslog=true"
+      - "--api.insecure=true"
+      - "--api=true"
+      - "--api.dashboard=true"
+      - "--providers.docker.endpoint=unix:///var/run/docker.sock"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.traefik_certs.acme.email=$PERSONNAL_MAIL"
+      - "--certificatesresolvers.traefik_certs.acme.caserver=https://acme-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.traefik_certs.acme.storage=/certs/acme.json"
+      - "--certificatesresolvers.traefik_certs.acme.keytype=RSA4096"
+      - "--certificatesresolvers.traefik_certs.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.traefik_certs.acme.httpchallenge=true"
     networks:
-      - web # <== Placing traefik on the network named web, to access containers on this network
-    labels:
-      - traefik.http.routers.http-catchall.rule=hostregexp(`{host:[a-z-.]+}`)
-      - traefik.http.routers.http-catchall.entrypoints=web
-      - traefik.http.routers.http-catchall.middlewares=redirect-to-https
-      - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
-      - traefik.http.routers.traefik.rule=Host(`traefik.$PERSONAL_DOMAINE_NAME`)
-      - traefik.http.routers.traefik.service=api@internal
-      - traefik.http.routers.traefik.entrypoints=websecure
-      - traefik.http.routers.traefik.tls=true
-      
+      - web
+
   whoami:
-    image: traefik/whoami:v1.8.1
+    image: traefik/whoami:latest
+    container_name: whoami
+    restart: always
     labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.whoami.tls=true'
-      - 'traefik.http.routers.whoami.entrypoints=websecure'
-      - 'traefik.http.routers.whoami.rule=Host(`whoami.$PERSONAL_DOMAINE_NAME`)'
-      - 'traefik.http.services.whoami.loadbalancer.server.port=80'
+      traefik.enable: true
+      traefik.http.routers.whoami.tls: true
+      traefik.http.routers.whoami.entrypoints: websecure
+      traefik.http.routers.whoami.rule: Host(`whoami.$PERSONAL_DOMAINE_NAME`)
+      traefik.http.routers.whoami.tls.certresolver: traefik_certs
+    networks:
+      - web
+    ports:
+      - 8090:80
+    depends_on: 
+    - traefik
+
+#   reverse-proxy-https-helper:
+#     image: alpine:latest
+#     command: sh -c "cd /etc/ssl/traefik
+#       && wget traefik.me/cert.pem -O cert.pem
+#       && wget treafik.me/privkey.pem -O privkey.pem"
+#     volumes:
+#       - certs:/etc/ssl/traefik
+#     networks:
+#       - web
       
 volumes:
-  data: {}
+  certs: {}
 networks:
   web:
     external: true
