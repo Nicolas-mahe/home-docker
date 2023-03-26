@@ -16,6 +16,8 @@ services:
       traefik.http.routers.cloudflare.tls.certresolver: traefik_certs
     networks:
       - web
+    ports:
+      - 8081:80
 networks:
   web:
     external: true
