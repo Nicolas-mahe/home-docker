@@ -6,7 +6,7 @@ services:
     restart: always
     container_name: traefik
     volumes:
-      - certs:/certs/
+      - /certs:/certs/
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - 80:80
@@ -33,7 +33,7 @@ services:
     networks:
       - web
     depends_on: 
-    - file-helper
+      - file-helper
 
   whoami:
     image: traefik/whoami:latest
@@ -43,14 +43,14 @@ services:
       traefik.enable: true
       traefik.http.routers.whoami.tls: true
       traefik.http.routers.whoami.entrypoints: websecure
-      traefik.http.routers.whoami.rule: Host(`whoami.$PERSONAL_DOMAINE_NAME`)
+      traefik.http.routers.whoami.rule: Host(`whoami.$PERSONNAL_DOMAINE_NAME`)
       traefik.http.routers.whoami.tls.certresolver: traefik_certs
     networks:
       - web
     ports:
       - 8090:80
     depends_on: 
-    - traefik
+      - traefik
   
   file-helper:
     restart: "no"
@@ -59,7 +59,7 @@ services:
       && touch acme.json
       && chmod 600 acme.json"
     volumes:
-      - certs:/certs/
+      - /certs:/certs/
     networks:
       - web
 volumes:
