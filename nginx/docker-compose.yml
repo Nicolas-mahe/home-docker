@@ -9,7 +9,7 @@ services:
       - '443:443'
     volumes:
       - data:/data
-      - certs:/etc/letsencrypt
+      - cert:/etc/letsencrypt
     networks:
       - web
 volumes:
