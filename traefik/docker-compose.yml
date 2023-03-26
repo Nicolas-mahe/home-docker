@@ -6,7 +6,7 @@ services:
     restart: always
     container_name: traefik
     volumes:
-      - /certs:/certs/
+      - certs:/certs/
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - 80:80
@@ -59,7 +59,7 @@ services:
       && touch acme.json
       && chmod 600 acme.json"
     volumes:
-      - /certs:/certs/
+      - certs:/certs/
     networks:
       - web
 volumes:
