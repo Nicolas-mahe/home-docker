@@ -14,7 +14,7 @@ services:
       traefik.http.routers.cloudflare.entrypoints: websecure
       traefik.http.routers.cloudflare.rule: Host(`cloudflare.$PERSONAL_DOMAINE_NAME`)
       traefik.http.routers.cloudflare.tls.certresolver: traefik_certs
-      traefik.http.services.monconteneur.loadbalancer.server.port: $PERSONNAL_PORT
+      traefik.http.services.cloudflare.loadbalancer.server.port: $PERSONNAL_PORT
     networks:
       - web
     ports:
