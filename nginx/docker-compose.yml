@@ -13,6 +13,8 @@ services:
       - cert:/etc/letsencrypt
     networks:
       - web
+    commands:
+    - "--logLevel=debug"
 volumes:
   data: {}
   cert: {}
