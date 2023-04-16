@@ -1,11 +1,11 @@
-## Setting up the middleware for redirect to https ##
+
 tls:
   stores:
     default:
       defaultCertificate:
-        certFile: /cert/laura-et-nicolas.pem
-        keyFile: /cert/laura-et-nicolas.key
+        certFile: /certs/laura-et-nicolas.pem
+        keyFile: /certs/laura-et-nicolas.key
 
   certificates:
-    - certFile: /cert/laura-et-nicolas.pem
-      keyFile: /cert/laura-et-nicolas.key
+    - certFile: /certs/laura-et-nicolas.pem
+      keyFile: /certs/laura-et-nicolas.key
