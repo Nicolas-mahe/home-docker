@@ -16,7 +16,7 @@ services:
       - $PERSONNAL_PORT_TRAEFIK:8080
     command:
       - "--global.sendAnonymousUsage"
-      - "--log.level=DEBUG"
+      - "--log.level=ERROR"
       - "--accesslog=true"
       - "--api.insecure=true"
       - "--api=true"
