@@ -1,16 +1,10 @@
 version: '3.8'
 
 services:
-  traefik:
+  proxy:
     image: traefik:2.9.9
     restart: always
     container_name: traefik
-    labels:
-      traefik.enable: true
-      traefik.http.routers.api.tls: true
-      # traefik.http.routers.api.entrypoints: websecure
-      traefik.http.routers.api.rule: Host(`monitor.$PERSONAL_DOMAINE_NAME`)
-      traefik.http.routers.api.service: api@internal
     volumes:
       - certs:/certs/
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -19,7 +13,7 @@ services:
     ports:
       - 80:80
       - 443:443
-      - 8080:8080
+      - $PERSONNAL_PORT_TRAEFIK:8080
     command:
       - "--global.sendAnonymousUsage"
       - "--log.level=DEBUG"
@@ -27,13 +21,14 @@ services:
       - "--api.insecure=true"
       - "--api=true"
       - "--api.dashboard=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker=true"
+      - "--providers.file.directory=/certs/"
+      - "--providers.file.watch=true"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
       - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
       - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
-      - "--providers.docker=true"
-      - "--providers.file.directory=/certs/"
-      - "--providers.file.watch=true"
     networks:
       - web
     depends_on: 
@@ -46,12 +41,12 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.whoami.tls: true
-      # traefik.http.routers.whoami.entrypoints: websecure
+      traefik.http.routers.whoami.entrypoints: websecure
       traefik.http.routers.whoami.rule: Host(`whoami.$PERSONAL_DOMAINE_NAME`)
     networks:
       - web
     ports:
-      - 8090:80
+      - $PERSONNAL_PORT_WHOAMI:80
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
