@@ -7,7 +7,7 @@ services:
       - API_KEY=$DNS_API_KEY
       - ZONE=laura-et-nicolas.com
       - PROXIED=true
-      - TZ= Europe/Paris
+      - TZ=Europe/Paris
     labels:
       traefik.enable: true
       traefik.http.routers.cloudflare.tls: true
