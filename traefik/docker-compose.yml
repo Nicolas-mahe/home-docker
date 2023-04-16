@@ -2,12 +2,12 @@ version: '3.8'
 
 services:
   traefik:
-    image: traefik:2.9.9
+    image: traefik:2.6
     restart: always
     container_name: traefik
     volumes:
       - /certs:/certs/
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     ports:
       - 80:80
       - 443:443
@@ -19,17 +19,11 @@ services:
       - "--api.insecure=true"
       - "--api=true"
       - "--api.dashboard=true"
-      - "--providers.docker.endpoint=unix:///var/run/docker.sock"
       - "--entrypoints.web.address=:80"
-      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
-      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
       - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.traefik_certs.acme.email=$PERSONNAL_MAIL"
-      - "--certificatesresolvers.traefik_certs.acme.caserver=https://acme-v02.api.letsencrypt.org/directory"
-      - "--certificatesresolvers.traefik_certs.acme.storage=/certs/acme.json"
-      - "--certificatesresolvers.traefik_certs.acme.keytype=RSA4096"
-      - "--certificatesresolvers.traefik_certs.acme.httpchallenge.entrypoint=web"
-      - "--certificatesresolvers.traefik_certs.acme.httpchallenge=true"
+      - "--providers.docker=true"
+      - "--providers.file.directory=/certs/"
+      - "--providers.file.watch=true"
     networks:
       - web
     depends_on: 
