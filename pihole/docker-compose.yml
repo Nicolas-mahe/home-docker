@@ -3,16 +3,14 @@ version: '3.7'
 services:
   pihole:
     container_name: pihole
-    image: pihole/pihole:latest
+    image: pihole/pihole:2023.03.1
     restart: always
     environment:
       TZ: Europe/Paris
       WEBPASSWORD: $PI_HOLE_PASSWORD
     volumes:
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
-      - data:/etc/pihole/
-      # - /volume1/docker/pihole/dnsmasq.d/:/etc/dnsmasq.d/
+      - data:/etc/pihole
+      - dnsmasq:/etc/dnsmasq.d
     labels:
       traefik.enable: true
       traefik.http.routers.pihole.tls: true
@@ -22,12 +20,13 @@ services:
     ports:
       - 53:53/tcp
       - 53:53/udp
-      - 8080:80/tcp
+      - 8053:80
     networks:
       - web
 
 volumes:
   data:
+  dnsmasq:
 
 networks:
   web:
