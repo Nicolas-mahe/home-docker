@@ -5,8 +5,6 @@ services:
     image: traefik:2.9.9
     restart: always
     container_name: traefik
-    environment:
-      - TZ=Europe/Paris
     labels:
       traefik.enable: true
       traefik.http.routers.api.tls: true
@@ -16,6 +14,8 @@ services:
     volumes:
       - certs:/certs/
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
     ports:
       - 80:80
       - 443:443
@@ -43,8 +43,6 @@ services:
     image: traefik/whoami:latest
     container_name: whoami
     restart: unless-stopped
-    environment:
-      - TZ=Europe/Paris
     labels:
       traefik.enable: true
       traefik.http.routers.whoami.tls: true
@@ -54,6 +52,9 @@ services:
       - web
     ports:
       - 8090:80
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
     depends_on: 
     - traefik
   
@@ -63,6 +64,8 @@ services:
     command: sh -c "wget https://raw.githubusercontent.com/Nicolas-mahe/Ansible-perso/Treafik/traefik/dynamic.yml -O /certs/dynamic.yml"
     volumes:
       - certs:/certs/
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
     networks:
       - web
 
