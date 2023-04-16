@@ -61,7 +61,7 @@ services:
     image: alpine:latest
     command: sh -c "cd /certs/
       && rm dynamic.yml
-      && wget https://raw.githubusercontent.com/Nicolas-mahe/Ansible-perso/Treafik/traefik/dynamic.yaml"
+      && wget https://raw.githubusercontent.com/Nicolas-mahe/Ansible-perso/Treafik/traefik/dynamic.yml"
     volumes:
       - certs:/certs/
     networks:
