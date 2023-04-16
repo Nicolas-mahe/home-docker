@@ -9,9 +9,10 @@ services:
       - TZ=Europe/Paris
     labels:
       traefik.enable: true
-      traefik.http.routers.traefik.tls: true
-      traefik.http.routers.traefik.entrypoints: websecure
-      traefik.http.routers.traefik.rule: Host(`monitor.$PERSONAL_DOMAINE_NAME`)
+      traefik.http.routers.api.tls: true
+      traefik.http.routers.api.entrypoints: websecure
+      traefik.http.routers.api.rule: Host(`monitor.$PERSONAL_DOMAINE_NAME`)
+      traefik.http.routers.api.service: api@internal
     volumes:
       - certs:/certs/
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -23,7 +24,7 @@ services:
       - "--global.sendAnonymousUsage"
       - "--log.level=DEBUG"
       - "--accesslog=true"
-      - "--api.insecure=true"
+      - "--api.insecure=false"
       - "--api=true"
       - "--api.dashboard=true"
       - "--entrypoints.web.address=:80"
