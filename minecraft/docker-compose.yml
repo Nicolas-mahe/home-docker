@@ -6,12 +6,6 @@ version: "3.8"
 services:
   minecraft:
     image: itzg/minecraft-server:java8
-    labels:
-      traefik.enable: true
-      traefik.http.routers.ragnamog6.tls: true
-      traefik.http.routers.ragnamog6.entrypoints: websecure
-      traefik.http.routers.ragnamog6.rule: Host(`ragnamog6.$PERSONAL_DOMAINE_NAME`)
-      traefik.http.routers.ragnamog6.tls.certresolver: traefik_certs
     environment:
       EULA: TRUE
       VERSION: 1.16.5
