@@ -16,13 +16,15 @@ services:
       - 8080:8080
     command:
       - "--global.sendAnonymousUsage"
-      # - "--log.level=DEBUG"
+      - "--log.level=DEBUG"
       - "--accesslog=true"
       - "--api.insecure=true"
       - "--api=true"
       - "--api.dashboard=true"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
       - "--providers.docker=true"
       - "--providers.file.directory=/certs/"
       - "--providers.file.watch=true"
@@ -52,7 +54,8 @@ services:
   file-helper:
     restart: "no"
     image: alpine:latest
-    command: sh -c "wget https://github.com/Nicolas-mahe/Ansible-perso/blob/Treafik/traefik/dynamic.yaml /certs/"
+    command: sh -c "cd /certs/
+      && wget https://github.com/Nicolas-mahe/Ansible-perso/blob/Treafik/traefik/dynamic.yaml"
     volumes:
       - certs:/certs/
     networks:
