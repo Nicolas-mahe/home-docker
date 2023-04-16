@@ -59,9 +59,7 @@ services:
   file-helper:
     restart: "no"
     image: alpine:latest
-    command: sh -c "cd /certs/
-      && rm dynamic.yml
-      && wget https://raw.githubusercontent.com/Nicolas-mahe/Ansible-perso/Treafik/traefik/dynamic.yml"
+    command: sh -c "wget https://raw.githubusercontent.com/Nicolas-mahe/Ansible-perso/Treafik/traefik/dynamic.yml -r -O /certs/dynamic.yml"
     volumes:
       - certs:/certs/
     networks:
