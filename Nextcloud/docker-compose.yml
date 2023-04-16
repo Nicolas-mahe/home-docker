@@ -38,12 +38,6 @@ services:
     restart: unless-stopped
     links:
       - bdd
-    labels:
-      traefik.enable: true
-      traefik.http.routers.cloud.tls: true
-      traefik.http.routers.cloud.entrypoints: websecure
-      traefik.http.routers.cloud.rule: Host(`cloud.$PERSONAL_DOMAINE_NAME`)
-      traefik.http.routers.cloud.tls.certresolver: traefik_certs
     
 volumes:
   nextcloud_bdd: 
