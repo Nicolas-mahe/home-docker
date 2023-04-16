@@ -23,7 +23,13 @@ services:
       - 8053:80
     networks:
       - web
-
+    command: 
+        - bash
+        - -c
+        - >
+          cd /var/log;
+          sudo chown -R www-data:www-data lighttpd/;
+          
 volumes:
   data:
   dnsmasq:
