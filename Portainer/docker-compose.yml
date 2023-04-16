@@ -1,15 +1,22 @@
-version: "3.8"
+version: '3.8'
 
 services:
   portainer:
     container_name: portainer
     image: portainer/portainer-ee:2.17.1
-    restart: unless-stopped
+    restart: always    
+    labels:
+      traefik.enable: true
+      traefik.http.routers.portainer.tls: true
+      traefik.http.routers.portainer.entrypoints: websecure
+      traefik.http.routers.portainer.rule: Host(`management.$PERSONAL_DOMAINE_NAME`)
     ports:
-      - 37834:9000
+      - $PERSONNAL_PORT_PORTAINER:9000
     volumes:
       - data:/data
       - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
     networks:
       - web
 
