@@ -2,7 +2,7 @@ services:
   cloudflare-ddns:
     restart: always
     container_name: Cloudflare-DNS
-    image: oznu/cloudflare-ddns
+    image: oznu/cloudflare-ddns:latest
     environment:
       - API_KEY=$DNS_API_KEY
       - ZONE=laura-et-nicolas.com
@@ -13,12 +13,8 @@ services:
       traefik.http.routers.cloudflare.tls: true
       traefik.http.routers.cloudflare.entrypoints: websecure
       traefik.http.routers.cloudflare.rule: Host(`cloudflare.$PERSONAL_DOMAINE_NAME`)
-      traefik.http.routers.cloudflare.tls.certresolver: traefik_certs
-      traefik.http.services.cloudflare.loadbalancer.server.port: $PERSONNAL_PORT
     networks:
       - web
-    ports:
-      - $PERSONNAL_PORT:80
 networks:
   web:
     external: true
