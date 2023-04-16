@@ -1,3 +1,5 @@
+version: '2'
+
 services:
   cloudflare-ddns:
     restart: always
@@ -5,14 +7,16 @@ services:
     image: oznu/cloudflare-ddns:latest
     environment:
       - API_KEY=$DNS_API_KEY
-      - ZONE=laura-et-nicolas.com
-      - PROXIED=true
+      - ZONE=$PERSONAL_DOMAINE_NAME
+      - PROXIED=false
       - TZ=Europe/Paris
     labels:
       traefik.enable: true
       traefik.http.routers.cloudflare.tls: true
       traefik.http.routers.cloudflare.entrypoints: websecure
       traefik.http.routers.cloudflare.rule: Host(`cloudflare.$PERSONAL_DOMAINE_NAME`)
+    ports:
+      - $PERSONNAL_PORT_CLOUDFLARE:80
     networks:
       - web
 networks:
