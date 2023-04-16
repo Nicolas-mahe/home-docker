@@ -16,7 +16,7 @@ services:
       - 8080:8080
     command:
       - "--global.sendAnonymousUsage"
-      - "--log.level=DEBUG"
+      # - "--log.level=DEBUG"
       - "--accesslog=true"
       - "--api.insecure=true"
       - "--api=true"
