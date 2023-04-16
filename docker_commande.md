@@ -24,3 +24,5 @@ apt-get update && \
     apt install -y ansible && \
     pip install requests-credssp && \
     apt install libz-dev libssl-dev libcurl4-gnutls-dev libexpat1-dev gettext cmake gcc -y
+## Docker-compose
+`docker-compose --env-file portainer.env up -d --force-recreate`

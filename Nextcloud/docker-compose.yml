@@ -20,21 +20,27 @@ services:
   app:
     container_name: nextcloud_app
     image: nextcloud
+    labels:
+      traefik.enable: true
+      traefik.http.routers.cloud.tls: true
+      traefik.http.routers.cloud.entrypoints: websecure
+      traefik.http.routers.cloud.rule: Host(`cloud.$PERSONAL_DOMAINE_NAME`)
     volumes:
       - nextcloud_app:/var/www/html
       - /srv/dev-disk-by-uuid-db7c7d33-a087-41db-b3ee-272c7a0601b7/Raid/Users/test:/mnt/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
     networks:
       - web
     ports:
       - 9080:80
     environment:
-      NEXTCLOUD_TRUSTED_DOMAINS: $HOST
+      NEXTCLOUD_TRUSTED_DOMAINS: $PERSONAL_DOMAINE_NAME
       MYSQL_PASSWORD: $PWD
       MYSQL_DATABASE: $DATABASE
       MYSQL_USER: $USER
       MYSQL_HOST: bdd
       config_is_read_only: false
-      TZ: Europe/Paris
     restart: unless-stopped
     links:
       - bdd
