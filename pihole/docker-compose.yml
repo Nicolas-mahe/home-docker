@@ -6,6 +6,7 @@ services:
     image: pihole/pihole:latest
     restart: always
     environment:
+      TZ: Europe/Paris
       WEBPASSWORD: $PI_HOLE_PASSWORD
     volumes:
       - /etc/timezone:/etc/timezone:ro
