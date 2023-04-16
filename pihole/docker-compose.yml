@@ -13,11 +13,11 @@ services:
       - data:/etc/pihole/
       # - /volume1/docker/pihole/dnsmasq.d/:/etc/dnsmasq.d/
     labels:
-      traefik.enable=: true
-      traefik.http.routers.pihole.rule: Host(`pihole.$PERSONAL_DOMAINE_NAME`)
-      traefik.http.routers.pihole.entrypoints: websecure
+      traefik.enable: true
       traefik.http.routers.pihole.tls: true
-      traefik.http.services.pihole.loadBalancer.server.port: 80
+      traefik.http.routers.pihole.entrypoints: websecure
+      traefik.http.routers.pihole.rule: Host(`pihole.$PERSONAL_DOMAINE_NAME`)
+      traefik.http.services.pihole.loadbalancer.server.port: 9000
     ports:
       - 53:53/tcp
       - 53:53/udp
