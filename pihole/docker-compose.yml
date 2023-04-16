@@ -4,7 +4,7 @@ services:
   pihole:
     container_name: pihole
     image: pihole/pihole:latest
-    restart: unless-stopped
+    restart: always
     environment:
       WEBPASSWORD: $PI_HOLE_PASSWORD
     volumes:
@@ -17,7 +17,7 @@ services:
       traefik.http.routers.pihole.tls: true
       traefik.http.routers.pihole.entrypoints: websecure
       traefik.http.routers.pihole.rule: Host(`pihole.$PERSONAL_DOMAINE_NAME`)
-      traefik.http.services.pihole.loadbalancer.server.port: 9000
+      traefik.http.services.pihole.loadbalancer.server.port: 80
     ports:
       - 53:53/tcp
       - 53:53/udp
