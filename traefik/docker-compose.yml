@@ -62,11 +62,11 @@ services:
     container_name: file-helper-traefik
     restart: "no"
     image: alpine:latest
+    environment:
+      - TZ=Europe/Paris
     command: sh -c "wget https://raw.githubusercontent.com/Nicolas-mahe/Ansible-perso/Treafik/traefik/dynamic.yml -O /certs/dynamic.yml"
     volumes:
       - certs:/certs/
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
     networks:
       - web
 
