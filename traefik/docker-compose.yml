@@ -60,7 +60,7 @@ services:
     restart: "no"
     image: alpine:latest
     command: sh -c "cd /certs/
-      && wget https://github.com/Nicolas-mahe/Ansible-perso/blob/Treafik/traefik/dynamic.yaml"
+      && wget https://raw.githubusercontent.com/Nicolas-mahe/Ansible-perso/Treafik/traefik/dynamic.yaml"
     volumes:
       - certs:/certs/
     networks:
