@@ -1,10 +1,11 @@
+
 tls:
   stores:
     default:
       defaultCertificate:
-        certFile: /certs/cert.pem
-        keyFile: /certs/cert.key
+        certFile: /certs/laura-et-nicolas.pem
+        keyFile: /certs/laura-et-nicolas.key
 
   certificates:
-    - certFile: /certs/cert.pem
-      keyFile: /certs/cert.key
+    - certFile: /certs/laura-et-nicolas.pem
+      keyFile: /certs/laura-et-nicolas.key
