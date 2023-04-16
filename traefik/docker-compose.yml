@@ -6,7 +6,7 @@ services:
     restart: always
     container_name: traefik
     volumes:
-      - /certs:/certs/
+      - certs:/certs/
       - /var/run/docker.sock:/var/run/docker.sock:ro
     ports:
       - 80:80
@@ -36,7 +36,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.whoami.tls: true
-      traefik.http.routers.whoami.entrypoints: websecure
+      # traefik.http.routers.whoami.entrypoints: websecure
       traefik.http.routers.whoami.rule: Host(`whoami.$PERSONAL_DOMAINE_NAME`)
     networks:
       - web
@@ -52,7 +52,7 @@ services:
   #     && touch acme.json
   #     && chmod 600 acme.json"
   #   volumes:
-  #     - /certs:/certs/
+  #     - certs:/certs/
   #   networks:
   #     - web
 
