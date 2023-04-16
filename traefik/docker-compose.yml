@@ -28,8 +28,8 @@ services:
       - "--providers.file.watch=true"
     networks:
       - web
-    # depends_on: 
-    # - file-helper
+    depends_on: 
+    - file-helper
 
   whoami:
     image: traefik/whoami:latest
@@ -49,16 +49,14 @@ services:
     depends_on: 
     - traefik
   
-  # file-helper:
-  #   restart: "no"
-  #   image: alpine:latest
-  #   command: sh -c "cd certs
-  #     && touch acme.json
-  #     && chmod 600 acme.json"
-  #   volumes:
-  #     - certs:/certs/
-  #   networks:
-  #     - web
+  file-helper:
+    restart: "no"
+    image: alpine:latest
+    command: sh -c "wget https://github.com/Nicolas-mahe/Ansible-perso/blob/Treafik/traefik/dynamic.yaml /certs/"
+    volumes:
+      - certs:/certs/
+    networks:
+      - web
 
 volumes:
   certs: {}
