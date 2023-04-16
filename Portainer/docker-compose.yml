@@ -4,12 +4,13 @@ services:
   portainer:
     container_name: portainer
     image: portainer/portainer-ee:2.17.1
-    restart: always    
+    restart: always
     labels:
       traefik.enable: true
       traefik.http.routers.portainer.tls: true
       traefik.http.routers.portainer.entrypoints: websecure
       traefik.http.routers.portainer.rule: Host(`management.$PERSONAL_DOMAINE_NAME`)
+      traefik.http.services.portainer.loadbalancer.server.port: 9000
     ports:
       - $PERSONAL_PORT_PORTAINER:9000
     volumes:
