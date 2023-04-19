@@ -59,8 +59,6 @@ services:
       - $PERSONAL_PORT_MINECRAFT:25565
     networks:
       - web
-    env_file:
-      - .env_minecraft
 
 volumes:
   data: {}
