@@ -3,7 +3,7 @@ version: '3.8'
 services:
   portainer:
     container_name: portainer
-    image: portainer/portainer-ee:2.17.1
+    image: portainer/portainer-ee:2.18.1
     restart: always
     labels:
       traefik.enable: true
