@@ -59,8 +59,8 @@ services:
       - $PERSONAL_PORT_PORTAINER:25565
     networks:
       - web
-    env_file:
-      - .env_minecraft
+    # env_file:
+    #   - .env_minecraft
     command: sh -c "ls /modpacks"
 
 volumes:
