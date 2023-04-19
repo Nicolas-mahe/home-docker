@@ -13,6 +13,9 @@ services:
       - cert:/etc/letsencrypt
     networks:
       - web
+    environment:
+      TZ: Europe/Paris
+      logLevel: debug
 volumes:
   data: {}
   cert: {}
