@@ -5,7 +5,7 @@ version: '3.9'
 #C:\Users\Nico2\curseforge\minecraft\Instances\Ragnamod VI\ #path of Modpacks
 services:
   minecraft:
-    image: itzg/minecraft-server:java8
+    image: itzg/minecraft-server:2023.3.0
     environment:
       EULA: TRUE
       VERSION: 1.16.5
