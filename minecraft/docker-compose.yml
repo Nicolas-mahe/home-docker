@@ -61,6 +61,7 @@ services:
       - web
     env_file:
       - .env_minecraft
+    command: sh -c "ls /modpacks"
 
 volumes:
   data: {}
