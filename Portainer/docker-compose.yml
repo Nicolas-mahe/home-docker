@@ -20,6 +20,8 @@ services:
       - /etc/localtime:/etc/localtime:ro
     networks:
       - web
+    env_file:
+      - .env_portainer
 
 volumes:
   data:
