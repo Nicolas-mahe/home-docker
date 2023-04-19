@@ -1,4 +1,4 @@
-version: '3.9'
+version: '3'
 #https://github.com/itzg/docker-minecraft-server
 #https://github.com/itzg/docker-mc-backup
 #https://www.curseforge.com/minecraft/modpacks/ragnamod-vi
@@ -59,9 +59,8 @@ services:
       - $PERSONAL_PORT_MINECRAFT:25565
     networks:
       - web
-    # env_file:
-    #   - .env_minecraft
-    command: sh -c "ls /modpacks"
+    env_file:
+      - .env_minecraft
 
 volumes:
   data: {}
