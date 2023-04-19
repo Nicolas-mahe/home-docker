@@ -6,6 +6,12 @@ version: '3.9'
 services:
   minecraft:
     image: itzg/minecraft-server:java8-openj9
+    labels:
+      traefik.enable: true
+      traefik.http.routers.portainer.tls: true
+      traefik.http.routers.portainer.entrypoints: websecure
+      traefik.http.routers.portainer.rule: Host(`minecraft.$PERSONAL_DOMAINE_NAME`)
+      traefik.http.services.portainer.loadbalancer.server.port: 25566
     environment:
       EULA: TRUE
       VERSION: 1.16.5
@@ -53,6 +59,8 @@ services:
       - 25566:25565
     networks:
       - web
+    env_file:
+      - .env_minecraft
 
 volumes:
   data: {}
