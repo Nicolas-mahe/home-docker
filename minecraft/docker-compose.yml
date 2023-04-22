@@ -10,7 +10,7 @@ services:
       traefik.enable: true
       traefik.http.routers.minecraft.tls: true
       traefik.http.routers.minecraft.entrypoints: websecure
-      traefik.http.routers.minecraft.rule: Host(`minecraft.$PERSONAL_DOMAINE_NAME`)
+      traefik.http.routers.minecraft.rule: Host(`ragnamod.$PERSONAL_DOMAINE_NAME`)
       traefik.http.services.minecraft.loadbalancer.server.port: $PERSONAL_PORT_MINECRAFT
     environment:
       UID: $PERSONAL_UID_MINECRAFT
