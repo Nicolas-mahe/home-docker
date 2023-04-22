@@ -8,10 +8,10 @@ services:
     image: itzg/minecraft-server:java8
     labels:
       traefik.enable: true
-      traefik.http.routers.minecraft.tls: true
-      traefik.http.routers.minecraft.entrypoints: websecure
-      traefik.http.routers.minecraft.rule: Host(`ragnamod.$PERSONAL_DOMAINE_NAME`)
-      traefik.http.services.minecraft.loadbalancer.server.port: $PERSONAL_PORT_MINECRAFT
+      traefik.http.routers.ragnamod.tls: true
+      traefik.http.routers.ragnamod.entrypoints: websecure
+      traefik.http.routers.ragnamod.rule: Host(`ragnamod.$PERSONAL_DOMAINE_NAME`)
+      traefik.http.services.ragnamod.loadbalancer.server.port: $PERSONAL_PORT_MINECRAFT
     environment:
       UID: $PERSONAL_UID_MINECRAFT
       GID: $PERSONAL_UID_MINECRAFT
