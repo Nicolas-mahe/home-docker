@@ -14,7 +14,6 @@ services:
     environment:
       UID: $PERSONAL_UID_MINECRAFT
       GID: $PERSONAL_GID_MINECRAFT
-
       PROXY: Traefik:$PERSONAL_PORT_MINECRAFT
       EULA: TRUE
       MOTD: "RaBByT Season v1"
