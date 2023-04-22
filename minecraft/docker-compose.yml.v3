@@ -1,0 +1,68 @@
+version: '3'
+#https://github.com/itzg/docker-minecraft-server
+#https://github.com/itzg/docker-mc-backup
+#https://www.curseforge.com/minecraft/modpacks/ragnamod-vi
+#C:\Users\Nico2\curseforge\minecraft\Instances\Ragnamod VI\ #path of Modpacks
+services:
+  minecraft:
+    image: itzg/minecraft-server:java8
+    labels:
+      traefik.enable: true
+      traefik.http.routers.ragnamod.tls: true
+      traefik.http.routers.ragnamod.entrypoints: websecure
+      traefik.http.routers.ragnamod.rule: Host(`ragnamod.$PERSONAL_DOMAINE_NAME`)
+      traefik.http.services.ragnamod.loadbalancer.server.port: $PERSONAL_PORT_MINECRAFT
+    environment:
+      UID: $PERSONAL_UID_MINECRAFT
+      GID: $PERSONAL_UID_MINECRAFT
+      EULA: TRUE
+      VERSION: 1.16.5
+      TYPE: CURSEFORGE
+      CF_SERVER_MOD: /modpacks/RagnamodVI-Serverfiles-6.1.10.zip
+      MOTD: "RaBByT Ragnamod IV"
+      MEMORY: ""
+      JVM_XX_OPTS: "-XX:MaxRAMPercentage=100"
+      MAX_PLAYERS: 5
+      SPAWN_PROTECTION: 0
+      VIEW_DISTANCE: 10
+      SIMULATION_DISTANCE: 5
+      ENABLE_WHITELIST: TRUE
+      DIFFICULTY: Hard
+      OPS: "RaBByt_Tv"
+      ALLOW_NETHER: TRUE
+      ANNOUNCE_PLAYER_ACHIEVEMENTS: TRUE
+      GENERATE_STRUCTURES: TRUE
+      SNOOPER_ENABLED: FALSE
+      MAX_TICK_TIME: 60000
+      TZ: Europe/Paris
+      MODE: 0 # 0=survival, 1=creative, 2=adventure, 3=spectator // not sure it work
+      FORCE_GAMEMODE: TRUE # force default gamemode at connection
+      HARDCORE: FALSE
+      ALLOW_FLIGHT: TRUE
+      MAX_WORLD_SIZE: 10000
+      SPAWN_ANIMALS: TRUE
+      SPAWN_MONSTERS: TRUE
+      SPAWN_NPCS: TRUE
+      PVP: TRUE
+      LEVEL_TYPE: normal # type of generating world
+      SERVER_NAME: Ragnamod6_RaBByT
+      ENABLE_RCON: TRUE
+    deploy:
+      resources:
+        limits:
+          memory: 28160M
+    volumes:
+      - data:/data
+      - modpacks:/modpacks
+    restart: "no"
+    ports:
+      - $PERSONAL_PORT_MINECRAFT:25565
+    networks:
+      - web
+
+volumes:
+  data: {}
+  modpacks: {}
+networks:
+    web:
+      external: true

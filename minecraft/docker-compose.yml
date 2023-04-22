@@ -1,68 +1,100 @@
-version: '3'
+version: "3.8"
 #https://github.com/itzg/docker-minecraft-server
 #https://github.com/itzg/docker-mc-backup
-#https://www.curseforge.com/minecraft/modpacks/ragnamod-vi
-#C:\Users\Nico2\curseforge\minecraft\Instances\Ragnamod VI\ #path of Modpacks
+
 services:
-  minecraft:
-    image: itzg/minecraft-server:java8
+  server:
+    image: itzg/minecraft-server:2023.3.0
     labels:
       traefik.enable: true
-      traefik.http.routers.ragnamod.tls: true
-      traefik.http.routers.ragnamod.entrypoints: websecure
-      traefik.http.routers.ragnamod.rule: Host(`ragnamod.$PERSONAL_DOMAINE_NAME`)
-      traefik.http.services.ragnamod.loadbalancer.server.port: $PERSONAL_PORT_MINECRAFT
+      traefik.http.routers.minecraft.tls: true
+      traefik.http.routers.minecraft.entrypoints: websecure
+      traefik.http.routers.minecraft.rule: Host(`minecraft.$PERSONAL_DOMAINE_NAME`)
+      traefik.http.services.minecraft.loadbalancer.server.port: $PERSONAL_PORT_MINECRAFT
     environment:
       UID: $PERSONAL_UID_MINECRAFT
-      GID: $PERSONAL_UID_MINECRAFT
+      GID: $PERSONAL_GID_MINECRAFT
+
+      PROXY: Traefik:$PERSONAL_PORT_MINECRAFT
       EULA: TRUE
-      VERSION: 1.16.5
-      TYPE: CURSEFORGE
-      CF_SERVER_MOD: /modpacks/RagnamodVI-Serverfiles-6.1.10.zip
-      MOTD: "RaBByT Ragnamod IV"
+      MOTD: "RaBByT Season v1"
+      VERSION: 1.18.2
+      TYPE: FORGE
+      FORGE_VERSION: 40.1.60
       MEMORY: ""
       JVM_XX_OPTS: "-XX:MaxRAMPercentage=100"
-      MAX_PLAYERS: 5
+      MAX_PLAYERS: 10
       SPAWN_PROTECTION: 0
-      VIEW_DISTANCE: 10
-      SIMULATION_DISTANCE: 5
+      VIEW_DISTANCE: 12
+      SIMULATION_DISTANCE: 10
+      MAX_BUILD_HEIGHT: 320 # only under 320
       ENABLE_WHITELIST: TRUE
-      DIFFICULTY: Hard
-      OPS: "RaBByt_Tv"
+      DIFFICULTY: hard
+      OPS: "RaBByt_Tv,Zaula,TBMPQF"
       ALLOW_NETHER: TRUE
       ANNOUNCE_PLAYER_ACHIEVEMENTS: TRUE
       GENERATE_STRUCTURES: TRUE
       SNOOPER_ENABLED: FALSE
       MAX_TICK_TIME: 60000
       TZ: Europe/Paris
-      MODE: 0 # 0=survival, 1=creative, 2=adventure, 3=spectator // not sure it work
+      MODE: survival # 0=survival, 1=creative, 2=adventure, 3=spectator // not sure it work
       FORCE_GAMEMODE: TRUE # force default gamemode at connection
       HARDCORE: FALSE
       ALLOW_FLIGHT: TRUE
-      MAX_WORLD_SIZE: 10000
+      MAX_WORLD_SIZE: 10000000
       SPAWN_ANIMALS: TRUE
       SPAWN_MONSTERS: TRUE
       SPAWN_NPCS: TRUE
       PVP: TRUE
       LEVEL_TYPE: normal # type of generating world
-      SERVER_NAME: Ragnamod6_RaBByT
+      SERVER_NAME: RaBByT_S1
+      ICON: ./icon-server.jpg
       ENABLE_RCON: TRUE
+      RCON_PASSWORD: $PERSONAL_RCON_PWD
+      RCON_PORT: $PERSONAL_PORT_MINECRAFT_RCON
+      RCON_CMDS_STARTUP:  |-
+        gamerule keepinventory true
+        gamerule playersSleepingPercentage 1
     deploy:
       resources:
         limits:
-          memory: 28160M
+          memory: 16G
+          cpus: '7'
     volumes:
       - data:/data
-      - modpacks:/modpacks
-    restart: "no"
+      - mods:/mods
+    restart: unless-stopped
     ports:
       - $PERSONAL_PORT_MINECRAFT:25565
     networks:
       - web
-
+    
+  backups:
+    image: itzg/mc-backup
+    environment:
+      TZ: Europe/Paris
+      INITIAL_DELAY: 5m
+      BACKUP_INTERVAL: 24h
+      PRUNE_BACKUPS_DAYS: 7
+      PRUNE_RESTIC_RETENTION: --keep-within 7d
+      RCON_HOST: server
+      RCON_PORT: $PERSONAL_PORT_MINECRAFT_RCON
+      RCON_PASSWORD: $PERSONAL_RCON_PWD
+      DEST_DIR: /backups
+      LINK_LATEST: FALSE
+      TAR_COMPRESS_METHOD: gzip
+      ZSTD_PARAMETERS: -3 --long=25 --single-thread
+    volumes:
+    - data:/data:ro
+    - backups:/backups
+    network_mode: "service:server"
+    restart: unless-stopped
+    
 volumes:
+  mods: {}
   data: {}
-  modpacks: {}
+  backups: {}
+  setting: {}
 networks:
     web:
       external: true
