@@ -3,7 +3,7 @@ version: "3.8"
 #https://github.com/itzg/docker-mc-backup
 
 services:
-  server:
+  server-test:
     image: itzg/minecraft-server:2023.3.0
     labels:
       traefik.enable: true
@@ -14,25 +14,27 @@ services:
     environment:
       UID: $PERSONAL_UID_MINECRAFT
       GID: $PERSONAL_GID_MINECRAFT
+      PROXY: Traefik:$PERSONAL_PORT_MINECRAFT
       EULA: TRUE
-      MOTD: "RaBByT Season v3"
+      MOTD: "RaBByT Season v1"
       VERSION: 1.18.2
       TYPE: FORGE
-      FORGE_VERSION: 40.2.2
+      FORGE_VERSION: 40.1.60
       MEMORY: ""
-      JVM_XX_OPTS: "-XX:MaxRAMPercentage=80"
+      JVM_XX_OPTS: "-XX:MaxRAMPercentage=100"
       MAX_PLAYERS: 10
       SPAWN_PROTECTION: 0
       VIEW_DISTANCE: 12
       SIMULATION_DISTANCE: 10
       MAX_BUILD_HEIGHT: 320 # only under 320
       ENABLE_WHITELIST: TRUE
-      DIFFICULTY: normal
-      OPS: "RaBByt_Tv,TBMPQF"
+      DIFFICULTY: hard
+      OPS: "RaBByt_Tv,Zaula,TBMPQF"
       ALLOW_NETHER: TRUE
       ANNOUNCE_PLAYER_ACHIEVEMENTS: TRUE
       GENERATE_STRUCTURES: TRUE
       SNOOPER_ENABLED: FALSE
+      MAX_TICK_TIME: 60000
       TZ: Europe/Paris
       MODE: survival # 0=survival, 1=creative, 2=adventure, 3=spectator // not sure it work
       FORCE_GAMEMODE: TRUE # force default gamemode at connection
@@ -44,7 +46,8 @@ services:
       SPAWN_NPCS: TRUE
       PVP: TRUE
       LEVEL_TYPE: normal # type of generating world
-      SERVER_NAME: RaBByT_S3
+      SERVER_NAME: RaBByT_S1
+      ICON: ./icon-server.jpg
       ENABLE_RCON: TRUE
       RCON_PASSWORD: $PERSONAL_RCON_PWD
       RCON_PORT: $PERSONAL_PORT_MINECRAFT_RCON
@@ -54,7 +57,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 24G
+          memory: 16G
           cpus: '7'
     volumes:
       - data:/data
@@ -69,10 +72,10 @@ services:
     image: itzg/mc-backup
     environment:
       TZ: Europe/Paris
-      INITIAL_DELAY: 15m
+      INITIAL_DELAY: 5m
       BACKUP_INTERVAL: 24h
-      PRUNE_BACKUPS_DAYS: 14
-      PRUNE_RESTIC_RETENTION: --keep-within 14d
+      PRUNE_BACKUPS_DAYS: 7
+      PRUNE_RESTIC_RETENTION: --keep-within 7d
       RCON_HOST: server
       RCON_PORT: $PERSONAL_PORT_MINECRAFT_RCON
       RCON_PASSWORD: $PERSONAL_RCON_PWD
@@ -83,13 +86,30 @@ services:
     volumes:
     - data:/data:ro
     - backups:/backups
-    network_mode: "service:server"
+    network_mode: "service:server-test"
     restart: unless-stopped
+    depends_on:
+      - server-test
     
+  router:
+    image: itzg/mc-router:1.18.0
+    depends_on:
+      - server-test
+      - backups
+    environment:
+      # enable API
+      API_BINDING: ":25564"
+    ports:
+      - $PERSONAL_PORT_MINECRAFT2:25565
+      # bind the API port to only loopback to avoid external exposure
+      - $PERSONAL_PORT_ROUTER:25564
+    command: --mapping=minecraft.$PERSONAL_DOMAINE_NAME=server-test:25565
+
 volumes:
   mods: {}
   data: {}
   backups: {}
+  setting: {}
 networks:
     web:
       external: true
