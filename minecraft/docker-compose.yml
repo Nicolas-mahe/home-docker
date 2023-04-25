@@ -14,14 +14,13 @@ services:
     environment:
       UID: $PERSONAL_UID_MINECRAFT
       GID: $PERSONAL_GID_MINECRAFT
-      PROXY: Traefik:$PERSONAL_PORT_MINECRAFT
       EULA: TRUE
-      MOTD: "RaBByT Season v1"
+      MOTD: "RaBByT Season v3"
       VERSION: 1.18.2
       TYPE: FORGE
-      FORGE_VERSION: 40.1.60
+      FORGE_VERSION: 40.2.2
       MEMORY: ""
-      JVM_XX_OPTS: "-XX:MaxRAMPercentage=100"
+      JVM_XX_OPTS: "-XX:MaxRAMPercentage=80"
       MAX_PLAYERS: 10
       SPAWN_PROTECTION: 0
       VIEW_DISTANCE: 12
@@ -29,7 +28,7 @@ services:
       MAX_BUILD_HEIGHT: 320 # only under 320
       ENABLE_WHITELIST: TRUE
       DIFFICULTY: hard
-      OPS: "RaBByt_Tv,Zaula,TBMPQF"
+      OPS: "RaBByt_Tv,TBMPQF"
       ALLOW_NETHER: TRUE
       ANNOUNCE_PLAYER_ACHIEVEMENTS: TRUE
       GENERATE_STRUCTURES: TRUE
@@ -46,8 +45,7 @@ services:
       SPAWN_NPCS: TRUE
       PVP: TRUE
       LEVEL_TYPE: normal # type of generating world
-      SERVER_NAME: RaBByT_S1
-      ICON: ./icon-server.jpg
+      SERVER_NAME: RaBByT_S3
       ENABLE_RCON: TRUE
       RCON_PASSWORD: $PERSONAL_RCON_PWD
       RCON_PORT: $PERSONAL_PORT_MINECRAFT_RCON
@@ -57,7 +55,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 16G
+          memory: 24G
           cpus: '7'
     volumes:
       - data:/data
