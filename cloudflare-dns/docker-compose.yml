@@ -8,8 +8,9 @@ services:
     environment:
       - API_KEY=$DNS_API_KEY
       - ZONE=$PERSONAL_DOMAINE_NAME
-      - PROXIED=false
+      - PROXIED=true
       - TZ=Europe/Paris
+      - DELETE_ON_STOP=true
     labels:
       traefik.enable: true
       traefik.http.routers.cloudflare.tls: true
