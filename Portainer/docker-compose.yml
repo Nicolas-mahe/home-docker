@@ -5,6 +5,8 @@ services:
     container_name: portainer
     image: portainer/portainer-ee:2.18.1
     restart: always
+    environment:
+      TZ: Europe/Paris
     labels:
       traefik.enable: true
       traefik.http.routers.portainer.tls: true
