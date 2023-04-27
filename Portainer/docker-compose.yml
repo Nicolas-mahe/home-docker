@@ -23,7 +23,7 @@ services:
     networks:
       - web
     env_file:
-      - .env_portainer
+      - .env
 
 volumes:
   data:
