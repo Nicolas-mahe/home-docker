@@ -86,6 +86,8 @@ services:
       RCON_RETRIES: 10
       RCON_RETRY_INTERVAL: 10s
       EXCLUDES: *.jar,cache,logs
+      PAUSE_IF_NO_PLAYERS: true
+      PLAYERS_ONLINE_CHECK_INTERVAL: 60
     volumes:
     - data:/data:ro
     - backups:/backups
