@@ -70,7 +70,10 @@ services:
     environment:
       TZ: Europe/Paris
       INITIAL_DELAY: 15m
-      BACKUP_INTERVAL: 24h
+      BACKUP_INTERVAL: 6h
+      SRC_DIR: /data
+      BACKUP_NAME: world
+      BACKUP_METHOD: tar
       PRUNE_BACKUPS_DAYS: 14
       PRUNE_RESTIC_RETENTION: --keep-within 14d
       RCON_HOST: server
@@ -79,7 +82,10 @@ services:
       DEST_DIR: /backups
       LINK_LATEST: FALSE
       TAR_COMPRESS_METHOD: gzip
-      ZSTD_PARAMETERS: -3 --long=25 --single-thread
+      ZSTD_PARAMETERS: -3 --long=50 --single-thread
+      RCON_RETRIES: 10
+      RCON_RETRY_INTERVAL: 10s
+      EXCLUDES: *.jar,cache,logs
     volumes:
     - data:/data:ro
     - backups:/backups
