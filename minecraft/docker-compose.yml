@@ -69,7 +69,7 @@ services:
     image: itzg/mc-backup
     environment:
       TZ: Europe/Paris
-      INITIAL_DELAY: 10m
+      INITIAL_DELAY: 5m
       BACKUP_INTERVAL: 6h
       SRC_DIR: /data
       BACKUP_NAME: world
