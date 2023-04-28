@@ -88,6 +88,8 @@ services:
       # EXCLUDES: *.jar,cache,logs
       PAUSE_IF_NO_PLAYERS: true
       PLAYERS_ONLINE_CHECK_INTERVAL: 1h
+      PRE_BACKUP_SCRIPT: echo "Backup en cours"
+      POST_BACKUP_SCRIPT: echo "Backup done"
     volumes:
     - data:/data:ro
     - backups:/backups
