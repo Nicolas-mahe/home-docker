@@ -70,7 +70,7 @@ services:
     environment:
       TZ: Europe/Paris
       INITIAL_DELAY: 5m
-      BACKUP_INTERVAL: 6h
+      BACKUP_INTERVAL: 2h
       SRC_DIR: /data
       BACKUP_NAME: world
       BACKUP_METHOD: tar
