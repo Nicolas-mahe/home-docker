@@ -49,7 +49,6 @@ services:
       RCON_PASSWORD: $PERSONAL_RCON_PWD
       RCON_PORT: $PERSONAL_PORT_MINECRAFT_RCON
       RCON_CMDS_STARTUP:  |-
-        gamerule keepinventory true
         gamerule playersSleepingPercentage 1
     deploy:
       resources:
