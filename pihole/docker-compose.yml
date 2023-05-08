@@ -43,7 +43,8 @@ services:
         - -c
         - >
           cd /var/log;
-          sudo chown -R 777 lighttpd/;
+          ls;
+          chown -R 777 lighttpd/;
     volumes:
       - var:/var
     networks:
