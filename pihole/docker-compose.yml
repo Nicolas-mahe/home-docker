@@ -10,7 +10,7 @@ services:
       WEBPASSWORD: $PIHOLE_PASSWORD
       # UID: $PERSONAL_UID_PIHOLE
       # GID: $PERSONAL_GID_PIHOLE
-      PIHOLE_UID: PERSONAL_UID_PIHOLE
+      PIHOLE_UID: $PERSONAL_UID_PIHOLE
       DNSMASQ_USER: root
     volumes:
       - data:/etc/pihole
