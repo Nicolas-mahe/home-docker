@@ -15,7 +15,7 @@ services:
     volumes:
       - data:/etc/pihole
       - dnsmasq:/etc/dnsmasq.d
-      - var:/var
+      - file:/var
     labels:
       traefik.enable: true
       traefik.http.routers.pihole.tls: true
@@ -42,18 +42,18 @@ services:
         - sh
         - -c
         - >
-          cd /var/log;
-          ls;
-          chown -R 777 lighttpd/;
+          ls /file;
+          chown -R 777 /file;
+
     volumes:
-      - var:/var
+      - file:/file
     networks:
       - web
 
 volumes:
-  var:
   data:
   dnsmasq:
+  file:
 
 networks:
   web:
