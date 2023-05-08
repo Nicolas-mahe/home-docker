@@ -28,7 +28,7 @@ services:
       - $PERSONAL_PORT_PIHOLE:80
     networks:
       - web
-  command: sh -c "chown -R 777 /var"
+    command: sh -c "chown -R 777 /var"
 
   #   depends_on:
   #     - file-helper
