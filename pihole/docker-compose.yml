@@ -8,6 +8,8 @@ services:
     environment:
       TZ: Europe/Paris
       WEBPASSWORD: $PI_HOLE_PASSWORD
+      UID: $PERSONAL_UID_PIHOLE
+      GID: $PERSONAL_GID_PIHOLE
     volumes:
       - data:/etc/pihole
       - dnsmasq:/etc/dnsmasq.d
