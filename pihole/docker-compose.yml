@@ -26,7 +26,7 @@ services:
       - $PERSONAL_PORT_PIHOLE:80
     networks:
       - web
-    command: sh -c "chown -R 777 /var"
+    command: sh -c "ls -al /var/log/lighttpd"
 
   #   depends_on:
   #     - file-helper
