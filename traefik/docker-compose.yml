@@ -57,7 +57,6 @@ services:
     container_name: file-helper-traefik
     restart: "no"
     image: alpine:latest
-    rm: true
     environment:
       - TZ=Europe/Paris
     command: sh -c "wget https://raw.githubusercontent.com/Nicolas-mahe/Ansible-perso/Treafik/traefik/dynamic.yml -O /certs/dynamic.yml"
@@ -65,6 +64,7 @@ services:
       - certs:/certs/
     networks:
       - web
+    rm: true
 
 volumes:
   certs: {}
