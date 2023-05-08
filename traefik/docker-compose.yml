@@ -64,7 +64,7 @@ services:
       - certs:/certs/
     networks:
       - web
-    rm: true
+    # rm: true
 
 volumes:
   certs: {}
