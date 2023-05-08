@@ -28,27 +28,29 @@ services:
       - $PERSONAL_PORT_PIHOLE:80
     networks:
       - web
-    depends_on:
-      - file-helper
+  command: sh -c "chown -R 777 /var"
 
-  
-  file-helper:
-    container_name: file-helper-pihole
-    restart: 'no'
-    image: alpine:latest
-    environment:
-      - TZ=Europe/Paris
-    command: 
-        - sh
-        - -c
-        - >
-          ls /file;
-          chown -R 777 /file;
+  #   depends_on:
+  #     - file-helper
 
-    volumes:
-      - file:/file
-    networks:
-      - web
+
+  # file-helper:
+  #   container_name: file-helper-pihole
+  #   restart: 'no'
+  #   image: alpine:latest
+  #   environment:
+  #     - TZ=Europe/Paris
+  #   command: 
+  #       - sh
+  #       - -c
+  #       - >
+  #         ls /file;
+  #         chown -R 777 /file;
+
+  #   volumes:
+  #     - file:/file
+  #   networks:
+  #     - web
 
 volumes:
   data:
