@@ -8,9 +8,6 @@ services:
     environment:
       TZ: Europe/Paris
       WEBPASSWORD: $PIHOLE_PASSWORD
-      UID: $PERSONAL_UID_PIHOLE
-      GID: $PERSONAL_GID_PIHOLE
-      PIHOLE_UID: $PERSONAL_UID_PIHOLE
       DNSMASQ_USER: root
     volumes:
       - data:/etc/pihole
@@ -26,26 +23,6 @@ services:
       - 53:53/tcp
       - 53:53/udp
       - $PERSONAL_PORT_PIHOLE:80
-    networks:
-      - web
-    depends_on:
-      - file-helper
-
-  
-  file-helper:
-    container_name: file-helper-pihole
-    restart: 'no'
-    image: alpine:latest
-    environment:
-      - TZ=Europe/Paris
-    command: 
-        - sh
-        - -c
-        - >
-          cd /var/log;
-          sudo chown -R www-data:www-data lighttpd/;
-    volumes:
-      - var:/var
     networks:
       - web
 
