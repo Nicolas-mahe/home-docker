@@ -1,13 +1,13 @@
-version: '3.7'
+version: '3'
 
 services:
   pihole:
     container_name: pihole
-    image: pihole/pihole:2023.03.1
-    restart: always
+    image: pihole/pihole
+    restart: 'no'
     environment:
       TZ: Europe/Paris
-      WEBPASSWORD: $PI_HOLE_PASSWORD
+      WEBPASSWORD: $PIHOLE_PASSWORD
       UID: $PERSONAL_UID_PIHOLE
       GID: $PERSONAL_GID_PIHOLE
     volumes:
@@ -25,12 +25,12 @@ services:
       - $PERSONAL_PORT_PIHOLE:80
     networks:
       - web
-    command: 
-        - bash
-        - -c
-        - >
-          cd /var/log;
-          sudo chown -R www-data:www-data lighttpd/;
+    # command: 
+    #     - bash
+    #     - -c
+    #     - >
+    #       cd /var/log;
+    #       sudo chown -R www-data:www-data lighttpd/;
           
 volumes:
   data:
