@@ -8,8 +8,10 @@ services:
     environment:
       TZ: Europe/Paris
       WEBPASSWORD: $PIHOLE_PASSWORD
+      DNSMASQ_USER: pihole
       PIHOLE_UID: $PERSONAL_UID_PIHOLE
-      DNSMASQ_USER: root
+      PIHOLE_GID: $PERSONAL_GID_PIHOLE
+      FTLCONF_LOCAL_IPV4: 192.168.1.1
     volumes:
       - data:/etc/pihole
       - dnsmasq:/etc/dnsmasq.d
@@ -26,7 +28,7 @@ services:
       - $PERSONAL_PORT_PIHOLE:80
     networks:
       - web
-    command: sh -c "ls -al /var/log/lighttpd"
+    command: sh -c "chown -R 777 /var"
 
   #   depends_on:
   #     - file-helper
