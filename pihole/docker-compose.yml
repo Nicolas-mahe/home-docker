@@ -13,7 +13,7 @@ services:
     volumes:
       - data:/etc/pihole
       - dnsmasq:/etc/dnsmasq.d
-      - file:/var
+      # - file:/var
     labels:
       traefik.enable: true
       traefik.http.routers.pihole.tls: true
@@ -53,7 +53,7 @@ services:
 volumes:
   data:
   dnsmasq:
-  file:
+  # file:
 
 networks:
   web:
