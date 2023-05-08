@@ -39,7 +39,7 @@ services:
     environment:
       - TZ=Europe/Paris
     command: 
-        - bash
+        - sh
         - -c
         - >
           cd /var/log;
