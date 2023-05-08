@@ -9,8 +9,7 @@ services:
       TZ: Europe/Paris
       WEBPASSWORD: $PIHOLE_PASSWORD
       DNSMASQ_USER: pihole
-      PIHOLE_UID: $PERSONAL_UID_PIHOLE
-      PIHOLE_GID: $PERSONAL_GID_PIHOLE
+      user: "${PERSONAL_UID_PIHOLE}:${PERSONAL_GID_PIHOLE}"
       FTLCONF_LOCAL_IPV4: 192.168.1.1
     volumes:
       - data:/etc/pihole
