@@ -15,6 +15,7 @@ services:
     volumes:
       - data:/etc/pihole
       - dnsmasq:/etc/dnsmasq.d
+      - var:/var
     labels:
       traefik.enable: true
       traefik.http.routers.pihole.tls: true
@@ -27,14 +28,29 @@ services:
       - $PERSONAL_PORT_PIHOLE:80
     networks:
       - web
-    # command: 
-    #     - bash
-    #     - -c
-    #     - >
-    #       cd /var/log;
-    #       sudo chown -R www-data:www-data lighttpd/;
-          
+    depends_on:
+      - file-helper
+
+  
+  file-helper:
+    container_name: file-helper-pihole
+    restart: 'no'
+    image: alpine:latest
+    environment:
+      - TZ=Europe/Paris
+    command: 
+        - bash
+        - -c
+        - >
+          cd /var/log;
+          sudo chown -R www-data:www-data lighttpd/;
+    volumes:
+      - var:/var
+    networks:
+      - web
+
 volumes:
+  var:
   data:
   dnsmasq:
 
