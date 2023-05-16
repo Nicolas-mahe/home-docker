@@ -45,7 +45,7 @@ services:
       PVP: TRUE
       LEVEL_TYPE: normal # type of generating world
       SERVER_NAME: RaBByT_S3
-      ICON: /backups/icon-server.jpg
+      # ICON: /backups/icon-server.jpg
       ENABLE_RCON: TRUE
       RCON_PASSWORD: $PERSONAL_RCON_PWD
       RCON_PORT: $PERSONAL_PORT_MINECRAFT_RCON
