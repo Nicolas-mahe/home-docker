@@ -45,6 +45,7 @@ services:
       PVP: TRUE
       LEVEL_TYPE: normal # type of generating world
       SERVER_NAME: RaBByT_S3
+      # ICON: /backups/icon-server.jpg
       ENABLE_RCON: TRUE
       RCON_PASSWORD: $PERSONAL_RCON_PWD
       RCON_PORT: $PERSONAL_PORT_MINECRAFT_RCON
@@ -81,7 +82,7 @@ services:
       DEST_DIR: /backups
       LINK_LATEST: FALSE
       TAR_COMPRESS_METHOD: gzip
-      ZSTD_PARAMETERS: -3 --long=50 --single-thread
+      ZSTD_PARAMETERS: -3 --long=25 --single-thread
       RCON_RETRIES: 10
       RCON_RETRY_INTERVAL: 10s
       # EXCLUDES: *.jar,cache,logs
