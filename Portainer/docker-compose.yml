@@ -3,7 +3,7 @@ version: '3.8'
 services:
   portainer:
     container_name: portainer
-    image: portainer/portainer-ee:2.18.2
+    image: portainer/portainer-ee:2.18
     restart: always
     environment:
       TZ: Europe/Paris
