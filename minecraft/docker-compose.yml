@@ -82,7 +82,7 @@ services:
       DEST_DIR: /backups
       LINK_LATEST: FALSE
       TAR_COMPRESS_METHOD: gzip
-      ZSTD_PARAMETERS: -3 --long=25 --single-thread
+      ZSTD_PARAMETERS: -3 --long=25 --threads=4
       RCON_RETRIES: 10
       RCON_RETRY_INTERVAL: 10s
       # EXCLUDES: *.jar,cache,logs
