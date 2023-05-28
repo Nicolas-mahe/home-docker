@@ -3,8 +3,10 @@ version: '3.8'
 services:
   portainer:
     container_name: portainer
-    image: portainer/portainer-ee:2.17.1
+    image: portainer/portainer-ee:2.18.3
     restart: always
+    environment:
+      TZ: Europe/Paris
     labels:
       traefik.enable: true
       traefik.http.routers.portainer.tls: true
@@ -21,7 +23,7 @@ services:
     networks:
       - web
     env_file:
-      - .env_portainer
+      - .env
 
 volumes:
   data:
