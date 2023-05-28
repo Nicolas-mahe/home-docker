@@ -69,7 +69,7 @@ services:
     image: itzg/mc-backup
     environment:
       TZ: Europe/Paris
-      INITIAL_DELAY: 5m
+      INITIAL_DELAY: 1h
       BACKUP_INTERVAL: 2h
       SRC_DIR: /data
       BACKUP_NAME: world
@@ -82,7 +82,7 @@ services:
       DEST_DIR: /backups
       LINK_LATEST: FALSE
       TAR_COMPRESS_METHOD: gzip
-      ZSTD_PARAMETERS: -2 --long=25 --single-thread
+      ZSTD_PARAMETERS: -3 --long=25 --single-thread
       RCON_RETRIES: 10
       RCON_RETRY_INTERVAL: 10s
       # EXCLUDES: *.jar,cache,logs
