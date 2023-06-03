@@ -20,7 +20,7 @@ services:
       TYPE: FORGE
       FORGE_VERSION: 40.2.2
       MEMORY: ""
-      JVM_XX_OPTS: "-XX:MaxRAMPercentage=80"
+      JVM_XX_OPTS: "-XX:MaxRAMPercentage=90"
       MAX_PLAYERS: 10
       SPAWN_PROTECTION: 0
       VIEW_DISTANCE: 12
@@ -45,16 +45,17 @@ services:
       PVP: TRUE
       LEVEL_TYPE: normal # type of generating world
       SERVER_NAME: RaBByT_S3
+      # ICON: /backups/icon-server.jpg
       ENABLE_RCON: TRUE
       RCON_PASSWORD: $PERSONAL_RCON_PWD
       RCON_PORT: $PERSONAL_PORT_MINECRAFT_RCON
       RCON_CMDS_STARTUP:  |-
         gamerule playersSleepingPercentage 1
-    deploy:
-      resources:
-        limits:
-          memory: 24G
-          cpus: '7'
+    # deploy:
+    #   resources:
+    #     limits:
+    #       memory: 24G
+    #       cpus: '7'
     volumes:
       - data:/data
       - mods:/mods
@@ -68,25 +69,25 @@ services:
     image: itzg/mc-backup
     environment:
       TZ: Europe/Paris
-      INITIAL_DELAY: 5m
-      BACKUP_INTERVAL: 10m
+      INITIAL_DELAY: 1h
+      BACKUP_INTERVAL: 2h
       SRC_DIR: /data
       BACKUP_NAME: world
       BACKUP_METHOD: tar
-      PRUNE_BACKUPS_DAYS: 1
-      PRUNE_RESTIC_RETENTION: --keep-within 1h
+      PRUNE_BACKUPS_DAYS: 7
+      PRUNE_RESTIC_RETENTION: --keep-within 7d
       RCON_HOST: server
       RCON_PORT: $PERSONAL_PORT_MINECRAFT_RCON
       RCON_PASSWORD: $PERSONAL_RCON_PWD
       DEST_DIR: /backups
-      LINK_LATEST: false
+      LINK_LATEST: FALSE
       TAR_COMPRESS_METHOD: gzip
       ZSTD_PARAMETERS: -3 --long=50 --single-thread
       RCON_RETRIES: 10
       RCON_RETRY_INTERVAL: 10s
       # EXCLUDES: *.jar,cache,logs
-      # PAUSE_IF_NO_PLAYERS: true
-      # PLAYERS_ONLINE_CHECK_INTERVAL: 1h
+      PAUSE_IF_NO_PLAYERS: true
+      PLAYERS_ONLINE_CHECK_INTERVAL: 1h
       PRE_BACKUP_SCRIPT: echo "Backup en cours"
       POST_BACKUP_SCRIPT: echo "Backup done"
     volumes:
