@@ -51,11 +51,11 @@ services:
       RCON_PORT: $PERSONAL_PORT_MINECRAFT_RCON
       RCON_CMDS_STARTUP:  |-
         gamerule playersSleepingPercentage 1
-    # deploy:
-    #   resources:
-    #     limits:
-    #       memory: 24G
-    #       cpus: '7'
+    deploy:
+      resources:
+        limits:
+          memory: 22G
+          cpus: '6'
     volumes:
       - data:/data
       - mods:/mods
