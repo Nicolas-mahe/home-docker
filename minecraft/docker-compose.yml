@@ -1,15 +1,16 @@
 version: "3.8"
 #https://github.com/itzg/docker-minecraft-server
 #https://github.com/itzg/docker-mc-backup
+#https://www.youtube.com/watch?v=PHJE60COs5g&ab_channel=OuiHeberg DNS
 
 services:
   server:
     image: itzg/minecraft-server:2023.3.0
     labels:
-      traefik.enable: true
+      traefik.enable: false
       traefik.http.routers.minecraft.tls: true
       traefik.http.routers.minecraft.entrypoints: websecure
-      traefik.http.routers.minecraft.rule: Host(`minecraft.$PERSONAL_DOMAINE_NAME`)
+      traefik.http.routers.minecraft.rule: Host(`play.$PERSONAL_DOMAINE_NAME`)
       traefik.http.services.minecraft.loadbalancer.server.port: $PERSONAL_PORT_MINECRAFT
     environment:
       UID: $PERSONAL_UID_MINECRAFT
