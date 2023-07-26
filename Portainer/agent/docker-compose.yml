@@ -1,4 +1,4 @@
-#docker run -d \ -p $PERSONNAL_AGENT_PORT:9001 --name portainer_agent --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/docker/volumes:/var/lib/docker/volumes portainer/agent:2.18.4
+#docker run -d -p $PERSONNAL_AGENT_PORT:9001 --name portainer_agent_beta --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/docker/volumes:/var/lib/docker/volumes portainer/agent:2.18.4
 version: '3'
 
 services:
@@ -11,3 +11,5 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/lib/docker/volumes:/var/lib/docker/volumes
+    env_file:
+      - .env
