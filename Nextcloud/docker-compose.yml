@@ -7,7 +7,7 @@ services:
     ports:
       - 3306:3306
     volumes:
-      - nextcloud_bdd:/var/lib/mysql
+      - bdd:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: $ROOT_PWD
       MYSQL_PASSWORD: $PWD
@@ -21,8 +21,8 @@ services:
     container_name: nextcloud_app
     image: nextcloud
     volumes:
-      - nextcloud_app:/var/www/html
-      - /srv/dev-disk-by-uuid-88861031-30c5-4c7f-9b3f-2f4087d6f927/Raid/Users/test:/mnt/data
+      - app:/var/www/html
+      #- /srv/dev-disk-by-uuid-88861031-30c5-4c7f-9b3f-2f4087d6f927/Raid/Users/test:/mnt/data
     networks:
       - web
     ports:
@@ -46,10 +46,8 @@ services:
       - traefik.http.routers.nextcloud.entrypoints=web
     
 volumes:
-  nextcloud_bdd: 
-    external: true
-  nextcloud_app:
-    external: true
+  bdd:
+  app:
 
 networks:
   web:
