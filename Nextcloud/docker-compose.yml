@@ -22,7 +22,7 @@ services:
     image: nextcloud
     volumes:
       - app:/var/www/html
-      #- /srv/dev-disk-by-uuid-88861031-30c5-4c7f-9b3f-2f4087d6f927/Raid/Users/test:/mnt/data
+      - smb:/mnt/data
     networks:
       - web
     ports:
@@ -34,8 +34,6 @@ services:
       MYSQL_USER: $USER
       MYSQL_HOST: bdd
       config_is_read_only: false
-      PUID: 1000
-      PGID: 100
       TZ: Europe/Paris
     restart: unless-stopped
     links:
@@ -48,6 +46,11 @@ services:
 volumes:
   bdd:
   app:
+  smb:
+    driver: local
+    driver_opts:
+      type: cifs
+      device: "//192.168.1.1/share"
 
 networks:
   web:
