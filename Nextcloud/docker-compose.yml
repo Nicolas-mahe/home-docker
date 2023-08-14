@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   bdd:
     container_name: nextcloud_bdd
@@ -9,10 +11,10 @@ services:
     volumes:
       - bdd:/var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: $ROOT_PWD
-      MYSQL_PASSWORD: $PWD
-      MYSQL_DATABASE: $DATABASE
-      MYSQL_USER: $USER
+      MYSQL_ROOT_PASSWORD: ${ROOT_PWD}
+      MYSQL_PASSWORD: ${PWD}
+      MYSQL_DATABASE: ${DATABASE}
+      MYSQL_USER: ${USER}
       TZ: Europe/Paris
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     restart: unless-stopped
@@ -28,10 +30,10 @@ services:
     ports:
       - 9080:80
     environment:
-      NEXTCLOUD_TRUSTED_DOMAINS: $HOST
-      MYSQL_PASSWORD: $PWD
-      MYSQL_DATABASE: $DATABASE
-      MYSQL_USER: $USER
+      NEXTCLOUD_TRUSTED_DOMAINS: ${HOST}
+      MYSQL_PASSWORD: ${PWD}
+      MYSQL_DATABASE: ${DATABASE}
+      MYSQL_USER: ${USER}
       MYSQL_HOST: bdd
       config_is_read_only: false
       TZ: Europe/Paris
@@ -40,7 +42,7 @@ services:
       - bdd
     labels:
       - traefik.enable=true
-      - traefik.http.routers.nextcloud.rule=Host(`$HOST`)
+      - traefik.http.routers.nextcloud.rule=Host(`${HOST}`)
       - traefik.http.routers.nextcloud.entrypoints=web
     
 volumes:
@@ -50,8 +52,8 @@ volumes:
     driver: local
     driver_opts:
       type: cifs
-      device: "//192.168.1.1/Partage_DLNA"
-      o: "username=$SMB_USER,password=$SMB_PWD,uid=$SMB_UID,gid=$SMB_GID"
+      device: ${SMB_ADDR}
+      o: "username=${SMB_USER},password=${SMB_PWD},uid=${SMB_UID},gid=${SMB_GID}"
 
 networks:
   web:
