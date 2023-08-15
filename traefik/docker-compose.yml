@@ -42,7 +42,7 @@ services:
   #     traefik.enable: true
   #     traefik.http.routers.whoami.tls: true
   #     traefik.http.routers.whoami.entrypoints: websecure
-  #     traefik.http.routers.whoami.rule: Host(`whoami.$PERSONAL_DOMAINE_NAME`)
+  #     traefik.http.routers.whoami.rule: Host(`whoami.$PERSONNAL_DOMAINE_NAME`)
   #   networks:
   #     - web
   #   ports:
