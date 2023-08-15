@@ -10,11 +10,11 @@ services:
       traefik.enable: false
       traefik.http.routers.minecraft.tls: true
       traefik.http.routers.minecraft.entrypoints: websecure
-      traefik.http.routers.minecraft.rule: Host(`play.$PERSONAL_DOMAINE_NAME`)
-      traefik.http.services.minecraft.loadbalancer.server.port: $PERSONAL_PORT_MINECRAFT
+      traefik.http.routers.minecraft.rule: Host(`play.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.services.minecraft.loadbalancer.server.port: ${PERSONAL_PORT_MINECRAFT}
     environment:
-      UID: $PERSONAL_UID_MINECRAFT
-      GID: $PERSONAL_GID_MINECRAFT
+      UID: ${PERSONAL_UID_MINECRAFT}
+      GID: ${PERSONAL_GID_MINECRAFT}
       EULA: TRUE
       MOTD: "RaBByT Season v3"
       VERSION: 1.18.2
@@ -48,8 +48,8 @@ services:
       SERVER_NAME: RaBByT_S3
       # ICON: /backups/icon-server.jpg
       ENABLE_RCON: TRUE
-      RCON_PASSWORD: $PERSONAL_RCON_PWD
-      RCON_PORT: $PERSONAL_PORT_MINECRAFT_RCON
+      RCON_PASSWORD: ${PERSONAL_RCON_PWD}
+      RCON_PORT: ${PERSONAL_PORT_MINECRAFT_RCON}
       RCON_CMDS_STARTUP:  |-
         gamerule playersSleepingPercentage 1
     deploy:
@@ -62,7 +62,7 @@ services:
       - mods:/mods
     restart: unless-stopped
     ports:
-      - $PERSONAL_PORT_MINECRAFT:25565
+      - ${PERSONAL_PORT_MINECRAFT}:25565
     networks:
       - web
     
@@ -78,8 +78,8 @@ services:
       PRUNE_BACKUPS_DAYS: 7
       PRUNE_RESTIC_RETENTION: --keep-within 7d
       RCON_HOST: server
-      RCON_PORT: $PERSONAL_PORT_MINECRAFT_RCON
-      RCON_PASSWORD: $PERSONAL_RCON_PWD
+      RCON_PORT: ${PERSONAL_PORT_MINECRAFT_RCON}
+      RCON_PASSWORD: ${PERSONAL_RCON_PWD}
       DEST_DIR: /backups
       LINK_LATEST: FALSE
       TAR_COMPRESS_METHOD: gzip
