@@ -10,8 +10,8 @@ services:
       traefik.enable: true
       traefik.http.routers.minecraft.tls: true
       traefik.http.routers.minecraft.entrypoints: websecure
-      traefik.http.routers.minecraft.rule: Host(`minecraft.$PERSONAL_DOMAINE_NAME`)
-      traefik.http.services.minecraft.loadbalancer.server.port: $PERSONAL_PORT_MINECRAFT
+      traefik.http.routers.minecraft.rule: Host(`minecraft.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.services.minecraft.loadbalancer.server.port: ${PERSONAL_PORT_MINECRAFT}
     environment:
       EULA: TRUE
       VERSION: 1.16.5
@@ -56,7 +56,7 @@ services:
     tty: true
     restart: unless-stopped
     ports:
-      - $PERSONAL_PORT_MINECRAFT:25565
+      - ${PERSONAL_PORT_MINECRAFT}:25565
     networks:
       - web
 
