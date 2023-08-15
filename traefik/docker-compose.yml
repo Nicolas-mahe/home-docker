@@ -51,7 +51,7 @@ services:
   #     - /etc/timezone:/etc/timezone:ro
   #     - /etc/localtime:/etc/localtime:ro
   #   depends_on: 
-  #   - traefik
+  #   - proxy
   
   file-helper:
     container_name: file-helper-traefik
