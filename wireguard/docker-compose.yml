@@ -12,14 +12,14 @@ services:
       - PGID=1000
       - TZ=Europe/Paris
       - SERVERURL=auto
-      - SERVERPORT=$PERSONNAL_PORT_WIREGUARD
+      - SERVERPORT=$PERSONAL_PORT_WIREGUARD
       - PEERS=Nicolas,Laura
       - PEERDNS=auto
       - INTERNAL_SUBNET=10.13.13.0
       - ALLOWEDIPS=0.0.0.0/0
       - LOG_CONFS=true
     ports:
-      - $PERSONNAL_PORT_WIREGUARD:51820/udp
+      - $PERSONAL_PORT_WIREGUARD:51820/udp
     volumes:
       - config:/config
       - /lib/modules:/lib/modules
