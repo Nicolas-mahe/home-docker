@@ -3,58 +3,43 @@ version: '3'
 services:
   pihole:
     container_name: pihole
-    image: pihole/pihole:2023.03.1
-    restart: 'no'
+    hostname: pi.hole
+    image: pihole/pihole
+    restart: unless-stopped
     environment:
       TZ: Europe/Paris
-      WEBPASSWORD: $PIHOLE_PASSWORD
-      DNSMASQ_USER: pihole
-      user: "${PERSONAL_UID_PIHOLE}:${PERSONAL_GID_PIHOLE}"
-      FTLCONF_LOCAL_IPV4: 192.168.1.1
+      WEBPASSWORD: ${PIHOLE_PASSWORD}
+      UID: ${PERSONAL_UID_PIHOLE}
+      GID: ${PERSONAL_GID_PIHOLE}
+      FTLCONF_LOCAL_IPV4: ${PERSONAL_LOCAL_IP}
+      WEBUIBOXEDLAYOUT: traditional
+      WEBTHEME: default-auto
+      PIHOLE_DNS_: 127.0.0.1#8053;1.1.1.1;1.0.0.1 #;2606:4700:4700:#1111;2606:4700:4700:#1001
+      DNSSEC: true
+      DHCP_ACTIVE: false
+      DHCP_IPv6: false
+      IPv6: false
+      DNSMASQ_LISTENING : all
+      TEMPERATUREUNIT: c
     volumes:
       - data:/etc/pihole
       - dnsmasq:/etc/dnsmasq.d
-      # - file:/var
     labels:
       traefik.enable: true
       traefik.http.routers.pihole.tls: true
       traefik.http.routers.pihole.entrypoints: websecure
-      traefik.http.routers.pihole.rule: Host(`pihole.$PERSONAL_DOMAINE_NAME`)
+      traefik.http.routers.pihole.rule: Host(`pihole.${PERSONAL_DOMAINE_NAME}`)
       traefik.http.services.pihole.loadbalancer.server.port: 80
     ports:
-      - 53:53/tcp
-      - 53:53/udp
-      - $PERSONAL_PORT_PIHOLE:80
+      - 8053:53/tcp
+      - 8053:53/udp
+      - ${PERSONAL_PORT_PIHOLE}:80
     networks:
       - web
-    command: sh -c "chown -R 777 /var"
-
-  #   depends_on:
-  #     - file-helper
-
-
-  # file-helper:
-  #   container_name: file-helper-pihole
-  #   restart: 'no'
-  #   image: alpine:latest
-  #   environment:
-  #     - TZ=Europe/Paris
-  #   command: 
-  #       - sh
-  #       - -c
-  #       - >
-  #         ls /file;
-  #         chown -R 777 /file;
-
-  #   volumes:
-  #     - file:/file
-  #   networks:
-  #     - web
-
+          
 volumes:
   data:
   dnsmasq:
-  # file:
 
 networks:
   web:
