@@ -4,6 +4,12 @@ services:
   wireguard:
     image: linuxserver/wireguard:amd64-version-v1.0.20210914
     container_name: wireguard
+    labels:
+      traefik.enable: true
+      traefik.http.routers.vpn.tls: true
+      traefik.http.routers.vpn.entrypoints: websecure
+      traefik.http.routers.vpn.rule: Host(`vpn.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.services.vpn.loadbalancer.server.port: 51820
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
