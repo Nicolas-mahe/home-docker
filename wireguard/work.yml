@@ -4,12 +4,6 @@ services:
   wireguard:
     image: linuxserver/wireguard:amd64-version-v1.0.20210914
     container_name: wireguard
-    labels:
-      traefik.enable: true
-      traefik.http.routers.vpn.tls: true
-      traefik.http.routers.vpn.entrypoints: websecure
-      traefik.http.routers.vpn.rule: Host(`vpn.${PERSONAL_DOMAINE_NAME}`)
-      traefik.http.services.vpn.loadbalancer.server.port: 51820
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
@@ -17,21 +11,21 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Paris
-      - SERVERURL=vpn.${PERSONAL_DOMAINE_NAME}
-      - SERVERPORT=$PERSONNAL_PORT_WIREGUARD
-      - PEERS=Nicolas,Laura
+      - SERVERURL=auto
+      - SERVERPORT=${PERSONAL_PORT_WIREGUARD}
+      - PEERS=Nicolas,Laura,Tablette
       - PEERDNS=auto
       - INTERNAL_SUBNET=10.13.13.0
       - ALLOWEDIPS=0.0.0.0/0
       - LOG_CONFS=true
     ports:
-      - $PERSONNAL_PORT_WIREGUARD:51820/udp
+      - ${PERSONAL_PORT_WIREGUARD}:51820/udp
     volumes:
       - config:/config
       - /lib/modules:/lib/modules
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
-    restart: unless-stopped
+    restart: always
     networks:
       - web
 
