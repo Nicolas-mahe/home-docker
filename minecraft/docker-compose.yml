@@ -71,7 +71,7 @@ services:
     environment:
       TZ: Europe/Paris
       INITIAL_DELAY: 1h
-      BACKUP_INTERVAL: 2h
+      BACKUP_INTERVAL: 1h
       SRC_DIR: /data
       BACKUP_NAME: world
       BACKUP_METHOD: tar
@@ -89,7 +89,7 @@ services:
       # EXCLUDES: *.jar,cache,logs
       PAUSE_IF_NO_PLAYERS: true
       PLAYERS_ONLINE_CHECK_INTERVAL: 1h
-      PRE_BACKUP_SCRIPT: echo "Backup en cours"
+      PRE_BACKUP_SCRIPT: echo "Backup in progress"
       POST_BACKUP_SCRIPT: echo "Backup done"
     volumes:
     - data:/data:ro
