@@ -71,7 +71,7 @@ services:
     environment:
       TZ: Europe/Paris
       INITIAL_DELAY: 1h
-      BACKUP_INTERVAL: 1h
+      BACKUP_INTERVAL: $PERSONAL_INTERVAL_SAVE
       SRC_DIR: /data
       BACKUP_NAME: world
       BACKUP_METHOD: tar
