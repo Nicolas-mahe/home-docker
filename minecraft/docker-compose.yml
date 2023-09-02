@@ -55,8 +55,8 @@ services:
     deploy:
       resources:
         limits:
-          memory: 22G
-          cpus: '6'
+          memory: 28G
+          cpus: '8'
     volumes:
       - data:/data
       - mods:/mods
