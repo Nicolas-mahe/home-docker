@@ -29,29 +29,31 @@ services:
       - "--entrypoints.websecure.address=:443"
       - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
       - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.vpn.address=:51820/udp"
+      - "--http.middlewares.internal-only-ip.ipWhitelist.sourceRange:=${PERSONAL_LOCAL_MASK},${PERSONAL_VPN_MASK}"
     networks:
       - web
     depends_on: 
     - file-helper
 
-  # whoami:
-  #   image: traefik/whoami:latest
-  #   container_name: whoami
-  #   restart: unless-stopped
-  #   labels:
-  #     traefik.enable: true
-  #     traefik.http.routers.whoami.tls: true
-  #     traefik.http.routers.whoami.entrypoints: websecure
-  #     traefik.http.routers.whoami.rule: Host(`whoami.${PERSONAL_DOMAINE_NAME}`)
-  #   networks:
-  #     - web
-  #   ports:
-  #     - ${PERSONAL_PORT_WHOAMI}:80
-  #   volumes:
-  #     - /etc/timezone:/etc/timezone:ro
-  #     - /etc/localtime:/etc/localtime:ro
-  #   depends_on: 
-  #   - proxy
+  whoami:
+    image: traefik/whoami:latest
+    container_name: whoami
+    restart: unless-stopped
+    labels:
+      traefik.enable: true
+      traefik.http.routers.whoami.tls: true
+      traefik.http.routers.whoami.entrypoints: websecure
+      traefik.http.routers.whoami.rule: Host(`whoami.${PERSONAL_DOMAINE_NAME}`)
+    networks:
+      - web
+    ports:
+      - ${PERSONAL_PORT_WHOAMI}:80
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    depends_on: 
+    - proxy
   
   file-helper:
     container_name: file-helper-traefik
