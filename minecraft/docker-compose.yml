@@ -14,7 +14,7 @@ services:
       traefik.http.services.minecraft.loadbalancer.server.port: ${PERSONAL_PORT_MINECRAFT}
     environment:
       EULA: TRUE
-      MOTD: "RaBByT Season v3"
+      MOTD: "&b&l&oRaBByT Season V3\\n&kMinecraft docker Server"
       VERSION: 1.18.2
       TYPE: FORGE
       FORGE_VERSION: 40.2.2
@@ -32,7 +32,6 @@ services:
       ANNOUNCE_PLAYER_ACHIEVEMENTS: TRUE
       GENERATE_STRUCTURES: TRUE
       SNOOPER_ENABLED: FALSE
-      TZ: Europe/Paris
       MODE: survival # 0=survival, 1=creative, 2=adventure, 3=spectator // not sure it work
       FORCE_GAMEMODE: TRUE # force default gamemode at connection
       HARDCORE: FALSE
@@ -58,6 +57,8 @@ services:
     volumes:
       - data:/data
       - mods:/mods
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
     ports:
       - ${PERSONAL_PORT_MINECRAFT}:25565
@@ -92,6 +93,8 @@ services:
     volumes:
       - data:/data:ro
       - backups:/backups
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
     network_mode: "service:server"
     restart: unless-stopped
     
