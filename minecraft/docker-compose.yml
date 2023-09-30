@@ -49,6 +49,7 @@ services:
       RCON_PORT: ${PERSONAL_PORT_MINECRAFT_RCON}
       RCON_CMDS_STARTUP:  |-
         gamerule playersSleepingPercentage 1
+        kill @e[type=item]
     deploy:
       resources:
         limits:
