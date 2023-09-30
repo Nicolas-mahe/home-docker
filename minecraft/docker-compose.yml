@@ -13,8 +13,6 @@ services:
       traefik.http.routers.minecraft.rule: Host(`play.${PERSONAL_DOMAINE_NAME}`)
       traefik.http.services.minecraft.loadbalancer.server.port: ${PERSONAL_PORT_MINECRAFT}
     environment:
-      UID: ${PERSONAL_UID_MINECRAFT}
-      GID: ${PERSONAL_GID_MINECRAFT}
       EULA: TRUE
       MOTD: "RaBByT Season v3"
       VERSION: 1.18.2
@@ -46,7 +44,7 @@ services:
       PVP: TRUE
       LEVEL_TYPE: normal # type of generating world
       SERVER_NAME: RaBByT_S3
-      # ICON: /backups/icon-server.jpg
+      ICON: /mods/RaBByT-S3.jpg
       ENABLE_RCON: TRUE
       RCON_PASSWORD: ${PERSONAL_RCON_PWD}
       RCON_PORT: ${PERSONAL_PORT_MINECRAFT_RCON}
@@ -92,8 +90,8 @@ services:
       PRE_BACKUP_SCRIPT: echo "Backup in progress"
       POST_BACKUP_SCRIPT: echo "Backup done"
     volumes:
-    - data:/data:ro
-    - backups:/backups
+      - data:/data:ro
+      - backups:/backups
     network_mode: "service:server"
     restart: unless-stopped
     
