@@ -14,7 +14,7 @@ services:
       traefik.http.services.minecraft.loadbalancer.server.port: ${PERSONAL_PORT_MINECRAFT}
     environment:
       EULA: TRUE
-      MOTD: "&b&l&oRaBByT Season V3\\n&kMinecraft docker Server"
+      MOTD: "§3§l§oRaBByT Season V3\\n§f§kMinecraft docker Server"
       VERSION: 1.18.2
       TYPE: FORGE
       FORGE_VERSION: 40.2.2
