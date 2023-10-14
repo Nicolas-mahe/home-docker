@@ -18,8 +18,4 @@ services:
       traefik.http.routers.cloudflare.rule: Host(`cloudflare.${PERSONAL_DOMAINE_NAME}`)
     ports:
       - ${PERSONAL_PORT_CLOUDFLARE}:80
-    networks:
-      - web
-networks:
-  web:
-    external: true
+    network_mode: bridge
