@@ -69,9 +69,3 @@ services:
     ports:
       - ${PERSONAL_PORT_MINECRAFT}:25565
     network_mode: bridge
-
-volumes:
-  data: {}
-  modpacks: {}
-      - ${PERSONAL_PORT_MINECRAFT}:25565
-    network_mode: bridge
