@@ -6,8 +6,8 @@ services:
     container_name: Cloudflare-DNS
     image: oznu/cloudflare-ddns:latest
     environment:
-      - API_KEY=$DNS_API_KEY
-      - ZONE=$PERSONAL_DOMAINE_NAME
+      - API_KEY=${DNS_API_KEY}
+      - ZONE=${PERSONAL_DOMAINE_NAME}
       - PROXIED=true
       - TZ=Europe/Paris
       - DELETE_ON_STOP=true
@@ -15,11 +15,7 @@ services:
       traefik.enable: true
       traefik.http.routers.cloudflare.tls: true
       traefik.http.routers.cloudflare.entrypoints: websecure
-      traefik.http.routers.cloudflare.rule: Host(`cloudflare.$PERSONAL_DOMAINE_NAME`)
+      traefik.http.routers.cloudflare.rule: Host(`cloudflare.${PERSONAL_DOMAINE_NAME}`)
     ports:
-      - $PERSONNAL_PORT_CLOUDFLARE:80
-    networks:
-      - web
-networks:
-  web:
-    external: true
+      - ${PERSONAL_PORT_CLOUDFLARE}:80
+    network_mode: bridge
