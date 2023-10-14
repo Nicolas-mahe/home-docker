@@ -21,12 +21,9 @@ services:
     ports:
       - ${PERSONAL_PORT_WIREGUARD}:51820/udp
     volumes:
-      - config:/config
+      - /home/docker/wireguard:/config
       - /lib/modules:/lib/modules
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
     restart: unless-stopped
     network_mode: bridge
-
-volumes:
-  config: {}

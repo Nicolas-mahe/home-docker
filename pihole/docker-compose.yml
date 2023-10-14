@@ -27,8 +27,8 @@ services:
       DNSMASQ_LISTENING : all
       TEMPERATUREUNIT: c
     volumes:
-      - data:/etc/pihole
-      - dnsmasq:/etc/dnsmasq.d
+      - /home/docker/pi_hole/data:/etc/pihole
+      - /home/docker/pi_hole/dnsmasq.d:/etc/dnsmasq.d
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     ports:
