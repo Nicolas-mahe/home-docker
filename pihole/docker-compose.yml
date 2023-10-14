@@ -6,6 +6,13 @@ services:
     hostname: pi.hole
     image: pihole/pihole
     restart: unless-stopped
+    network_mode: bridge
+    labels:
+      traefik.enable: true
+      traefik.http.routers.pihole.tls: true
+      traefik.http.routers.pihole.entrypoints: websecure
+      traefik.http.routers.pihole.rule: Host(`pihole.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.services.pihole.loadbalancer.server.port: 80
     environment:
       TZ: Europe/Paris
       WEBPASSWORD: ${PIHOLE_PASSWORD}
@@ -14,7 +21,7 @@ services:
       FTLCONF_LOCAL_IPV4: ${PERSONAL_LOCAL_IP}
       WEBUIBOXEDLAYOUT: traditional
       WEBTHEME: default-auto
-      PIHOLE_DNS_: 127.0.0.1#8053;1.1.1.1;1.0.0.1 #;2606:4700:4700:#1111;2606:4700:4700:#1001
+      PIHOLE_DNS_: 127.0.0.1#53;1.1.1.1;1.0.0.1 #;2606:4700:4700:#1111;2606:4700:4700:#1001
       DNSSEC: true
       DHCP_ACTIVE: false
       DHCP_IPv6: false
@@ -24,23 +31,13 @@ services:
     volumes:
       - data:/etc/pihole
       - dnsmasq:/etc/dnsmasq.d
-    labels:
-      traefik.enable: true
-      traefik.http.routers.pihole.tls: true
-      traefik.http.routers.pihole.entrypoints: websecure
-      traefik.http.routers.pihole.rule: Host(`pihole.${PERSONAL_DOMAINE_NAME}`)
-      traefik.http.services.pihole.loadbalancer.server.port: 80
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
     ports:
-      - 8053:53/tcp
-      - 8053:53/udp
+      - 53:53/tcp
+      - 53:53/udp
       - ${PERSONAL_PORT_PIHOLE}:80
-    networks:
-      - web
           
 volumes:
-  data:
-  dnsmasq:
-
-networks:
-  web:
-    external: true
+  data: {}
+  dnsmasq: {}
