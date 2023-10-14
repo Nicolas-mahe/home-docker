@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   proxy:
-    image: traefik:2.9.9
+    image: traefik:2.10 #traefik:2.9.9
     restart: always
     container_name: traefik
     volumes:
@@ -13,7 +13,7 @@ services:
     ports:
       - 80:80
       - 443:443
-      - $PERSONNAL_PORT_TRAEFIK:8080
+      - ${PERSONAL_PORT_TRAEFIK}:8080
     command:
       - "--global.sendAnonymousUsage"
       - "--log.level=ERROR"
@@ -42,16 +42,16 @@ services:
   #     traefik.enable: true
   #     traefik.http.routers.whoami.tls: true
   #     traefik.http.routers.whoami.entrypoints: websecure
-  #     traefik.http.routers.whoami.rule: Host(`whoami.$PERSONAL_DOMAINE_NAME`)
+  #     traefik.http.routers.whoami.rule: Host(`whoami.${PERSONAL_DOMAINE_NAME}`)
   #   networks:
   #     - web
   #   ports:
-  #     - $PERSONNAL_PORT_WHOAMI:80
+  #     - ${PERSONAL_PORT_WHOAMI}:80
   #   volumes:
   #     - /etc/timezone:/etc/timezone:ro
   #     - /etc/localtime:/etc/localtime:ro
   #   depends_on: 
-  #   - traefik
+  #   - proxy
   
   file-helper:
     container_name: file-helper-traefik
@@ -64,6 +64,7 @@ services:
       - certs:/certs/
     networks:
       - web
+    # rm: true
 
 volumes:
   certs: {}

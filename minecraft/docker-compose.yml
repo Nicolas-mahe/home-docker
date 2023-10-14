@@ -1,11 +1,17 @@
-version: "3.8"
+version: '3'
 #https://github.com/itzg/docker-minecraft-server
 #https://github.com/itzg/docker-mc-backup
 #https://www.curseforge.com/minecraft/modpacks/ragnamod-vi
 #C:\Users\Nico2\curseforge\minecraft\Instances\Ragnamod VI\ #path of Modpacks
 services:
   minecraft:
-    image: itzg/minecraft-server:java8
+    image: itzg/minecraft-server:java8-openj9
+    labels:
+      traefik.enable: true
+      traefik.http.routers.minecraft.tls: true
+      traefik.http.routers.minecraft.entrypoints: websecure
+      traefik.http.routers.minecraft.rule: Host(`minecraft.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.services.minecraft.loadbalancer.server.port: ${PERSONAL_PORT_MINECRAFT}
     environment:
       EULA: TRUE
       VERSION: 1.16.5
@@ -46,17 +52,15 @@ services:
     volumes:
       - data:/data
       - modpacks:/modpacks
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
     stdin_open: true
     tty: true
     restart: unless-stopped
     ports:
-      - 25566:25565
-    networks:
-      - web
+      - ${PERSONAL_PORT_MINECRAFT}:25565
+    network_mode: bridge
 
 volumes:
   data: {}
   modpacks: {}
-networks:
-    web:
-      external: true

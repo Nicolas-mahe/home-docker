@@ -6,3 +6,6 @@ vars_rabbyt.yml
 vars_zaula.yml
 vars_test.yml
 *.env*
+*.zip
+/minecraft/data
+/minecraft/modpacks
