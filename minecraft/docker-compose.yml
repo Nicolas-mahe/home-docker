@@ -56,15 +56,14 @@ services:
           memory: 28G
           cpus: '8'
     volumes:
-      - data:/data
-      - mods:/mods
+      - /home/docker/mc-s3/data:/data
+      - /home/docker/mc-s3/mods:/mods
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
     ports:
       - ${PERSONAL_PORT_MINECRAFT}:25565
-    networks:
-      - web
+    network_mode: bridge
     
   backups:
     image: itzg/mc-backup
@@ -92,17 +91,9 @@ services:
       PRE_BACKUP_SCRIPT: echo "Backup in progress"
       POST_BACKUP_SCRIPT: echo "Backup done"
     volumes:
-      - data:/data:ro
-      - backups:/backups
+      - /home/docker/mc-s3/data:/data:ro
+      - /home/docker/mc-s3/backups:/backups
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     network_mode: "service:server"
     restart: unless-stopped
-    
-volumes:
-  mods: {}
-  data: {}
-  backups: {}
-networks:
-    web:
-      external: true
