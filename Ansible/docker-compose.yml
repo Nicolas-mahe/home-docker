@@ -9,8 +9,8 @@ services:
     environment:
       TZ: Europe/Paris
     volumes:
-      - git:/Ansible-perso
-      - data:/Ansible-Temp:ro
+      - /home/docker/ansible/git:/Ansible-perso
+      - /home/docker/ansible/data:/Ansible-Temp:ro
     command: >
       sh -c "git clone https://github.com/Nicolas-mahe/Ansible-perso.git && \
             cp -r ./Ansible-Temp/ ./Ansible-perso/Ansible/ &&\
@@ -18,10 +18,4 @@ services:
             cd ./Ansible-perso/Ansible/ && \
             ansible-galaxy collection install -r requirement.yml && \
             ansible-playbook -i inventory.yml playbook.yml"
-
-volumes:
-  git: {}
-  data: {}
-networks:
-    web:
-      external: true
+    network_mode: bridge
