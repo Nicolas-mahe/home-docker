@@ -61,9 +61,17 @@ services:
       - modpacks:/modpacks
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
     stdin_open: true
     tty: true
     restart: unless-stopped
     ports:
+      - ${PERSONAL_PORT_MINECRAFT}:25565
+    network_mode: bridge
+
+volumes:
+  data: {}
+  modpacks: {}
       - ${PERSONAL_PORT_MINECRAFT}:25565
     network_mode: bridge
