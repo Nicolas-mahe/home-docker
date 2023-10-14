@@ -11,6 +11,5 @@ services:
       PGID: 1000
       TZ: Europe/Paris
     ports:
-      - ${PERSONNAL_HEIMDALL_HTTP}:80
-      - ${PERSONNAL_HEIMDALL_HTTPS}:443
+      - ${PERSONNAL_HEIMDALL_PORT}:443
     restart: unless-stopped
