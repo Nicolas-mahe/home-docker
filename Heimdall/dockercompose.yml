@@ -1,0 +1,16 @@
+version: "2.1"
+
+services:
+  heimdall:
+    image: linuxserver/heimdall
+    container_name: heimdall
+    volumes:
+      - /home/docker/heimdall-config:/config
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Paris
+    ports:
+      - ${PERSONNAL_HEIMDALL_HTTP}:80
+      - ${PERSONNAL_HEIMDALL_HTTPS}:443
+    restart: unless-stopped
