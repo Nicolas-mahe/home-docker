@@ -10,7 +10,7 @@ mods:
 /gamerule playersSleepingPercentage 1
 
 
-## Entrer in docker
+## Enter in docker
 ` docker exec -it <name> /bin/bash `
 
 
@@ -25,4 +25,5 @@ apt-get update && \
     pip install requests-credssp && \
     apt install libz-dev libssl-dev libcurl4-gnutls-dev libexpat1-dev gettext cmake gcc -y
 ## Docker-compose
-`docker-compose --env-file portainer.env up -d --force-recreate`
+`docker compose -f Ansible-perso//Portainer/docker-compose.yml up -d --force-recreate --remove-orphans`
+`docker compose -f Ansible-perso/Portainer/agent/docker-compose.yml up -d --force-recreate --remove-orphans`
