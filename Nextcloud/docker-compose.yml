@@ -2,12 +2,11 @@ services:
   bdd:
     container_name: nextcloud_bdd
     image: mariadb:10.5
-    networks:
-      - web
+    network_mode: "service:app"
     ports:
       - 3306:3306
     volumes:
-      - nextcloud_bdd:/var/lib/mysql
+      - /home/docker/nextcloud/bdd:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: $ROOT_PWD
       MYSQL_PASSWORD: $PWD
@@ -26,12 +25,11 @@ services:
       traefik.http.routers.cloud.entrypoints: websecure
       traefik.http.routers.cloud.rule: Host(`cloud.$PERSONAL_DOMAINE_NAME`)
     volumes:
-      - nextcloud_app:/var/www/html
+      - /home/docker/nextcloud/data:/var/www/html
       - /srv/dev-disk-by-uuid-db7c7d33-a087-41db-b3ee-272c7a0601b7/Raid/Users/test:/mnt/data
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
-    networks:
-      - web
+    network_mode: bridge
     ports:
       - 9080:80
     environment:
@@ -44,13 +42,3 @@ services:
     restart: unless-stopped
     links:
       - bdd
-    
-volumes:
-  nextcloud_bdd: 
-    external: true
-  nextcloud_app:
-    external: true
-
-networks:
-  web:
-    external: true
