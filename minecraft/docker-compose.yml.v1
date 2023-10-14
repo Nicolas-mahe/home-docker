@@ -58,13 +58,16 @@ services:
       - /srv/dev-disk-by-uuid-9a8441b6-d899-4899-971f-3068a8e9c748/Ssd/Docker/volumes/minecraft_setting/icon-server.jpg:/data/icon-server.jpg
       - /srv/dev-disk-by-uuid-9a8441b6-d899-4899-971f-3068a8e9c748/Ssd/Docker/volumes/minecraft_setting/whitelist.json:/data/whitelist.json
       - /srv/dev-disk-by-uuid-9a8441b6-d899-4899-971f-3068a8e9c748/Ssd/Docker/volumes/minecraft_setting/mods:/mods
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
     stdin_open: true
     tty: true
     restart: unless-stopped
     ports:
       - 25565:25565
-    networks:
-      - web
+    network_mode: bridge
+
+
   backups:
     image: itzg/mc-backup
     environment:
@@ -83,6 +86,8 @@ services:
     volumes:
     - data:/data:ro
     - backup:/backups
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
     network_mode: "service:server"
     restart: unless-stopped
     
@@ -90,6 +95,3 @@ volumes:
   data: {}
   backup: {}
   setting: {}
-networks:
-    web:
-      external: true
