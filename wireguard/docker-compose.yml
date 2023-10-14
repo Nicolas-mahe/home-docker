@@ -2,7 +2,7 @@ version: '3'
 
 services:
   wireguard:
-    image: lscr.io/linuxserver/wireguard
+    image: linuxserver/wireguard:amd64-version-v1.0.20210914
     container_name: wireguard
     cap_add:
       - NET_ADMIN
@@ -13,7 +13,7 @@ services:
       - TZ=Europe/Paris
       - SERVERURL=auto
       - SERVERPORT=${PERSONAL_PORT_WIREGUARD}
-      - PEERS=Nicolas,Laura
+      - PEERS=Nicolas,Laura,Tablette
       - PEERDNS=auto
       - INTERNAL_SUBNET=10.13.13.0
       - ALLOWEDIPS=0.0.0.0/0
@@ -21,9 +21,9 @@ services:
     ports:
       - ${PERSONAL_PORT_WIREGUARD}:51820/udp
     volumes:
-      - /home/docker/wireguard:/config
-      - /lib/modules:/lib/modules
+      - /home/docker/wireguard/config:/config
+      - /home/docker/wireguard/modules:/lib/modules
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
-    restart: unless-stopped
+    restart: always
     network_mode: bridge
