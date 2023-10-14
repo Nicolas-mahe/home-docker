@@ -5,6 +5,7 @@ version: "3.8"
 
 services:
   server:
+    container_name: minecraft-server
     image: itzg/minecraft-server:2023.3.0
     labels:
       traefik.enable: true
@@ -67,6 +68,7 @@ services:
     
   backups:
     image: itzg/mc-backup
+    container_name: minecraft-save
     environment:
       TZ: Europe/Paris
       INITIAL_DELAY: 1h
