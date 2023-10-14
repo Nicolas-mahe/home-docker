@@ -68,7 +68,7 @@ services:
     
   backups:
     image: itzg/mc-backup
-    container_name: minecraft-save
+    container_name: minecraft-backups
     environment:
       TZ: Europe/Paris
       INITIAL_DELAY: 1h
