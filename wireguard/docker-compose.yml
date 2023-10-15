@@ -21,6 +21,8 @@ services:
     ports:
       - ${PERSONNAL_PORT_WIREGUARD}:51820/udp
     volumes:
+      - /etc/timezone:/etc/timezone:roa
+      - /etc/localtime:/etc/localtime:ro
       - /home/docker/wireguard/config:/config
       - /home/docker/wireguard/modules:/lib/modules
     sysctls:
@@ -32,11 +34,6 @@ services:
     image: traefik/whoami:latest
     container_name: whoami
     restart: unless-stopped
-    labels:
-      traefik.enable: true
-      traefik.http.routers.whoami.tls: true
-      traefik.http.routers.whoami.entrypoints: websecure
-      traefik.http.routers.whoami.rule: Host(`whoami.${PERSONNAL_DOMAINE_NAME}`)
     environment:
       PUID: 1000
       PGID: 1000
