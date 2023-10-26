@@ -68,7 +68,7 @@ services:
     
   save:
     image: itzg/mc-backup
-    container_name: minecraft-backups
+    container_name: minecraft-save
     environment:
       TZ: Europe/Paris
       INITIAL_DELAY: $PERSONAL_INTERVAL_SAVE
