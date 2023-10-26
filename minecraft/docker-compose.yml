@@ -97,5 +97,5 @@ services:
       - /home/docker/mc-s3/backups:/backups
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
-    network_mode: "service:server"
+    network_mode: service:server
     restart: unless-stopped
