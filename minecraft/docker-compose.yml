@@ -66,12 +66,12 @@ services:
       - ${PERSONAL_PORT_MINECRAFT}:25565
     network_mode: bridge
     
-  backups:
+  save:
     image: itzg/mc-backup
     container_name: minecraft-backups
     environment:
       TZ: Europe/Paris
-      INITIAL_DELAY: 1h
+      INITIAL_DELAY: $PERSONAL_INTERVAL_SAVE
       BACKUP_INTERVAL: $PERSONAL_INTERVAL_SAVE
       SRC_DIR: /data
       BACKUP_NAME: world
