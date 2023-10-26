@@ -64,7 +64,7 @@ services:
     restart: unless-stopped
     ports:
       - ${PERSONAL_PORT_MINECRAFT}:25565
-    network_mode: bridge
+    # network_mode: bridge
     
   save:
     image: itzg/mc-backup
