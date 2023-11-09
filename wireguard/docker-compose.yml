@@ -2,7 +2,7 @@ version: '3'
 
 services:
   wireguard:
-    image: linuxserver/wireguard:amd64-version-v1.0.20210914
+    image: lscr.io/linuxserver/wireguard:amd64-version-v1.0.20210914
     container_name: wireguard
     cap_add:
       - NET_ADMIN
@@ -21,7 +21,7 @@ services:
     ports:
       - ${PERSONNAL_PORT_WIREGUARD}:51820/udp
     volumes:
-      - /etc/timezone:/etc/timezone:roa
+      - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
       - /home/docker/wireguard/config:/config
       - /home/docker/wireguard/modules:/lib/modules
@@ -41,6 +41,6 @@ services:
     ports:
       - ${PERSONNAL_PORT_WHOAMI}:80
     volumes:
-      - /etc/timezone:/etc/timezone:roa
+      - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     network_mode: bridge
