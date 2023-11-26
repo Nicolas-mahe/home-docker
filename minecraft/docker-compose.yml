@@ -77,7 +77,7 @@ services:
       BACKUP_NAME: world
       BACKUP_METHOD: tar
       PRUNE_BACKUPS_DAYS: 7
-      PRUNE_RESTIC_RETENTION: --keep-within 7d
+      PRUNE_RESTIC_RETENTION: --keep-within 2d
       RCON_HOST: server
       RCON_PORT: ${PERSONAL_PORT_MINECRAFT_RCON}
       RCON_PASSWORD: ${PERSONAL_RCON_PWD}
