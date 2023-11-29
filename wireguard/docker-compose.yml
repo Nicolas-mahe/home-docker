@@ -13,7 +13,7 @@ services:
       - TZ=Europe/Paris
       - SERVERURL=auto
       - SERVERPORT=${PERSONAL_PORT_WIREGUARD}
-      - PEERS=Nicolas,Laura
+      - PEERS=${PERSONAL_PEER_LIST}
       - PEERDNS=auto
       - INTERNAL_SUBNET=${PERSONAL_VPN_MASK}
       - ALLOWEDIPS=0.0.0.0/0
