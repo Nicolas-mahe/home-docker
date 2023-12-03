@@ -1,11 +1,25 @@
 - name: Setup
   hosts: VM_Test
-  gather_facts: true
+  vars_files: ./vars_test.yml
+  gather_facts: false
   tasks:
   - name: autorisation chocolatey install
     win_shell: Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
+  - name: Install Chocolatey
+    chocolatey.chocolatey.win_chocolatey:
+      name: "{{ item }}"
+      state: present
+    loop: "{{ ChocolateyInstall }}"
+    # register: software_state
+
   - name: Install Software
     chocolatey.chocolatey.win_chocolatey:
-      name: googlechrome
+      name: "{{ item }}"
       state: present
-    register: software_state
+    loop: "{{ SoftwareInstall }}"
+    # register: software_state
+
+  # - name: Reboot Host
+  #   ansible.windows.win_reboot:
+  #   when: software_state.reboot_required
