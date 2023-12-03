@@ -1,0 +1,26 @@
+ChocolateyInstall:
+  - chocolatey
+  - chocolatey-core.extension
+SoftwareInstall:
+  - firefox
+  - steam
+  - ea-app
+  - epicgameslauncher
+  - ubisoft-connect
+  - goggalaxy
+  - rockstar-launcher
+  - minecraft-launcher
+  - icue
+  - wavelink
+  - streamdeck
+  - lghub
+  - obs-studio
+  - powertoys
+  - hwinfo
+  - docker-desktop
+  - mobaxterm
+  - bitwarden
+  - brave
+  - opera-gx
+  - discord
+  - vscode
