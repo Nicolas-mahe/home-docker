@@ -5,15 +5,16 @@ services:
     image: rabbyt/ansible_ubuntu
     restart: "no"
     ports:
-      - 5985:5985
+      - 8080:5985
     environment:
       TZ: Europe/Paris
     volumes:
       - /home/docker/ansible/git:/Ansible-perso
       - /home/docker/ansible/data:/Ansible-Temp:ro
     command: >
-      sh -c "git clone https://github.com/Nicolas-mahe/Ansible-perso.git && \
-            cp -r ./Ansible-Temp/ ./Ansible-perso/Ansible/ &&\
+      sh -c "find /Ansible-perso/ -mindepth 1 -delete && \
+            git clone -b ansible https://github.com/Nicolas-mahe/Ansible-perso.git && \
+            cp -r ./Ansible-Temp/* ./Ansible-perso/Ansible/ &&\
             git config --global --add safe.directory /Ansible-perso && \
             cd ./Ansible-perso/Ansible/ && \
             ansible-galaxy collection install -r requirement.yml && \
