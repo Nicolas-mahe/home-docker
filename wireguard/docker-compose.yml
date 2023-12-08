@@ -2,7 +2,7 @@ version: '3'
 
 services:
   wireguard:
-    image: lscr.io/linuxserver/wireguard:amd64-version-v1.0.20210914
+    image: linuxserver/wireguard:amd64-version-v1.0.20210914
     container_name: wireguard
     cap_add:
       - NET_ADMIN
