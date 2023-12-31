@@ -2,7 +2,7 @@ version: "2.1"
 
 services:
   heimdall:
-    image: linuxserver/heimdall
+    image: linuxserver/heimdall:${PERSONAL_HEIMDALL_VERSION}
     container_name: heimdall
     volumes:
       - /home/docker/heimdall-config:/config
