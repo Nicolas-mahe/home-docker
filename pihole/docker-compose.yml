@@ -4,7 +4,7 @@ services:
   pihole:
     container_name: pihole
     hostname: pi.hole
-    image: pihole/pihole
+    image: pihole/pihole:${PERSONAL_PIHOLE_VERSION}
     restart: unless-stopped
     network_mode: bridge
     labels:
@@ -25,7 +25,7 @@ services:
       DHCP_IPv6: false
       IPv6: false
       DNSMASQ_LISTENING : all
-      TEMPERATUREUNIT: c
+      TEMPERATUREUNIT: C
     volumes:
       - /home/docker/pi_hole/data:/etc/pihole
       - /home/docker/pi_hole/dnsmasq.d:/etc/dnsmasq.d

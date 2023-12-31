@@ -1,12 +1,12 @@
 version: '3.9'
 services:
   app:
-    image: 'jc21/nginx-proxy-manager:2.9.22'
+    image: jc21/nginx-proxy-manager:${PERSONAL_NGINX_VERSION} #2.9.22
     restart: unless-stopped
     container_name: nginx-proxy
     ports:
       - '80:80'
-      - '${PERSONNAL_NGINX_PORT}:81'
+      - '${PERSONAL_NGINX_PORT}:81'
       - '443:443'
     volumes:
       - /home/docker/nginx/data:/data
