@@ -13,8 +13,8 @@ services:
       - URL=chou-dou.com
       - VALIDATION=dns
       - PROPAGATION= 30
-      - SUBDOMAINS=wildcard #optional
-      - DNSPLUGIN=cloudflare #optional
+      - SUBDOMAINS=wildcard
+      - DNSPLUGIN=cloudflare
       - EMAIL= ${PERSONAL_EMAIL}
       - EXTRA_DOMAINS= #optional
     volumes:
@@ -22,4 +22,21 @@ services:
     ports:
       - 443:443
     restart: always
+    network_mode: bridge
+
+  authelia:
+    image: authelia/authelia
+    container_name: authelia
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    volumes:
+      - /home/docker/reverse-proxy/authelia:/config
+    expose:
+      - 9091
+    restart: unless-stopped
+    healthcheck:
+      ## In production the healthcheck section should be commented.
+      disable: true
     network_mode: bridge
