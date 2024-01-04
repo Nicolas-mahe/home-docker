@@ -4,15 +4,8 @@ services:
   pihole:
     container_name: pihole
     hostname: pi.hole
-    image: pihole/pihole:${PERSONAL_PIHOLE_VERSION}
+    image: pihole/pihole
     restart: unless-stopped
-    network_mode: bridge
-    labels:
-      traefik.enable: true
-      traefik.http.routers.pihole.tls: true
-      traefik.http.routers.pihole.entrypoints: websecure
-      traefik.http.routers.pihole.rule: Host(`pihole.${PERSONAL_DOMAINE_NAME}`)
-      traefik.http.services.pihole.loadbalancer.server.port: 80
     environment:
       TZ: Europe/Paris
       WEBPASSWORD: ${PIHOLE_PASSWORD}
@@ -25,17 +18,19 @@ services:
       DHCP_IPv6: false
       IPv6: false
       DNSMASQ_LISTENING : all
-      TEMPERATUREUNIT: C
+      TEMPERATUREUNIT: c
     volumes:
       - /home/docker/pi_hole/data:/etc/pihole
       - /home/docker/pi_hole/dnsmasq.d:/etc/dnsmasq.d
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     ports:
-      - 53:53/tcp
-      - 53:53/udp
+      - 8053:53/tcp
+      - 8053:53/udp
       - ${PERSONAL_PORT_PIHOLE}:80
-          
-volumes:
-  data: {}
-  dnsmasq: {}
+    networks:
+    - web
+
+networks:
+  web:
+    external: true
