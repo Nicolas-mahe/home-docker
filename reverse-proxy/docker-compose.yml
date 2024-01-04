@@ -2,8 +2,9 @@ version: "2.1"
 
 services:
   swag:
-    image: linuxserver/swag:latest
+    image: linuxserver/swag
     container_name: swag
+    hostname: swag
     cap_add:
       - NET_ADMIN
     environment:
@@ -28,6 +29,7 @@ services:
   authelia:
     image: authelia/authelia
     container_name: authelia
+    hostname: swag
     environment:
       - PUID=1000
       - PGID=1000
