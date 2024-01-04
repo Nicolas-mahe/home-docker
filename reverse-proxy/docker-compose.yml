@@ -1,0 +1,25 @@
+version: "2.1"
+
+services:
+  swag:
+    image: linuxserver/swag:latest
+    container_name: swag
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+      - URL=chou-dou.com
+      - VALIDATION=dns
+      - PROPAGATION= 30
+      - SUBDOMAINS=wildcard #optional
+      - DNSPLUGIN=cloudflare #optional
+      - EMAIL= ${PERSONAL_EMAIL}
+      - EXTRA_DOMAINS= #optional
+    volumes:
+      - /home/docker/reverse-proxy/swag:/config
+    ports:
+      - 443:443
+    restart: always
+    network_mode: bridge
