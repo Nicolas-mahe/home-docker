@@ -22,7 +22,8 @@ services:
     ports:
       - 443:443
     restart: always
-    network_mode: bridge
+    networks:
+      - web
 
   authelia:
     image: authelia/authelia
@@ -36,7 +37,9 @@ services:
     expose:
       - 9091
     restart: unless-stopped
-    healthcheck:
-      ## In production the healthcheck section should be commented.
-      disable: true
-    network_mode: bridge
+    networks:
+      - web
+
+networks:
+  web:
+    external: true

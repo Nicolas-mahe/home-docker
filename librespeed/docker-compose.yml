@@ -13,4 +13,9 @@ services:
     ports:
       - ${PERSONAL_LIBRESPEED_PORT}:80
     restart: unless-stopped
-    network_mode: bridge
+    networks:
+    - web
+
+networks:
+  web:
+    external: true
