@@ -12,10 +12,9 @@ services:
       PROXIED: true
       TZ: Europe/Paris
       DELETE_ON_STOP: true
-    ports:
-      - ${PERSONAL_PORT_CLOUDFLARE}:80
     networks:
       - web
+
 networks:
   web:
     external: true
