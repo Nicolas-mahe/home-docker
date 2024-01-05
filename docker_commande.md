@@ -27,3 +27,7 @@ apt-get update && \
 ## Docker-compose
 `docker compose -f Ansible-perso//Portainer/docker-compose.yml up -d --force-recreate --remove-orphans`
 `docker compose -f Ansible-perso/Portainer/agent/docker-compose.yml up -d --force-recreate --remove-orphans`
+
+## Authelia
+to generate a new password:
+`docker run authelia/authelia:latest authelia crypto hash generate argon2 --password 'CHANGEME'`
