@@ -12,8 +12,6 @@ services:
       TZ: Europe/Paris
     volumes:
       - /home/docker/heimdall:/config
-    ports:
-      - ${PERSONNAL_HEIMDALL_PORT}:443
     networks:
     - web
 
