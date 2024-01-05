@@ -5,6 +5,7 @@ services:
     image: linuxserver/swag
     container_name: swag
     hostname: swag
+    restart: always
     cap_add:
       - NET_ADMIN
     environment:
@@ -21,7 +22,6 @@ services:
       - /home/docker/reverse-proxy/swag:/config
     ports:
       - 443:443
-    restart: always
     networks:
       - web
 
@@ -29,16 +29,16 @@ services:
     image: authelia/authelia
     container_name: authelia
     hostname: authelia
+    restart: unless-stopped
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/Paris
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Paris
     volumes:
       - /home/docker/reverse-proxy/authelia/config:/config
       - /home/docker/reverse-proxy/authelia/log:/var/log
     expose:
       - 9091
-    restart: unless-stopped
     networks:
       - web
 
