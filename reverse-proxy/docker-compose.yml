@@ -17,7 +17,6 @@ services:
       - SUBDOMAINS=wildcard
       - DNSPLUGIN=cloudflare
       - EMAIL= ${PERSONAL_EMAIL}
-      - EXTRA_DOMAINS= #optional
     volumes:
       - /home/docker/reverse-proxy/swag:/config
     ports:
@@ -29,13 +28,14 @@ services:
   authelia:
     image: authelia/authelia
     container_name: authelia
-    hostname: swag
+    hostname: authelia
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Paris
     volumes:
-      - /home/docker/reverse-proxy/authelia:/config
+      - /home/docker/reverse-proxy/authelia/config:/config
+      - /home/docker/reverse-proxy/authelia/log:/var/log
     expose:
       - 9091
     restart: unless-stopped
