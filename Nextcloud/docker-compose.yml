@@ -1,61 +1,39 @@
-version: '3.8'
-
+version: "2"
 services:
-  bdd:
-    container_name: nextcloud_bdd
-    image: mariadb
-    networks:
-      - web
-    ports:
-      - 3306:3306
-    volumes:
-      - bdd:/var/lib/mysql
-      - /etc/localtime:/etc/localtime:ro
-    environment:
-      MYSQL_ROOT_PASSWORD: ${ROOT_PWD}
-      MYSQL_PASSWORD: ${PWD}
-      MYSQL_DATABASE: ${DATABASE}
-      MYSQL_USER: ${USER}
-      TZ: Europe/Paris
-    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+  nextcloud:
     restart: unless-stopped
-
-  app:
-    container_name: nextcloud_app
-    image: nextcloud
-    volumes:
-      - app:/var/www/html
-      - smb:/mnt/data
-      - /etc/localtime:/etc/localtime:ro
-    networks:
-      - web
-    ports:
-      - 9080:80
+    image: linuxserver/nextcloud
+    hostname: nextcloud
+    container_name: nextcloud
     environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Paris
       NEXTCLOUD_TRUSTED_DOMAINS: ${HOST}
-      MYSQL_PASSWORD: ${PWD}
-      MYSQL_DATABASE: ${DATABASE}
-      MYSQL_USER: ${USER}
-      MYSQL_HOST: bdd
-      config_is_read_only: false
-      TZ: Europe/Paris
+    volumes:
+      - /home/docker/nextcloud/config:/config
+      - /home/docker/nextcloud/data:/data
+    depends_on:
+      - mariadb
+    ports:
+      - 450:443
+    networks:
+      - web
+
+  mariadb:
     restart: unless-stopped
-    links:
-      - bdd
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.nextcloud.rule=Host(`${HOST}`)
-      - traefik.http.routers.nextcloud.entrypoints=web
-    
-volumes:
-  bdd:
-  app:
-  smb:
-    driver: local
-    driver_opts:
-      type: cifs
-      device: ${SMB_ADDR}
-      o: "username=${SMB_USER},password=${SMB_PWD},uid=${SMB_UID},gid=${SMB_GID}"
+    image: linuxserver/mariadb
+    container_name: nextcloud_db
+    hostname: nextcloud_db
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Paris
+      MYSQL_ROOT_PASSWORD: ${ROOT_PWD}
+    volumes:
+      - /home/docker/nextcloud/mariadb:/config
+    networks:
+      - web
 
 networks:
   web:
