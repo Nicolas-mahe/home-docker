@@ -12,7 +12,7 @@ services:
       NEXTCLOUD_TRUSTED_DOMAINS: ${HOST}
     volumes:
       - /home/docker/nextcloud/config:/config
-      - /home/docker/nextcloud/data:/data
+      - nextcloud_data:/data
     depends_on:
       - mariadb
     ports:
@@ -34,6 +34,13 @@ services:
       - /home/docker/nextcloud/mariadb:/config
     networks:
       - web
+
+volumes:
+  nextcloud_data:
+    driver_opts:
+      type: nfs
+      o: "addr=192.168.1.1,rw,nolock,nfsvers=4"
+      device: ":/export/nextcloud/data"
 
 networks:
   web:
