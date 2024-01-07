@@ -1,0 +1,50 @@
+version: '2.1'
+
+services:
+  swag:
+    restart: always
+    image: linuxserver/swag
+    container_name: swag
+    hostname: swag
+    cap_add:
+      - NET_ADMIN
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Paris
+      URL: ${PERSONAL_DOMAINE_NAME}
+      VALIDATION: dns
+      PROPAGATION: 30
+      SUBDOMAINS: wildcard
+      DNSPLUGIN: cloudflare
+      EMAIL: ${PERSONAL_EMAIL}
+      DOCKER_MODS: linuxserver/mods:swag-dashboard #|lineserver/mods:swag-dbip
+    volumes:
+      - /home/docker/swag:/config #config Swag
+      - /home/docker/authelia/config/authelia.log:/authelia/authelia.log:ro #Logs Authelia
+      - /home/docker/nextcloud/config/nextcloud.log:/nextcloud/nextcloud.log:ro #Logs Nextcloud
+    ports:
+      - 443:443
+    networks:
+      - web
+
+  authelia:
+    restart: always
+    image: authelia/authelia
+    container_name: authelia
+    hostname: authelia
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Paris
+    volumes:
+      - /home/docker/authelia/config:/config
+      - /home/docker/authelia/log:/var/log
+    expose:
+      - 9091
+    networks:
+      - web
+
+networks:
+  web:
+    external: true
