@@ -2,18 +2,19 @@ version: '2'
 
 services:
   cloudflare-ddns:
+    image: oznu/cloudflare-ddns
+    container_name: cloudflare-ddns
+    hostname: cloudflare-ddns
     restart: always
-    container_name: Cloudflare-DNS
-    image: oznu/cloudflare-ddns:latest
     environment:
-      - API_KEY=${DNS_API_KEY}
-      - ZONE=${PERSONAL_DOMAINE_NAME}
-      - PROXIED=true
-      - TZ=Europe/Paris
-      - DELETE_ON_STOP=true
-    labels:
-      traefik.enable: true
-      traefik.http.routers.cloudflare.tls: true
-      traefik.http.routers.cloudflare.entrypoints: websecure
-      traefik.http.routers.cloudflare.rule: Host(`cloudflare.${PERSONAL_DOMAINE_NAME}`)
-    network_mode: bridge
+      API_KEY: ${DNS_API_KEY}
+      ZONE: ${PERSONAL_DOMAINE_NAME}
+      PROXIED: true
+      TZ: Europe/Paris
+      DELETE_ON_STOP: true
+    networks:
+      - web
+
+networks:
+  web:
+    external: true

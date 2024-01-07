@@ -1,18 +1,20 @@
-version: "2.1"
+version: '2.1'
 
 services:
   heimdall:
-    image: linuxserver/heimdall:${PERSONAL_HEIMDALL_VERSION}
+    image: linuxserver/heimdall
     container_name: heimdall
-    volumes:
-      - /home/docker/heimdall-config:/config
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
+    hostname: heimdall
+    restart: unless-stopped
     environment:
       PUID: 1000
       PGID: 1000
       TZ: Europe/Paris
-    ports:
-      - ${PERSONNAL_HEIMDALL_PORT}:443
-    restart: unless-stopped
-    network_mode: bridge
+    volumes:
+      - /home/docker/heimdall:/config
+    networks:
+    - web
+
+networks:
+  web:
+    external: true
