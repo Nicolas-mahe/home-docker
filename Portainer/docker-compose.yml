@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  portainer:
+    container_name: portainer
+    hostname: portainer
+    image: portainer/portainer-ee:${PERSONAL_PORTAINER_VERSION}
+    restart: always
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Paris
+    ports:
+      - ${PERSONAL_PORT_PORTAINER}:9000
+    volumes:
+      - /home/docker/portainer:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+    - web
+
+networks:
+  web:
+    external: true

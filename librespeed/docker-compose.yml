@@ -1,0 +1,21 @@
+version: '2.1'
+
+services:
+  librespeed:
+    image: linuxserver/librespeed
+    container_name: librespeed
+    hostname: librespeed
+    restart: unless-stopped
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Paris
+      PASSWORD: ${PERSONAL_LIBRESPEED_PWD}
+    volumes:
+      - /home/docker/librespeed:/config
+    networks:
+    - web
+
+networks:
+  web:
+    external: true
