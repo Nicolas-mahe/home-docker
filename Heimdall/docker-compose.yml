@@ -2,7 +2,7 @@ version: '2.1'
 
 services:
   heimdall:
-    image: linuxserver/heimdall
+    image: lscr.io/linuxserver/heimdall
     container_name: heimdall
     hostname: heimdall
     restart: unless-stopped
