@@ -71,6 +71,8 @@ services:
       - authelia-back
 
 networks:
+  authelia-back:
+    name: authelia-back
   cloud:
     name: cloud
   dns:
