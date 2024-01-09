@@ -3,7 +3,7 @@ version: '2.1'
 services:
   swag:
     restart: always
-    image: linuxserver/swag
+    image: lscr.io/linuxserver/swag
     container_name: swag
     hostname: swag
     cap_add:
@@ -26,6 +26,12 @@ services:
     ports:
       - 443:443
     networks:
+      - cloud
+      - dns
+      - homepage
+      - librespeed
+      - portainer
+      - vpn
       - web
 
   authelia:
@@ -48,7 +54,7 @@ services:
 
   mariadb:
     restart: unless-stopped
-    image: linuxserver/mariadb
+    image: lscr.io/linuxserver/mariadb
     container_name: authelia_db
     hostname: authelia_db
     environment:
@@ -65,8 +71,17 @@ services:
       - authelia-back
 
 networks:
-  authelia-back:
-    name: authelia-back
-
+  cloud:
+    name: cloud
+  dns:
+    name: dns
+  homepage:
+    name: homepage
+  librespeed:
+    name: librespeed
+  portainer:
+    name: portainer
+  vpn:
+    name: vpn
   web:
-    external: true
+    name: web
