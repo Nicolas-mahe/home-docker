@@ -3,7 +3,7 @@ version: '2.1'
 services:
   swag:
     restart: always
-    image: lscr.io/linuxserver/swag
+    image: ghcr.io/linuxserver/swag
     container_name: swag
     hostname: swag
     cap_add:
@@ -18,7 +18,7 @@ services:
       SUBDOMAINS: wildcard
       DNSPLUGIN: cloudflare
       EMAIL: ${PERSONAL_EMAIL}
-      DOCKER_MODS: linuxserver/mods:swag-dashboard #|lineserver/mods:swag-dbip
+      DOCKER_MODS: linuxserver/mods:swag-dashboard|lineserver/mods:swag-dbip|linuxserver/mods:swag-auto-reload
     volumes:
       - /home/docker/swag:/config #config Swag
       - /home/docker/authelia/config/authelia.log:/authelia/authelia.log:ro #Logs Authelia
@@ -28,6 +28,7 @@ services:
     networks:
       - cloud
       - dns
+      - duplicati
       - homepage
       - librespeed
       - portainer
@@ -36,7 +37,7 @@ services:
 
   authelia:
     restart: always
-    image: authelia/authelia
+    image: ghcr.io/authelia/authelia
     container_name: authelia
     hostname: authelia
     environment:
@@ -54,7 +55,7 @@ services:
 
   mariadb:
     restart: unless-stopped
-    image: lscr.io/linuxserver/mariadb
+    image: ghcr.io/linuxserver/mariadb
     container_name: authelia_db
     hostname: authelia_db
     environment:
@@ -85,7 +86,5 @@ networks:
     name: librespeed
   portainer:
     name: portainer
-  # vpn:
-  #   name: vpn
   web:
     external: true
