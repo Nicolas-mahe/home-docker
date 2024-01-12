@@ -31,7 +31,7 @@ services:
       - homepage
       - librespeed
       - portainer
-      - vpn
+      # - vpn
       - web
 
   authelia:
@@ -85,7 +85,7 @@ networks:
     name: librespeed
   portainer:
     name: portainer
-  vpn:
-    name: vpn
+  # vpn:
+  #   name: vpn
   web:
-    name: web
+    external: true
