@@ -3,7 +3,7 @@ version: '2.1'
 services:
   swag:
     restart: always
-    image: lscr.io/linuxserver/swag
+    image: ghcr.io/linuxserver/swag
     container_name: swag
     hostname: swag
     cap_add:
@@ -48,7 +48,7 @@ services:
 
   mariadb:
     restart: unless-stopped
-    image: lscr.io/linuxserver/mariadb
+    image: ghcr.io/linuxserver/mariadb
     container_name: authelia_db
     hostname: authelia_db
     environment:
