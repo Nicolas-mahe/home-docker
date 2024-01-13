@@ -3,7 +3,7 @@ version: '2.1'
 services:
   swag:
     restart: always
-    image: linuxserver/swag
+    image: ghcr.io/linuxserver/swag
     container_name: swag
     hostname: swag
     cap_add:
@@ -43,8 +43,30 @@ services:
     expose:
       - 9091
     networks:
+      - authelia-back
       - web
 
+  mariadb:
+    restart: unless-stopped
+    image: ghcr.io/linuxserver/mariadb
+    container_name: authelia_db
+    hostname: authelia_db
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Paris
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_USER}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - /home/docker/authelia/mariadb:/config
+    networks:
+      - authelia-back
+
 networks:
+  authelia-back:
+    name: authelia-back
+
   web:
     external: true
