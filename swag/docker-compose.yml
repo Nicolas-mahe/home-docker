@@ -1,4 +1,4 @@
-version: '2.1'
+version: '3.8'
 
 services:
   swag:
@@ -8,6 +8,8 @@ services:
     hostname: swag
     cap_add:
       - NET_ADMIN
+    security_opt:
+      - no-new-privileges=true
     environment:
       PUID: 1000
       PGID: 1000
@@ -18,7 +20,7 @@ services:
       SUBDOMAINS: wildcard
       DNSPLUGIN: cloudflare
       EMAIL: ${PERSONAL_EMAIL}
-      DOCKER_MODS: linuxserver/mods:swag-dashboard|lineserver/mods:swag-dbip|linuxserver/mods:swag-auto-reload
+      DOCKER_MODS: ghcr.io/linuxserver/mods:swag-dashboard|ghcr.io/linuxserver/mods:swag-auto-reload|ghcr.io/lineserver/mods:swag-dbip
     volumes:
       - /home/docker/swag:/config #config Swag
       - /home/docker/authelia/config/authelia.log:/authelia/authelia.log:ro #Logs Authelia
@@ -32,7 +34,6 @@ services:
       - homepage
       - librespeed
       - portainer
-      # - vpn
       - web
 
   authelia:
