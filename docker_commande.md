@@ -31,3 +31,7 @@ apt-get update && \
 ## Authelia
 to generate a new password:
 `docker run authelia/authelia:latest authelia crypto hash generate argon2 --password 'CHANGEME'`
+
+## Fail2Ban
+fail2ban-client status
+fail2ban-client set [nom du jail] unbanip [IP concerné]
