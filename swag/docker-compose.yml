@@ -26,7 +26,7 @@ services:
       CROWDSEC_CAPTCHA_PROVIDER: recaptcha
       CROWDSEC_SITE_KEY: ${CROWDSEC_SITE_KEY}
       CROWDSEC_SECRET_KEY: ${CROWDSEC_SECRET_KEY}
-      DOCKER_MODS: ghcr.io/linuxserver/mods:swag-dashboard|ghcr.io/linuxserver/mods:swag-auto-reload|ghcr.io/lineserver/mods:swag-dbip|ghcr.io/linuxserver/mods:swag-crowdsec
+      DOCKER_MODS: ghcr.io/linuxserver/mods:swag-dashboard|ghcr.io/linuxserver/mods:swag-auto-reload|ghcr.io/linuxserver/mods:swag-dbip|ghcr.io/linuxserver/mods:swag-crowdsec
     volumes:
       - /home/docker/swag:/config #Config Swag
       - /home/docker/authelia/config/authelia.log:/authelia/authelia.log:ro #Logs Authelia
