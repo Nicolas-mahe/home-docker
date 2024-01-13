@@ -1,8 +1,9 @@
-version: "2"
+version: '3.8'
+
 services:
   nextcloud:
     restart: unless-stopped
-    image: linuxserver/nextcloud
+    image: ghcr.io/linuxserver/nextcloud
     hostname: nextcloud
     container_name: nextcloud
     environment:
@@ -10,19 +11,21 @@ services:
       PGID: 1000
       TZ: Europe/Paris
       NEXTCLOUD_TRUSTED_DOMAINS: ${HOST}
+      DOCKER_MODS: ghcr.io/linuxserver/mods:nextcloud-mediadc|ghcr.io/linuxserver/mods:nextcloud-memories
     volumes:
       - /home/docker/nextcloud/config:/config
       - /home/docker/nextcloud/data:/data
     depends_on:
       - mariadb
-    ports:
-      - 450:443
+    # ports:
+    #   - 450:443
     networks:
-      - web
+      - cloud
+      - cloud_db
 
   mariadb:
     restart: unless-stopped
-    image: linuxserver/mariadb
+    image: ghcr.io/linuxserver/mariadb
     container_name: nextcloud_db
     hostname: nextcloud_db
     environment:
@@ -33,8 +36,10 @@ services:
     volumes:
       - /home/docker/nextcloud/mariadb:/config
     networks:
-      - web
+      - cloud_db
 
 networks:
-  web:
-    external: true
+  cloud:
+    name: cloud
+  cloud_db:
+    name: cloud_db
