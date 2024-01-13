@@ -71,6 +71,8 @@ services:
     image: ghcr.io/authelia/authelia
     container_name: authelia
     hostname: authelia
+    security_opt:
+      - no-new-privileges=true
     environment:
       PUID: 1000
       PGID: 1000
@@ -89,6 +91,8 @@ services:
     image: ghcr.io/linuxserver/mariadb
     container_name: authelia_db
     hostname: authelia_db
+    security_opt:
+      - no-new-privileges=true
     environment:
       PUID: 1000
       PGID: 1000
