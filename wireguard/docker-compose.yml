@@ -2,7 +2,7 @@ version: '3'
 
 services:
   wireguard:
-    image: linuxserver/wireguard
+    image: ghcr.io/linuxserver/wireguard
     container_name: wireguard
     hostname: wireguard
     restart: unless-stopped
