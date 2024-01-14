@@ -1,0 +1,29 @@
+version: "3.5"
+
+services:
+  diun:
+    restart: unless-stopped
+    image: ghcr.io/crazymax/diun
+    container_name: diun
+    hostname: diun
+    command: serve
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+    environment:
+      TZ: Europe/Paris
+      LOG_LEVEL: info
+      LOG_JSON: false
+      DIUN_WATCH_WORKERS: 20
+      DIUN_WATCH_SCHEDULE: 0 17 * * *
+      DIUN_PROVIDERS_DOCKER: true
+    volumes:
+      - /home/docker/diun:/data
+      - /home/docker/diun/duin.yml:/duin.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - diun
+
+networks:
+  diun:
+    name: diun
