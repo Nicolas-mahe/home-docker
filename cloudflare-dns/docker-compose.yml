@@ -1,21 +1,23 @@
-version: '2'
+version: '3.8'
 
 services:
   cloudflare-ddns:
+    restart: always
     image: oznu/cloudflare-ddns
     container_name: cloudflare-ddns
     hostname: cloudflare-ddns
-    restart: always
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
     environment:
       API_KEY: ${DNS_API_KEY}
       ZONE: ${PERSONAL_DOMAINE_NAME}
       PROXIED: true
       TZ: Europe/Paris
       DELETE_ON_STOP: true
-    ports:
-      - ${PERSONAL_PORT_CLOUDFLARE}:80
     networks:
       - web
+
 networks:
   web:
     external: true
