@@ -13,7 +13,7 @@ services:
       APP_NAME: home.${PERSONAL_DOMAINE_NAME}
     volumes:
       - /home/docker/heimdall:/config
-      - /home/docker/heimdall/icon_server.ico:/var/www/localhost/heimdall/public/favicon.ico
+      - /home/docker/heimdall/icon_server.ico:/icon.ico:/var/www/localhost/heimdall/public/favicon.ico
     networks:
     - web
 
