@@ -5,6 +5,9 @@ services:
     image: traefik:2.10 #traefik:2.9.9
     restart: always
     container_name: traefik
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
     volumes:
       - /home/docker/traefik/certs:/certs/
       - /var/run/docker.sock:/var/run/docker.sock:ro
