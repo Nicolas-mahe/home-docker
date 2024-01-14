@@ -6,6 +6,9 @@ services:
     image: ghcr.io/linuxserver/nextcloud
     hostname: nextcloud
     container_name: nextcloud
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
     environment:
       PUID: 1000
       PGID: 1000
@@ -28,6 +31,9 @@ services:
     image: ghcr.io/linuxserver/mariadb
     container_name: nextcloud_db
     hostname: nextcloud_db
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
     environment:
       PUID: 1000
       PGID: 1000

@@ -2,10 +2,13 @@ version: '2.1'
 
 services:
   librespeed:
+    restart: unless-stopped
     image: ghcr.io/linuxserver/librespeed
     container_name: librespeed
     hostname: librespeed
-    restart: unless-stopped
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
     environment:
       PUID: 1000
       PGID: 1000
