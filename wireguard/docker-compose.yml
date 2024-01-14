@@ -2,15 +2,18 @@ version: '3'
 
 services:
   wireguard:
+    restart: unless-stopped
     image: ghcr.io/linuxserver/wireguard
     container_name: wireguard
     hostname: wireguard
-    restart: unless-stopped
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
     environment:
       PUID: 1000
       PGID: 1000

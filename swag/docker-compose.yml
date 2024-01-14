@@ -6,6 +6,9 @@ services:
     image: ghcr.io/linuxserver/swag
     container_name: swag
     hostname: swag
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
     cap_add:
       - NET_ADMIN
     security_opt:
@@ -26,7 +29,7 @@ services:
       CROWDSEC_CAPTCHA_PROVIDER: recaptcha
       CROWDSEC_SITE_KEY: ${CROWDSEC_SITE_KEY}
       CROWDSEC_SECRET_KEY: ${CROWDSEC_SECRET_KEY}
-      DOCKER_MODS: ghcr.io/linuxserver/mods:swag-dashboard|ghcr.io/linuxserver/mods:swag-auto-reload|ghcr.io/linuxserver/mods:swag-dbip|ghcr.io/linuxserver/mods:swag-crowdsec
+      DOCKER_MODS: ghcr.io/linuxserver/mods:swag-dashboard|ghcr.io/linuxserver/mods:swag-auto-reload|ghcr.io/linuxserver/mods:swag-dbip|ghcr.io/linuxserver/mods:swag-crowdsec|ghcr.io/linuxserver/mods:swag-cloudflare-real-ip
     volumes:
       - /home/docker/swag:/config #Config Swag
       - /home/docker/authelia/config/authelia.log:/authelia/authelia.log:ro #Logs Authelia
@@ -48,6 +51,11 @@ services:
     image: ghcr.io/crowdsecurity/crowdsec
     container_name: crowdsec
     hostname: crowdsec
+    security_opt:
+      - no-new-privileges=true
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
     environment:
       PUID: 1000
       PGID: 1000
@@ -55,8 +63,6 @@ services:
       CUSTOM_HOSTNAME: crowdsec
       BOUNCER_KEY_SWAG: ${CROWDSEC_API_KEY}
       COLLECTIONS: crowdsecurity/http-cve crowdsecurity/whitelist-good-actors crowdsecurity/nginx crowdsecurity/nextcloud LePresidente/authelia
-    security_opt:
-      - no-new-privileges=true
     volumes:
       - /home/docker/crowdsec/config:/etc/crowdsec #Config Crowdsec
       - /home/docker/crowdsec/data:/var/lib/crowdsec/data/ #Config Crowdsec
@@ -73,6 +79,9 @@ services:
     hostname: authelia
     security_opt:
       - no-new-privileges=true
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
     environment:
       PUID: 1000
       PGID: 1000
@@ -93,6 +102,9 @@ services:
     hostname: authelia_db
     security_opt:
       - no-new-privileges=true
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
     environment:
       PUID: 1000
       PGID: 1000
