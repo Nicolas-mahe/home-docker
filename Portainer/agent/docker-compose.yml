@@ -3,10 +3,13 @@ version: '3'
 
 services:
   portainer_agent:
+    restart: always
     image: portainer/agent:${PERSONAL_PORTAINER_VERSION}
     container_name: portainer_agent
     hostname: portainer_agent
-    restart: always
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
     ports:
       - ${PERSONAL_AGENT_PORT}:9001
     volumes:
