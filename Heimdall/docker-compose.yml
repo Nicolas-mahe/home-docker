@@ -14,6 +14,9 @@ services:
     volumes:
       - /home/docker/heimdall:/config
       - /home/docker/heimdall/icon_server.ico:/icon.ico:/var/www/localhost/heimdall/public/favicon.ico
+      - /home/docker/heimdall/icon_serverx16.png:/var/www/localhost/heimdall/public/favicon-16x16.png
+      - /home/docker/heimdall/icon_serverx32.png:/var/www/localhost/heimdall/public/favicon-32x32.png
+      - /home/docker/heimdall/icon_serverx96.png:/var/www/localhost/heimdall/public/favicon-96x96.png
     networks:
     - web
 
