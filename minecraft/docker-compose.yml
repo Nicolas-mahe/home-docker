@@ -1,77 +1,72 @@
-version: "3.8"
+version: '3.8'
 #https://github.com/itzg/docker-minecraft-server
 #https://github.com/itzg/docker-mc-backup
 #https://www.youtube.com/watch?v=PHJE60COs5g&ab_channel=OuiHeberg DNS
 
 services:
   server:
+    restart: unless-stopped
     container_name: minecraft-server
-    image: itzg/minecraft-server:2023.3.0
+    image: itzg/minecraft-server:java17-jdk
     labels:
-      traefik.enable: true
-      traefik.http.routers.minecraft.tls: true
-      traefik.http.routers.minecraft.entrypoints: websecure
-      traefik.http.routers.minecraft.rule: Host(`play.${PERSONAL_DOMAINE_NAME}`)
-      traefik.http.services.minecraft.loadbalancer.server.port: ${PERSONAL_PORT_MINECRAFT}
       diun.enable: true
       diun.watch_repos: true
     environment:
-      EULA: TRUE
-      MOTD: "§b§l§oRaBByT Season V3\\n§f§kMinecraft docker Server"
-      VERSION: 1.18.2
-      TYPE: FORGE
-      FORGE_VERSION: 40.2.2
-      MEMORY: ""
-      JVM_XX_OPTS: "-XX:MaxRAMPercentage=95"
-      MAX_PLAYERS: 10
-      SPAWN_PROTECTION: 0
-      VIEW_DISTANCE: 12
-      SIMULATION_DISTANCE: 10
-      MAX_BUILD_HEIGHT: 320 # only under 320
-      ENABLE_WHITELIST: TRUE
-      DIFFICULTY: normal
-      OPS: "RaBByt_Tv,TBMPQF"
-      ALLOW_NETHER: TRUE
-      ANNOUNCE_PLAYER_ACHIEVEMENTS: TRUE
-      GENERATE_STRUCTURES: TRUE
-      SNOOPER_ENABLED: FALSE
-      MODE: survival # 0=survival, 1=creative, 2=adventure, 3=spectator // not sure it work
-      FORCE_GAMEMODE: TRUE # force default gamemode at connection
-      HARDCORE: FALSE
       ALLOW_FLIGHT: TRUE
-      MAX_WORLD_SIZE: 10000000
-      SPAWN_ANIMALS: TRUE
-      SPAWN_MONSTERS: TRUE
-      SPAWN_NPCS: TRUE
-      PVP: TRUE
-      LEVEL_TYPE: normal # type of generating world
-      SERVER_NAME: RaBByT_S3
-      ICON: /mods/RaBByT-S3.jpg
+      CF_API_KEY: ${CF_API_KEY}
+      CF_BASE_DIR: "/data"
+      CF_FILES_ID: 5048888
+      CF_SLUG: ragnamod-vii
+      DIFFICULTY: normal
+      EULA: TRUE
       ENABLE_RCON: TRUE
-      RCON_PASSWORD: ${PERSONAL_RCON_PWD}
-      RCON_PORT: ${PERSONAL_PORT_MINECRAFT_RCON}
-      RCON_CMDS_STARTUP:  |-
+      ENABLE_WHITELIST: TRUE
+      FORCE_GAMEMODE: TRUE
+      FORGE_VERSION: "40.2.9"
+      ICON: /RaBByT-S4.jpg
+      MAX_BUILD_HEIGHT: 320 # only under 320
+      MAX_PLAYERS: 10
+      MAX_WORLD_SIZE: 10000000
+      MEMORY: "29G"
+      MODE: survival # 0=survival, 1=creative, 2=adventure, 3=spectator
+      MOTD: "§b§l§oRaBByT Season V4 \n§f§kMinecraft docker Server"
+      OPS: "RaBByt_Tv,TBMPQF"
+      OVERRIDE_ICON: TRUE
+      PERSONAL_PORT_MINECRAFT_RCON: ${PERSONAL_PORT_MINECRAFT_RCON}
+      PERSONAL_RCON_PWD: ${PERSONAL_RCON_PWD}
+      PGID: 1000
+      PUID: 1000
+      PVP: TRUE
+      RCON_CMDS_STARTUP: |-
         gamerule playersSleepingPercentage 1
         kill @e[type=item]
-    deploy:
-      resources:
-        limits:
-          memory: 28G
-          cpus: '8'
+      RCON_PASSWORD: ${PERSONAL_RCON_PWD}
+      RCON_PORT: ${PERSONAL_PORT_MINECRAFT_RCON}
+      SERVER_NAME: RaBByT_S4
+      SIMULATION_DISTANCE: 6
+      SNOOPER_ENABLED: FALSE
+      SPAWN_PROTECTION: 0
+      STOP_DURATION: 180
+      TYPE: AUTO_CURSEFORGE
+      TZ: Europe/Paris
+      VERSION: "1.18.2"
+      VIEW_DISTANCE: 10
     volumes:
-      - /home/docker/mc-s3/data:/data
-      - /home/docker/mc-s3/mods:/mods
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
-    restart: unless-stopped
+      - /home/docker/mc-s4/data:/data
+      - /home/docker/mc-s4/RaBByT-S4.jpg:/RaBByT-S4.jpg
     ports:
       - ${PERSONAL_PORT_MINECRAFT}:25565
-    # network_mode: bridge
+    network_mode: bridge
+    tty: true
+    stdin_open: true
     
   save:
+    restart: unless-stopped
     image: itzg/mc-backup
     container_name: minecraft-save
     environment:
+      PUID: 1000
+      PGID: 1000
       TZ: Europe/Paris
       INITIAL_DELAY: $PERSONAL_INTERVAL_SAVE
       BACKUP_INTERVAL: $PERSONAL_INTERVAL_SAVE
@@ -95,9 +90,6 @@ services:
       PRE_BACKUP_SCRIPT: echo "Backup in progress"
       POST_BACKUP_SCRIPT: echo "Backup done"
     volumes:
-      - /home/docker/mc-s3/data:/data:ro
-      - /home/docker/mc-s3/backups:/backups
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
+      - /home/docker/mc-s4/data:/data:ro
+      - /home/docker/mc-s4/backups:/backups
     network_mode: service:server
-    restart: unless-stopped
