@@ -1,11 +1,11 @@
-version: '3.8'
+version: '2.1'
 
 services:
-  heimdall:
+  librespeed:
     restart: unless-stopped
-    image: ghcr.io/linuxserver/heimdall
-    container_name: heimdall
-    hostname: heimdall
+    image: ghcr.io/linuxserver/librespeed
+    container_name: librespeed
+    hostname: librespeed
     labels:
       diun.enable: true
       diun.watch_repos: true
@@ -13,8 +13,9 @@ services:
       PUID: 1000
       PGID: 1000
       TZ: Europe/Paris
+      PASSWORD: ${PERSONAL_LIBRESPEED_PWD}
     volumes:
-      - /home/docker/heimdall:/config
+      - /home/docker/librespeed:/config
     networks:
     - web
 

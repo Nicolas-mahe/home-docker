@@ -2,28 +2,37 @@ version: '3'
 
 services:
   wireguard:
-    image: lscr.io/linuxserver/wireguard
+    restart: unless-stopped
+    image: ghcr.io/linuxserver/wireguard
     container_name: wireguard
+    hostname: wireguard
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/Paris
-      - SERVERURL=auto
-      - SERVERPORT=${PERSONAL_PORT_WIREGUARD}
-      - PEERS=Nicolas,Laura
-      - PEERDNS=auto
-      - INTERNAL_SUBNET=10.13.13.0
-      - ALLOWEDIPS=0.0.0.0/0
-      - LOG_CONFS=true
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Paris
+      SERVERURL: auto
+      SERVERPORT: ${PERSONAL_PORT_WIREGUARD}
+      PEERS: ${PERSONAL_PEER_LIST}
+      PEERDNS: auto
+      INTERNAL_SUBNET: ${PERSONAL_VPN_MASK}
+      ALLOWEDIPS: 0.0.0.0/0
+      LOG_CONFS: true
     ports:
       - ${PERSONAL_PORT_WIREGUARD}:51820/udp
     volumes:
       - /home/docker/wireguard:/config
       - /lib/modules:/lib/modules
-    sysctls:
-      - net.ipv4.conf.all.src_valid_mark=1
-    restart: unless-stopped
-    network_mode: bridge
+    networks:
+    - vpn
+
+networks:
+  vpn:
+    external: true

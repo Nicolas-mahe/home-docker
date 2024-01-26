@@ -2,22 +2,25 @@ version: '3.8'
 
 services:
   portainer:
-    container_name: portainer
-    image: portainer/portainer-ee:${PERSONAL_PORTAINER_VERSION}
     restart: always
-    environment:
-      TZ: Europe/Paris
+    container_name: portainer
+    hostname: portainer
+    image: portainer/portainer-ee:${PERSONAL_PORTAINER_VERSION}
     labels:
-      traefik.enable: true
-      traefik.http.routers.portainer.tls: true
-      traefik.http.routers.portainer.entrypoints: websecure
-      traefik.http.routers.portainer.rule: Host(`management.${PERSONAL_DOMAINE_NAME}`)
-      traefik.http.services.portainer.loadbalancer.server.port: 9000
+      diun.enable: true
+      diun.watch_repos: true
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Paris
     ports:
       - ${PERSONAL_PORT_PORTAINER}:9000
     volumes:
       - /home/docker/portainer:/data
       - /var/run/docker.sock:/var/run/docker.sock
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
-    network_mode: bridge
+    networks:
+    - web
+
+networks:
+  web:
+    external: true
