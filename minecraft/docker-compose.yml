@@ -54,6 +54,7 @@ services:
     volumes:
       - /home/docker/mc-s4/data:/data
       - /home/docker/mc-s4/RaBByT-S4.jpg:/RaBByT-S4.jpg
+      - /home/docker/mc-s4/whitelist.json:/data/whitelist.json
     ports:
       - ${PERSONAL_PORT_MINECRAFT}:25565
     network_mode: bridge
@@ -84,7 +85,7 @@ services:
       ZSTD_PARAMETERS: -3 --long=50
       RCON_RETRIES: 10
       RCON_RETRY_INTERVAL: 10s
-      # EXCLUDES: *.jar,cache,logs
+      EXCLUDES: "*.jar,cache,logs"
       PAUSE_IF_NO_PLAYERS: true
       PLAYERS_ONLINE_CHECK_INTERVAL: 1h
       PRE_BACKUP_SCRIPT: echo "Backup in progress"
