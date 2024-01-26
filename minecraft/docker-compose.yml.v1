@@ -1,97 +1,114 @@
-version: "3.8"
+version: '3.8'
 #https://github.com/itzg/docker-minecraft-server
 #https://github.com/itzg/docker-mc-backup
+#https://www.youtube.com/watch?v=PHJE60COs5g&ab_channel=OuiHeberg DNS
 
 services:
-  server:
-    image: itzg/minecraft-server:2022.14.0
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.minecraft.rule=Host(`minecraft.laura-et-nicolas.com`)"
-      - "traefik.http.routers.minecraft.entrypoints=web"
-    environment:
-      EULA: TRUE
-      MOTD: "RaBByT Season v1"
-      VERSION: 1.18.2
-      TYPE: FORGE
-      FORGE_VERSION: 40.1.60
-      MEMORY: ""
-      JVM_XX_OPTS: "-XX:MaxRAMPercentage=100"
-      MAX_PLAYERS: 10
-      SPAWN_PROTECTION: 0
-      VIEW_DISTANCE: 12
-      SIMULATION_DISTANCE: 10
-      MAX_BUILD_HEIGHT: 320 # only under 320
-      ENABLE_WHITELIST: TRUE
-      DIFFICULTY: hard
-      OPS: "RaBByt_Tv,Zaula,TBMPQF"
-      ALLOW_NETHER: TRUE
-      ANNOUNCE_PLAYER_ACHIEVEMENTS: TRUE
-      GENERATE_STRUCTURES: TRUE
-      SNOOPER_ENABLED: FALSE
-      MAX_TICK_TIME: 60000
-      TZ: Europe/Paris
-      MODE: survival # 0=survival, 1=creative, 2=adventure, 3=spectator // not sure it work
-      FORCE_GAMEMODE: TRUE # force default gamemode at connection
-      HARDCORE: FALSE
-      ALLOW_FLIGHT: TRUE
-      MAX_WORLD_SIZE: 10000000
-      SPAWN_ANIMALS: TRUE
-      SPAWN_MONSTERS: TRUE
-      SPAWN_NPCS: TRUE
-      PVP: TRUE
-      LEVEL_TYPE: normal # type of generating world
-      SERVER_NAME: RaBByT_S1
-      ICON: ./icon-server.jpg
-      ENABLE_RCON: TRUE
-      RCON_PASSWORD: $RCON_PWD
-      RCON_CMDS_STARTUP:  |-
-        gamerule keepinventory true
-        gamerule playersSleepingPercentage 1
-      PROXY: Traefik:25565
-    deploy:
-      resources:
-        limits:
-          memory: 4096M
-    volumes:
-      - data:/data
-      - /srv/dev-disk-by-uuid-9a8441b6-d899-4899-971f-3068a8e9c748/Ssd/Docker/volumes/minecraft_setting/icon-server.jpg:/data/icon-server.jpg
-      - /srv/dev-disk-by-uuid-9a8441b6-d899-4899-971f-3068a8e9c748/Ssd/Docker/volumes/minecraft_setting/whitelist.json:/data/whitelist.json
-      - /srv/dev-disk-by-uuid-9a8441b6-d899-4899-971f-3068a8e9c748/Ssd/Docker/volumes/minecraft_setting/mods:/mods
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
-    stdin_open: true
-    tty: true
+  router:
     restart: unless-stopped
+    image: itzg/mc-router
+    container_name: minecraft-s4-router
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+    environment:
+      MAPPING: |
+        play.${PERSONAL_DOMAINE_NAME}=server:25565
     ports:
       - 25565:25565
-    network_mode: bridge
+    networks:
+      - web
 
-
-  backups:
-    image: itzg/mc-backup
+  server:
+    restart: unless-stopped
+    container_name: minecraft-server
+    image: itzg/minecraft-server:java17-jdk
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+    tty: true
+    stdin_open: true
     environment:
+      ALLOW_FLIGHT: TRUE
+      CF_API_KEY: ${CF_API_KEY}
+      CF_BASE_DIR: "/data"
+      CF_FILES_ID: 5048888
+      CF_SLUG: ragnamod-vii
+      DIFFICULTY: normal
+      EULA: TRUE
+      ENABLE_RCON: TRUE
+      ENABLE_WHITELIST: TRUE
+      FORCE_GAMEMODE: TRUE
+      FORGE_VERSION: "40.2.9"
+      ICON: /RaBByT-S4.jpg
+      MAX_BUILD_HEIGHT: 320 # only under 320
+      MAX_PLAYERS: 10
+      MAX_WORLD_SIZE: 10000000
+      MEMORY: "29G"
+      MODE: survival # 0=survival, 1=creative, 2=adventure, 3=spectator
+      MOTD: "§b§l§oRaBByT Season V4 \n§f§kMinecraft docker Server"
+      OPS: "RaBByt_Tv,TBMPQF"
+      OVERRIDE_ICON: TRUE
+      PERSONAL_PORT_MINECRAFT_RCON: ${PERSONAL_PORT_MINECRAFT_RCON}
+      PERSONAL_RCON_PWD: ${PERSONAL_RCON_PWD}
+      PGID: 1000
+      PUID: 1000
+      PVP: TRUE
+      RCON_CMDS_STARTUP: |-
+        gamerule playersSleepingPercentage 1
+        kill @e[type=item]
+      RCON_PASSWORD: ${PERSONAL_RCON_PWD}
+      RCON_PORT: ${PERSONAL_PORT_MINECRAFT_RCON}
+      SERVER_NAME: RaBByT_S4
+      SIMULATION_DISTANCE: 6
+      SNOOPER_ENABLED: FALSE
+      SPAWN_PROTECTION: 0
+      STOP_DURATION: 180
+      TYPE: AUTO_CURSEFORGE
       TZ: Europe/Paris
-      INITIAL_DELAY: 15m
-      BACKUP_INTERVAL: 24h
-      PRUNE_BACKUPS_DAYS: 7
-      PRUNE_RESTIC_RETENTION: --keep-within 7d
+      VERSION: "1.18.2"
+      VIEW_DISTANCE: 10
+    volumes:
+      - /home/docker/mc-s4/data:/data
+      - /home/docker/mc-s4/RaBByT-S4.jpg:/RaBByT-S4.jpg
+      - /home/docker/mc-s4/whitelist.json:/data/whitelist.json
+    network_mode: service:router
+    
+  save:
+    restart: unless-stopped
+    image: itzg/mc-backup
+    container_name: minecraft-save
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Paris
+      INITIAL_DELAY: $PERSONAL_INTERVAL_SAVE
+      BACKUP_INTERVAL: $PERSONAL_INTERVAL_SAVE
+      SRC_DIR: /data
+      BACKUP_NAME: world
+      BACKUP_METHOD: tar
+      PRUNE_BACKUPS_DAYS: 1
+      PRUNE_RESTIC_RETENTION: --keep-within 1
       RCON_HOST: server
-      RCON_PORT: 25575
-      RCON_PASSWORD: $RCON_PWD
+      RCON_PORT: ${PERSONAL_PORT_MINECRAFT_RCON}
+      RCON_PASSWORD: ${PERSONAL_RCON_PWD}
       DEST_DIR: /backups
       LINK_LATEST: FALSE
       TAR_COMPRESS_METHOD: gzip
-      ZSTD_PARAMETERS: -3 --long=25 --single-thread
+      ZSTD_PARAMETERS: -3 --long=50
+      RCON_RETRIES: 10
+      RCON_RETRY_INTERVAL: 10s
+      # EXCLUDES: *.jar,cache,logs
+      PAUSE_IF_NO_PLAYERS: true
+      PLAYERS_ONLINE_CHECK_INTERVAL: 1h
+      PRE_BACKUP_SCRIPT: echo "Backup in progress"
+      POST_BACKUP_SCRIPT: echo "Backup done"
     volumes:
-    - data:/data:ro
-    - backup:/backups
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
-    network_mode: "service:server"
-    restart: unless-stopped
-    
-volumes:
-  data: {}
-  backup: {}
-  setting: {}
+      - /home/docker/mc-s4/data:/data:ro
+      - /home/docker/mc-s4/backups:/backups
+    network_mode: service:server
+
+
+networks:
+  web:
+    external: true
