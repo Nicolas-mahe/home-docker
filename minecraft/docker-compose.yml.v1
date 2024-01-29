@@ -11,23 +11,28 @@ services:
     labels:
       diun.enable: true
       diun.watch_repos: true
+    depends_on:
+      - server
     environment:
+      DEBUG: true
+      PGID: 1000
+      PUID: 1000
       MAPPING: |
         play.${PERSONAL_DOMAINE_NAME}=server:25565
     ports:
-      - 25565:25565
+      - ${PERSONAL_PORT_MINECRAFT}:25565
     networks:
       - web
 
   server:
     restart: unless-stopped
-    container_name: minecraft-server
+    container_name: minecraft-s4-server
     image: itzg/minecraft-server:java17-jdk
+    tty: true
+    stdin_open: true
     labels:
       diun.enable: true
       diun.watch_repos: true
-    tty: true
-    stdin_open: true
     environment:
       ALLOW_FLIGHT: TRUE
       CF_API_KEY: ${CF_API_KEY}
@@ -53,6 +58,7 @@ services:
       PERSONAL_RCON_PWD: ${PERSONAL_RCON_PWD}
       PGID: 1000
       PUID: 1000
+      PROXY: router:25565
       PVP: TRUE
       RCON_CMDS_STARTUP: |-
         gamerule playersSleepingPercentage 1
@@ -72,41 +78,8 @@ services:
       - /home/docker/mc-s4/data:/data
       - /home/docker/mc-s4/RaBByT-S4.jpg:/RaBByT-S4.jpg
       - /home/docker/mc-s4/whitelist.json:/data/whitelist.json
-    network_mode: service:router
-    
-  save:
-    restart: unless-stopped
-    image: itzg/mc-backup
-    container_name: minecraft-save
-    environment:
-      PUID: 1000
-      PGID: 1000
-      TZ: Europe/Paris
-      INITIAL_DELAY: $PERSONAL_INTERVAL_SAVE
-      BACKUP_INTERVAL: $PERSONAL_INTERVAL_SAVE
-      SRC_DIR: /data
-      BACKUP_NAME: world
-      BACKUP_METHOD: tar
-      PRUNE_BACKUPS_DAYS: 1
-      PRUNE_RESTIC_RETENTION: --keep-within 1
-      RCON_HOST: server
-      RCON_PORT: ${PERSONAL_PORT_MINECRAFT_RCON}
-      RCON_PASSWORD: ${PERSONAL_RCON_PWD}
-      DEST_DIR: /backups
-      LINK_LATEST: FALSE
-      TAR_COMPRESS_METHOD: gzip
-      ZSTD_PARAMETERS: -3 --long=50
-      RCON_RETRIES: 10
-      RCON_RETRY_INTERVAL: 10s
-      # EXCLUDES: *.jar,cache,logs
-      PAUSE_IF_NO_PLAYERS: true
-      PLAYERS_ONLINE_CHECK_INTERVAL: 1h
-      PRE_BACKUP_SCRIPT: echo "Backup in progress"
-      POST_BACKUP_SCRIPT: echo "Backup done"
-    volumes:
-      - /home/docker/mc-s4/data:/data:ro
-      - /home/docker/mc-s4/backups:/backups
-    network_mode: service:server
+    networks:
+      - web
 
 
 networks:
