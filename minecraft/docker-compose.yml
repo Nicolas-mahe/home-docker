@@ -6,8 +6,11 @@ version: '3.8'
 services:
   server:
     restart: unless-stopped
-    container_name: minecraft-server
+    container_name: minecraft-s4-server
     image: itzg/minecraft-server:java17-jdk
+    hostname: minecraft-s4-server
+    tty: true
+    stdin_open: true
     labels:
       diun.enable: true
       diun.watch_repos: true
@@ -57,6 +60,9 @@ services:
       - /home/docker/mc-s4/whitelist.json:/data/whitelist.json
     ports:
       - ${PERSONAL_PORT_MINECRAFT}:25565
-    network_mode: bridge
-    tty: true
-    stdin_open: true
+    networks:
+      - web
+
+networks:
+  web:
+    external: true
