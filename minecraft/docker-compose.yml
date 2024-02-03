@@ -57,7 +57,6 @@ services:
     volumes:
       - /home/docker/mc-s4/data:/data
       - /home/docker/mc-s4/RaBByT-S4.jpg:/RaBByT-S4.jpg
-      - /home/docker/mc-s4/whitelist.json:/data/whitelist.json
     ports:
       - ${PERSONAL_PORT_MINECRAFT}:25565
     networks:
