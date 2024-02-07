@@ -10,6 +10,7 @@ services:
     labels:
       diun.enable: true
       diun.watch_repos: true
+      TZ: Europe/Paris
     ports:
       - ${PERSONAL_AGENT_PORT}:9001
     volumes:
