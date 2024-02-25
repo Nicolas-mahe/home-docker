@@ -10,7 +10,7 @@ mods:
 /gamerule playersSleepingPercentage 1
 
 
-## Entrer in docker
+## Enter in docker
 ` docker exec -it <name> /bin/bash `
 
 
@@ -24,3 +24,14 @@ apt-get update && \
     apt install -y ansible && \
     pip install requests-credssp && \
     apt install libz-dev libssl-dev libcurl4-gnutls-dev libexpat1-dev gettext cmake gcc -y
+## Docker-compose
+`docker compose -f Ansible-perso//Portainer/docker-compose.yml up -d --force-recreate --remove-orphans`
+`docker compose -f Ansible-perso/Portainer/agent/docker-compose.yml up -d --force-recreate --remove-orphans`
+
+## Authelia
+to generate a new password:
+`docker run authelia/authelia:latest authelia crypto hash generate argon2 --password 'CHANGEME'`
+
+## Fail2Ban
+fail2ban-client status
+fail2ban-client set [nom du jail] unbanip [IP concerné]

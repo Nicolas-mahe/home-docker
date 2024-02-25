@@ -1,4 +1,4 @@
-# Procedure
+# Procedure Ansible
 ## Windows
 
 CredSSp connexion:
@@ -27,3 +27,15 @@ apt install ansible
 
 3. Launch playbook :
 `ansible-playbook -i inventory.yml playbook_rabbyt.yml`
+
+
+# Dockerfile
+create image :` docker build . -t rabbyt/ansible_ubuntu:latest `
+push : `docker push rabbyt/ansible_ubuntu:latest`
+
+if not login:
+- go to docker hub \ connect \ Account setting \ Security => create token
+- `docker login -u rabbyt` and on password paste token given
+
+# Raid mdadm
+status: `cat /proc/mdstat`

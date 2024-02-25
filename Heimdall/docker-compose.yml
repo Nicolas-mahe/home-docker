@@ -1,0 +1,23 @@
+version: '2.1'
+
+services:
+  heimdall:
+    restart: unless-stopped
+    image: ghcr.io/linuxserver/heimdall
+    container_name: heimdall
+    hostname: heimdall
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Paris
+    volumes:
+      - /home/docker/heimdall:/config
+    networks:
+    - web
+
+networks:
+  web:
+    external: true
