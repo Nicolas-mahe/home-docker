@@ -1,4 +1,4 @@
-﻿﻿.vs/
+.vs/
 vars.yml
 inventory.yml
 .vs
@@ -9,3 +9,4 @@ vars_test.yml
 *.zip
 /minecraft/data
 /minecraft/modpacks
+.vscode

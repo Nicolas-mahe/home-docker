@@ -1,36 +1,40 @@
 version: "3.8"
 #https://github.com/itzg/docker-minecraft-server
 #https://github.com/itzg/docker-mc-backup
+#https://www.youtube.com/watch?v=PHJE60COs5g&ab_channel=OuiHeberg DNS
 
 services:
   server:
-    image: itzg/minecraft-server:2022.14.0
+    container_name: minecraft-server
+    image: itzg/minecraft-server:2023.3.0
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.minecraft_mod.rule=Host(`minecraft.laura-et-nicolas.com`)
-      - traefik.http.routers.minecraft_mod.entrypoints=webc748/Ssd/Docker/volumes/minecraft_data/_data
+      traefik.enable: true
+      traefik.http.routers.minecraft.tls: true
+      traefik.http.routers.minecraft.entrypoints: websecure
+      traefik.http.routers.minecraft.rule: Host(`play.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.services.minecraft.loadbalancer.server.port: ${PERSONAL_PORT_MINECRAFT}
+      diun.enable: true
+      diun.watch_repos: true
     environment:
       EULA: TRUE
-      MOTD: "RaBByT Season v1"
+      MOTD: "§b§l§oRaBByT Season V3\\n§f§kMinecraft docker Server"
       VERSION: 1.18.2
       TYPE: FORGE
-      FORGE_VERSION: 40.1.60
+      FORGE_VERSION: 40.2.2
       MEMORY: ""
-      JVM_XX_OPTS: "-XX:MaxRAMPercentage=100"
+      JVM_XX_OPTS: "-XX:MaxRAMPercentage=95"
       MAX_PLAYERS: 10
       SPAWN_PROTECTION: 0
       VIEW_DISTANCE: 12
-      SIMULATION_DISTANCE: 12
+      SIMULATION_DISTANCE: 10
       MAX_BUILD_HEIGHT: 320 # only under 320
       ENABLE_WHITELIST: TRUE
-      DIFFICULTY: hard
-      OPS: "RaBByt_Tv,Zaula,TBMPQF"
+      DIFFICULTY: normal
+      OPS: "RaBByt_Tv,TBMPQF"
       ALLOW_NETHER: TRUE
       ANNOUNCE_PLAYER_ACHIEVEMENTS: TRUE
       GENERATE_STRUCTURES: TRUE
       SNOOPER_ENABLED: FALSE
-      MAX_TICK_TIME: 60000
-      TZ: Europe/Paris
       MODE: survival # 0=survival, 1=creative, 2=adventure, 3=spectator // not sure it work
       FORCE_GAMEMODE: TRUE # force default gamemode at connection
       HARDCORE: FALSE
@@ -41,54 +45,27 @@ services:
       SPAWN_NPCS: TRUE
       PVP: TRUE
       LEVEL_TYPE: normal # type of generating world
-      SERVER_NAME: RaBByT_S1
-      ICON: ./icon-server.jpg
+      SERVER_NAME: RaBByT_S3
+      ICON: /mods/RaBByT-S3.jpg
       ENABLE_RCON: TRUE
-      RCON_PASSWORD: $RCON_PWD
+      RCON_PASSWORD: ${PERSONAL_RCON_PWD}
+      RCON_PORT: ${PERSONAL_PORT_MINECRAFT_RCON}
       RCON_CMDS_STARTUP:  |-
-        gamerule keepinventory true
         gamerule playersSleepingPercentage 1
-      PROXY: Traefik:25565
+        kill @e[type=item]
     deploy:
       resources:
         limits:
-          memory: 24064M
+          memory: 28G
+          cpus: '8'
     volumes:
       - data:/data
-      - /srv/dev-disk-by-uuid-9a8441b6-d899-4899-971f-3068a8e9c748/Ssd/Docker/volumes/minecraft_setting/icon-server.jpg:/data/icon-server.jpg
-      - /srv/dev-disk-by-uuid-9a8441b6-d899-4899-971f-3068a8e9c748/Ssd/Docker/volumes/minecraft_setting/whitelist.json:/data/whitelist.json
-      - /srv/dev-disk-by-uuid-9a8441b6-d899-4899-971f-3068a8e9c748/Ssd/Docker/volumes/minecraft_setting/mods:/mods
+      - modpacks:/modpacks
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
     stdin_open: true
     tty: true
     restart: unless-stopped
     ports:
-      - 25565:25565
-    networks:
-      - web
-  backups:
-    image: itzg/mc-backup
-    environment:
-      TZ: Europe/Paris
-      INITIAL_DELAY: 3m
-      BACKUP_INTERVAL: 1h
-      PRUNE_BACKUPS_DAYS: 14
-      RCON_HOST: server
-      RCON_PORT: 25575
-      RCON_PASSWORD: $RCON_PWD
-      DEST_DIR: /backups
-      LINK_LATEST: FALSE
-      TAR_COMPRESS_METHOD: gzip
-      ZSTD_PARAMETERS: -3 --long=25 --single-thread
-    volumes:
-    - data:/data:ro
-    - backup:/backups
-    network_mode: "service:server"
-    restart: unless-stopped
-    
-volumes:
-  data: {}
-  backup: {}
-  setting: {}
-networks:
-    web:
-      external: true
+      - ${PERSONAL_PORT_MINECRAFT}:25565
+    network_mode: bridge

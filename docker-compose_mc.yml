@@ -3,75 +3,77 @@ version: "3.8"
 #https://github.com/itzg/docker-mc-backup
 
 services:
-  server2:
-    image: itzg/minecraft-server:java8
-    #labels:
-    #  - "traefik.enable=true"
-    #  - "traefik.http.routers.minecraft_test.rule=Host(`minecraft-creative.laura-et-nicolas.com`)"
-    #  - "traefik.http.routers.minecraft_test.entrypoints=web"
+  server:
+    image: itzg/minecraft-server:2022.14.0
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.minecraft_mod.rule=Host(`minecraft_test.laura-et-nicolas.com`)"
+      - "traefik.http.routers.minecraft_mod.entrypoints=web"
     environment:
       EULA: TRUE
-      VERSION: 1.16.5
-      TYPE: CURSEFORGE
-      CF_SERVER_MOD: /modpacks/RagnamodVI-Serverfiles-6.1.10.zip
-      MOTD: "RaBByT test"
+      MOTD: "RaBByT Season v1"
+      VERSION: 1.18.2
+      TYPE: FORGE
+      FORGE_VERSION: 40.1.60
       MEMORY: ""
       JVM_XX_OPTS: "-XX:MaxRAMPercentage=100"
-      MAX_PLAYERS: 3
+      MAX_PLAYERS: 10
       SPAWN_PROTECTION: 0
-      VIEW_DISTANCE: 10
-      SIMULATION_DISTANCE: 5
-      MAX_BUILD_HEIGHT: 320
-      ENABLE_WHITELIST: FALSE
-      DIFFICULTY: Hard
-      OPS: "RaBByt_Tv,Zaula,TBMPQF,FodVodZ"
+      VIEW_DISTANCE: 12
+      SIMULATION_DISTANCE: 10
+      MAX_BUILD_HEIGHT: 320 # only under 320
+      ENABLE_WHITELIST: TRUE
+      DIFFICULTY: hard
+      OPS: "RaBByt_Tv,Zaula,TBMPQF"
       ALLOW_NETHER: TRUE
       ANNOUNCE_PLAYER_ACHIEVEMENTS: TRUE
       GENERATE_STRUCTURES: TRUE
       SNOOPER_ENABLED: FALSE
       MAX_TICK_TIME: 60000
       TZ: Europe/Paris
-      MODE: 1 # 0=survival, 1=creative, 2=adventure, 3=spectator // not sure it work
-      FORCE_GAMEMODE: FALSE # force default gamemode at connection
+      MODE: survival # 0=survival, 1=creative, 2=adventure, 3=spectator // not sure it work
+      FORCE_GAMEMODE: TRUE # force default gamemode at connection
       HARDCORE: FALSE
       ALLOW_FLIGHT: TRUE
-      MAX_WORLD_SIZE: 10000
+      MAX_WORLD_SIZE: 10000000
       SPAWN_ANIMALS: TRUE
       SPAWN_MONSTERS: TRUE
       SPAWN_NPCS: TRUE
       PVP: TRUE
       LEVEL_TYPE: normal # type of generating world
-      SERVER_NAME: RaBByT_S1_test
+      SERVER_NAME: RaBByT_S1
+      ICON: ./icon-server.jpg
       ENABLE_RCON: TRUE
       RCON_PASSWORD: $RCON_PWD
       RCON_CMDS_STARTUP:  |-
         gamerule keepinventory true
         gamerule playersSleepingPercentage 1
+      PROXY: Traefik:25565
     deploy:
       resources:
         limits:
-          memory: 26000M
+          memory: 4096M
     volumes:
       - data:/data
+      - /srv/dev-disk-by-uuid-9a8441b6-d899-4899-971f-3068a8e9c748/Ssd/Docker/volumes/minecraft_setting/icon-server.jpg:/data/icon-server.jpg
       - /srv/dev-disk-by-uuid-9a8441b6-d899-4899-971f-3068a8e9c748/Ssd/Docker/volumes/minecraft_setting/whitelist.json:/data/whitelist.json
-      - /srv/dev-disk-by-uuid-9a8441b6-d899-4899-971f-3068a8e9c748/Ssd/Docker/volumes/minecraft_setting/mods2:/mods
-      - /srv/dev-disk-by-uuid-9a8441b6-d899-4899-971f-3068a8e9c748/Ssd/Docker/volumes/minecraft_setting/modpacks:/modpacks
+      - /srv/dev-disk-by-uuid-9a8441b6-d899-4899-971f-3068a8e9c748/Ssd/Docker/volumes/minecraft_setting/mods:/mods
     stdin_open: true
     tty: true
     restart: unless-stopped
     ports:
-      - 25566:25565
+      - 25565:25565
     networks:
       - web
-  backups2:
+  backups:
     image: itzg/mc-backup
     environment:
       TZ: Europe/Paris
-      INITIAL_DELAY: 15m
-      BACKUP_INTERVAL: 6h
-      PRUNE_BACKUPS_DAYS: 7
-      PRUNE_RESTIC_RETENTION: --keep-within 6h
-      RCON_HOST: server2
+      INITIAL_DELAY: 3m
+      BACKUP_INTERVAL: 1h
+      PRUNE_BACKUPS_DAYS: 14
+      RCON_HOST: server
+      RCON_PORT: 25575
       RCON_PASSWORD: $RCON_PWD
       DEST_DIR: /backups
       LINK_LATEST: FALSE
@@ -80,7 +82,7 @@ services:
     volumes:
     - data:/data:ro
     - backup:/backups
-    network_mode: "service:server2"
+    network_mode: "service:server"
     restart: unless-stopped
     
 volumes:
