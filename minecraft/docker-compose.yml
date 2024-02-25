@@ -19,6 +19,7 @@ services:
       CF_API_KEY: ${CF_API_KEY}
       CF_BASE_DIR: "/data"
       CF_FILES_ID: 5048888
+      CF_FILENAME_MATCHER: 7.1.3
       CF_SLUG: ragnamod-vii
       DIFFICULTY: normal
       EULA: TRUE
@@ -50,17 +51,20 @@ services:
       SNOOPER_ENABLED: FALSE
       SPAWN_PROTECTION: 0
       STOP_DURATION: 180
-      TYPE: AUTO_CURSEFORGE
       TZ: Europe/Paris
+      TYPE: AUTO_CURSEFORGE
       VERSION: "1.18.2"
       VIEW_DISTANCE: 10
     volumes:
       - /home/docker/mc-s4/data:/data
       - /home/docker/mc-s4/RaBByT-S4.jpg:/RaBByT-S4.jpg
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
     ports:
       - ${PERSONAL_PORT_MINECRAFT}:25565
     networks:
       - web
+
 
 networks:
   web:
