@@ -6,16 +6,22 @@ services:
     image: ghcr.io/gethomepage/homepage
     container_name: homepage
     hostname: homepage
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
     environment:
       PUID: 1000
       PGID: 1000
+      TZ: Europe/Paris
     volumes:
       - /home/docker/homepage/config:/app/config
       - /home/docker/homepage/images:/app/public/images
       - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
     networks:
-      - web
+      - homepage
 
 networks:
-  web:
-    external: true
+  homepage:
+    name: homepage
