@@ -2,10 +2,13 @@ version: '2'
 
 services:
   cloudflare-ddns:
+    restart: always
     image: oznu/cloudflare-ddns
     container_name: cloudflare-ddns
     hostname: cloudflare-ddns
-    restart: always
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
     environment:
       API_KEY: ${DNS_API_KEY}
       ZONE: ${PERSONAL_DOMAINE_NAME}

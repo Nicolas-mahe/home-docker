@@ -13,6 +13,8 @@ services:
       traefik.http.routers.minecraft.entrypoints: websecure
       traefik.http.routers.minecraft.rule: Host(`play.${PERSONAL_DOMAINE_NAME}`)
       traefik.http.services.minecraft.loadbalancer.server.port: ${PERSONAL_PORT_MINECRAFT}
+      diun.enable: true
+      diun.watch_repos: true
     environment:
       EULA: TRUE
       MOTD: "§b§l§oRaBByT Season V3\\n§f§kMinecraft docker Server"
@@ -59,8 +61,6 @@ services:
     volumes:
       - data:/data
       - modpacks:/modpacks
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     stdin_open: true
