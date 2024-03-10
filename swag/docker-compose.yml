@@ -13,8 +13,6 @@ services:
       - NET_ADMIN
     security_opt:
       - no-new-privileges=true
-    depends_on:
-      - authelia
     environment:
       PUID: 1000
       PGID: 1000
@@ -65,7 +63,7 @@ services:
       diun.enable: true
       diun.watch_repos: true
     depends_on:
-      - swag
+      - authelia
     environment:
       PUID: 1000
       PGID: 1000
@@ -100,7 +98,6 @@ services:
       TZ: Europe/Paris
     volumes:
       - /home/docker/authelia/config:/config
-      - /home/docker/authelia/log:/var/log
     expose:
       - 9091
     networks:
