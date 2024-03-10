@@ -42,6 +42,7 @@ services:
       - /home/docker/authelia/config/authelia.log:/authelia/authelia.log:ro #Logs Authelia
       - /home/docker/nextcloud/config/nextcloud.log:/nextcloud/nextcloud.log:ro #Logs Nextcloud
     ports:
+      - 81:81
       - 443:443
     networks:
       - cloud
