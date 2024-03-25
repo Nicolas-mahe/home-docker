@@ -27,13 +27,14 @@ services:
       CROWDSEC_LAPI_URL: http://crowdsec:8080
       CROWDSEC_F2B_DISABLE: false
       CROWDSEC_CAPTCHA_PROVIDER: recaptcha
+      CROWDSEC_VERSION: v1.5.5
+
       CROWDSEC_SITE_KEY: ${CROWDSEC_SITE_KEY}
       CROWDSEC_SECRET_KEY: ${CROWDSEC_SECRET_KEY}
       DISC_HOOK: ${DISC_HOOK}
       DOCKER_MODS: |
         ghcr.io/linuxserver/mods:swag-auto-reload
         ghcr.io/linuxserver/mods:swag-cloudflare-real-ip
-        ghcr.io/linuxserver/mods:swag-crowdsec
         ghcr.io/linuxserver/mods:swag-dashboard
         ghcr.io/linuxserver/mods:swag-dbip
         ghcr.io/linuxserver/mods:swag-f2bdiscord
@@ -45,40 +46,40 @@ services:
       - 443:443
     networks:
       - cloud
-      - crowdsec
+      # - crowdsec
       - duplicati
       - homepage
       - librespeed
       - portainer
       - web
 
-  crowdsec:
-    restart: always
-    image: ghcr.io/crowdsecurity/crowdsec
-    container_name: crowdsec
-    hostname: crowdsec
-    security_opt:
-      - no-new-privileges=true
-    labels:
-      diun.enable: true
-      diun.watch_repos: true
-    depends_on:
-      - authelia
-    environment:
-      PUID: 1000
-      PGID: 1000
-      TZ: Europe/Paris
-      CUSTOM_HOSTNAME: crowdsec
-      BOUNCER_KEY_SWAG: ${CROWDSEC_API_KEY}
-      COLLECTIONS: crowdsecurity/http-cve crowdsecurity/whitelist-good-actors crowdsecurity/nginx crowdsecurity/nextcloud LePresidente/authelia
-    volumes:
-      - /home/docker/crowdsec/config:/etc/crowdsec #Config Crowdsec
-      - /home/docker/crowdsec/data:/var/lib/crowdsec/data/ #Config Crowdsec
-      - /home/docker/swag/log/nginx:/var/log/nginx:ro #Logs Swag
-      - /home/docker/authelia/config/authelia.log:/var/log/authelia.log:ro #Logs Authelia
-      - /home/docker/nextcloud/config/nextcloud.log:/var/log/nextcloud.log:ro #Logs Nextcloud
-    networks:
-      - crowdsec
+  # crowdsec:
+  #   restart: always
+  #   image: ghcr.io/crowdsecurity/crowdsec
+  #   container_name: crowdsec
+  #   hostname: crowdsec
+  #   security_opt:
+  #     - no-new-privileges=true
+  #   labels:
+  #     diun.enable: true
+  #     diun.watch_repos: true
+  #   depends_on:
+  #     - authelia
+  #   environment:
+  #     PUID: 1000
+  #     PGID: 1000
+  #     TZ: Europe/Paris
+  #     CUSTOM_HOSTNAME: crowdsec
+  #     BOUNCER_KEY_SWAG: ${CROWDSEC_API_KEY}
+  #     COLLECTIONS: crowdsecurity/http-cve crowdsecurity/whitelist-good-actors crowdsecurity/nginx crowdsecurity/nextcloud LePresidente/authelia
+  #   volumes:
+  #     - /home/docker/crowdsec/config:/etc/crowdsec #Config Crowdsec
+  #     - /home/docker/crowdsec/data:/var/lib/crowdsec/data/ #Config Crowdsec
+  #     - /home/docker/swag/log/nginx:/var/log/nginx:ro #Logs Swag
+  #     - /home/docker/authelia/config/authelia.log:/var/log/authelia.log:ro #Logs Authelia
+  #     - /home/docker/nextcloud/config/nextcloud.log:/var/log/nextcloud.log:ro #Logs Nextcloud
+  #   networks:
+  #     - crowdsec
 
   authelia:
     restart: always
@@ -132,8 +133,8 @@ networks:
   #   name: authelia-back
   cloud:
     name: cloud
-  crowdsec:
-    name: crowdsec
+  # crowdsec:
+  #   name: crowdsec
   duplicati:
     name: duplicati
   homepage:
