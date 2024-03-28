@@ -16,6 +16,7 @@ services:
     volumes:
       - /home/docker/homepage/config:/app/config
       - /home/docker/homepage/images:/app/public/images
+      - /home/docker/homepage/icons:/app/public/icons
       - /var/run/docker.sock:/var/run/docker.sock
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
