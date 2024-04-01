@@ -17,7 +17,7 @@ services:
       - ${PERSONAL_PORT_PORTAINER}:9000
     volumes:
       - /home/docker/portainer:/data
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
     - web
 
