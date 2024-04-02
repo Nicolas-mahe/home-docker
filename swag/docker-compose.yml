@@ -89,8 +89,6 @@ services:
     labels:
       diun.enable: true
       diun.watch_repos: true
-    # depends_on:
-    #   - mariadb
     environment:
       PUID: 1000
       PGID: 1000
@@ -100,35 +98,9 @@ services:
     expose:
       - 9091
     networks:
-      # - authelia-back
       - web
 
-  # mariadb:
-  #   restart: always
-  #   image: ghcr.io/linuxserver/mariadb
-  #   container_name: authelia_db
-  #   hostname: authelia_db
-  #   security_opt:
-  #     - no-new-privileges=true
-  #   labels:
-  #     diun.enable: true
-  #     diun.watch_repos: true
-  #   environment:
-  #     PUID: 1000
-  #     PGID: 1000
-  #     TZ: Europe/Paris
-  #     MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-  #     MYSQL_DATABASE: ${MYSQL_DATABASE}
-  #     MYSQL_USER: ${MYSQL_USER}
-  #     MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-  #   volumes:
-  #     - /home/docker/authelia/mariadb:/config
-  #   networks:
-  #     - authelia-back
-
 networks:
-  # authelia-back:
-  #   name: authelia-back
   cloud:
     name: cloud
   # crowdsec:
