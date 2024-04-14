@@ -1,11 +1,9 @@
-version: '3.5'
-
 services:
   diun:
     restart: unless-stopped
     image: docker.io/crazymax/diun
     container_name: diun
-    hostname: diun
+    hostname: diun.${PERSONAL_HOST}
     command: serve
     labels:
       diun.enable: true
