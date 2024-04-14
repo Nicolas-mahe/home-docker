@@ -34,7 +34,6 @@ services:
         ghcr.io/linuxserver/mods:swag-crowdsec
         ghcr.io/linuxserver/mods:swag-dashboard
         ghcr.io/linuxserver/mods:swag-dbip
-        ghcr.io/linuxserver/mods:swag-f2bdiscord
     volumes:
       - /home/docker/swag:/config #Config Swag
       - /home/docker/authelia/config/authelia.log:/authelia/authelia.log:ro #Logs Authelia
