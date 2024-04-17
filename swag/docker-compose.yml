@@ -1,7 +1,7 @@
 services:
   swag:
     restart: always
-    image: ghcr.io/linuxserver/swag
+    image: lscr.io/linuxserver/swag
     container_name: swag
     hostname: swag
     labels:
@@ -21,6 +21,7 @@ services:
       SUBDOMAINS: wildcard
       DNSPLUGIN: cloudflare
       EMAIL: ${PERSONAL_EMAIL}
+      DOCKER_MODS_DEBUG: ${DOCKER_MODS_DEBUG}
       CROWDSEC_API_KEY: ${CROWDSEC_API_KEY}
       CROWDSEC_LAPI_URL: http://crowdsec:8080
       CROWDSEC_F2B_DISABLE: false
@@ -29,11 +30,11 @@ services:
       CROWDSEC_SECRET_KEY: ${CROWDSEC_SECRET_KEY}
       DISC_HOOK: ${DISC_HOOK}
       DOCKER_MODS: |
-        ghcr.io/linuxserver/mods:swag-auto-reload
-        ghcr.io/linuxserver/mods:swag-cloudflare-real-ip
-        ghcr.io/linuxserver/mods:swag-crowdsec
-        ghcr.io/linuxserver/mods:swag-dashboard
-        ghcr.io/linuxserver/mods:swag-dbip
+        lscr.io/linuxserver/mods:swag-auto-reload
+        lscr.io/linuxserver/mods:swag-cloudflare-real-ip
+        lscr.io/linuxserver/mods:swag-crowdsec
+        lscr.io/linuxserver/mods:swag-dashboard
+        lscr.io/linuxserver/mods:swag-dbip
     volumes:
       - /home/docker/swag:/config #Config Swag
       - /home/docker/authelia/config/authelia.log:/authelia/authelia.log:ro #Logs Authelia

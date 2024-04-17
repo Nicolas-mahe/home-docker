@@ -1,7 +1,7 @@
 services:
   heimdall:
     restart: unless-stopped
-    image: ghcr.io/linuxserver/heimdall
+    image: lscr.io/linuxserver/heimdall
     container_name: heimdall
     hostname: heimdall
     labels:
