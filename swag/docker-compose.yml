@@ -29,6 +29,8 @@ services:
       CROWDSEC_SITE_KEY: ${CROWDSEC_SITE_KEY}
       CROWDSEC_SECRET_KEY: ${CROWDSEC_SECRET_KEY}
       DISC_HOOK: ${DISC_HOOK}
+      DISC_API: ${DISC_API}
+      DISC_ME: ${DISC_ME}
       DOCKER_MODS: |
         lscr.io/linuxserver/mods:swag-auto-reload
         lscr.io/linuxserver/mods:swag-cloudflare-real-ip
