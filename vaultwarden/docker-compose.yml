@@ -1,0 +1,21 @@
+services:
+  vaultwarden:
+    restart: always
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    hostname: vaultwarden
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Paris
+    volumes:
+      - /home/docker/vaultwarden/:/data/
+    networks:
+      - web
+
+networks:
+  web:
+    external: true
