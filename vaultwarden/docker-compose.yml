@@ -8,7 +8,7 @@ services:
       diun.enable: true
       diun.watch_repos: true
     environment:
-      DOMAIN: ${PERSONAL_DOMAINE_NAME}
+      DOMAIN: https://vaultwarden.${PERSONAL_DOMAINE_NAME}
       LOG_FILE: /data/vaultwarden.log
       PUID: 1000
       PGID: 1000
