@@ -1,7 +1,7 @@
 services:
   vaultwarden:
     restart: unless-stopped
-    image: vaultwarden/server:latest
+    image: vaultwarden/server:latest-alpine
     container_name: vaultwarden
     hostname: vaultwarden
     labels:
