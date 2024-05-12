@@ -8,10 +8,11 @@ services:
       diun.enable: true
       diun.watch_repos: true
     environment:
+      DOMAIN: ${PERSONAL_DOMAINE_NAME}
+      LOG_FILE: /data/vaultwarden.log
       PUID: 1000
       PGID: 1000
       TZ: Europe/Paris
-      LOG_FILE: /data/vaultwarden.log
     volumes:
       - /home/docker/vaultwarden/:/data/
     networks:
