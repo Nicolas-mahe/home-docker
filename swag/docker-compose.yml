@@ -43,6 +43,7 @@ services:
       - /home/docker/swag:/config #Config Swag
       - /home/docker/authelia/config/authelia.log:/authelia/authelia.log:ro #Logs Authelia
       - /home/docker/nextcloud/config/nextcloud.log:/nextcloud/nextcloud.log:ro #Logs Nextcloud
+      - /home/docker/vaultwarden/vaultwarden.log:/vaultwarden/vaultwarden.log:ro #Logs Vaultwarden
     ports:
       - 443:443
     networks:
@@ -73,13 +74,14 @@ services:
       TZ: Europe/Paris
       CUSTOM_HOSTNAME: crowdsec
       BOUNCER_KEY_SWAG: ${CROWDSEC_API_KEY}
-      COLLECTIONS: crowdsecurity/http-cve crowdsecurity/whitelist-good-actors crowdsecurity/nginx crowdsecurity/nextcloud LePresidente/authelia
+      COLLECTIONS: crowdsecurity/http-cve crowdsecurity/whitelist-good-actors crowdsecurity/nginx crowdsecurity/nextcloud LePresidente/authelia Dominic-Wagner/vaultwarden
     volumes:
       - /home/docker/crowdsec/config:/etc/crowdsec #Config Crowdsec
       - /home/docker/crowdsec/data:/var/lib/crowdsec/data/ #Config Crowdsec
       - /home/docker/swag/log/nginx:/var/log/nginx:ro #Logs Swag
       - /home/docker/authelia/config/authelia.log:/var/log/authelia.log:ro #Logs Authelia
       - /home/docker/nextcloud/config/nextcloud.log:/var/log/nextcloud.log:ro #Logs Nextcloud
+      - /home/docker/vaultwarden/vaultwarden.log:/var/log/vaultwarden.log:ro #Logs Vaultwarden
     networks:
       - crowdsec
 
