@@ -41,7 +41,10 @@ services:
         lscr.io/linuxserver/mods:swag-f2bdiscord
         lscr.io/linuxserver/mods:swag-maxmind
       MAXMINDDB_LICENSE_KEY: ${MAXMINDDB_LICENSE_KEY}
+      BAN_TEMPLATE_PATH: ${BAN_TEMPLATE_PATH}
+      CAPTCHA_TEMPLATE_PATH: ${CAPTCHA_TEMPLATE_PATH}
     volumes:
+      - /home/docker/html/:/config/www/ # Common html
       - /home/docker/swag:/config #Config Swag
       - /home/docker/authelia/config/authelia.log:/authelia/authelia.log:ro #Logs Authelia
       - /home/docker/nextcloud/config/nextcloud.log:/nextcloud/nextcloud.log:ro #Logs Nextcloud
@@ -78,6 +81,7 @@ services:
       BOUNCER_KEY_SWAG: ${CROWDSEC_API_KEY}
       COLLECTIONS: crowdsecurity/http-cve crowdsecurity/whitelist-good-actors crowdsecurity/nginx crowdsecurity/nextcloud LePresidente/authelia Dominic-Wagner/vaultwarden
     volumes:
+      - /home/docker/html/:/html # Common html
       - /home/docker/crowdsec/config:/etc/crowdsec #Config Crowdsec
       - /home/docker/crowdsec/data:/var/lib/crowdsec/data #Config Crowdsec
       - /home/docker/swag/log/nginx:/var/log/nginx:ro #Logs Swag
