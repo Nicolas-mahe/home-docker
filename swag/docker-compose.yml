@@ -52,6 +52,7 @@ services:
       - homepage
       - librespeed
       - portainer
+      - vaultwarden
       - web
 
   crowdsec:
@@ -116,5 +117,7 @@ networks:
     name: librespeed
   portainer:
     name: portainer
+  vaultwarden:
+    name: vaultwarden
   web:
     external: true

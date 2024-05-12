@@ -1,6 +1,6 @@
 services:
   vaultwarden:
-    restart: always
+    restart: unless-stopped
     image: vaultwarden/server:latest
     container_name: vaultwarden
     hostname: vaultwarden
@@ -14,8 +14,8 @@ services:
     volumes:
       - /home/docker/vaultwarden/:/data/
     networks:
-      - web
+      - vaultwarden
 
 networks:
-  web:
-    external: true
+  vaultwarden:
+    name: vaultwarden
