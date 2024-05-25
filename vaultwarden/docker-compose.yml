@@ -1,0 +1,23 @@
+services:
+  vaultwarden:
+    restart: unless-stopped
+    image: vaultwarden/server:latest-alpine
+    container_name: vaultwarden
+    hostname: vaultwarden
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+    environment:
+      DOMAIN: https://vaultwarden.${PERSONAL_DOMAINE_NAME}
+      LOG_FILE: /data/vaultwarden.log
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Paris
+    volumes:
+      - /home/docker/vaultwarden/:/data/
+    networks:
+      - vaultwarden
+
+networks:
+  vaultwarden:
+    name: vaultwarden

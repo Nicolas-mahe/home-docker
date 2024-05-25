@@ -1,9 +1,7 @@
-version: '3.8'
-
 services:
   swag:
     restart: always
-    image: ghcr.io/linuxserver/swag
+    image: lscr.io/linuxserver/swag
     container_name: swag
     hostname: swag
     labels:
@@ -23,27 +21,39 @@ services:
       SUBDOMAINS: wildcard
       DNSPLUGIN: cloudflare
       EMAIL: ${PERSONAL_EMAIL}
+      DOCKER_MODS_DEBUG: ${DOCKER_MODS_DEBUG}
       CROWDSEC_API_KEY: ${CROWDSEC_API_KEY}
       CROWDSEC_LAPI_URL: http://crowdsec:8080
       CROWDSEC_F2B_DISABLE: false
       CROWDSEC_CAPTCHA_PROVIDER: recaptcha
       CROWDSEC_SITE_KEY: ${CROWDSEC_SITE_KEY}
       CROWDSEC_SECRET_KEY: ${CROWDSEC_SECRET_KEY}
-      DOCKER_MODS: ghcr.io/linuxserver/mods:swag-dashboard|ghcr.io/linuxserver/mods:swag-auto-reload|ghcr.io/linuxserver/mods:swag-dbip|ghcr.io/linuxserver/mods:swag-crowdsec|ghcr.io/linuxserver/mods:swag-cloudflare-real-ip
+      CROWDSEC_VERSION: ${CROWDSEC_VERSION}
+      DISC_HOOK: ${DISC_HOOK}
+      DISC_API: ${DISC_API}
+      DISC_ME: ${DISC_ME}
+      DOCKER_MODS: |
+        lscr.io/linuxserver/mods:swag-auto-reload
+        lscr.io/linuxserver/mods:swag-cloudflare-real-ip
+        lscr.io/linuxserver/mods:swag-crowdsec
+        lscr.io/linuxserver/mods:swag-dashboard
+        lscr.io/linuxserver/mods:swag-dbip
+        lscr.io/linuxserver/mods:swag-f2bdiscord
     volumes:
       - /home/docker/swag:/config #Config Swag
       - /home/docker/authelia/config/authelia.log:/authelia/authelia.log:ro #Logs Authelia
       - /home/docker/nextcloud/config/nextcloud.log:/nextcloud/nextcloud.log:ro #Logs Nextcloud
+      - /home/docker/vaultwarden/vaultwarden.log:/vaultwarden/vaultwarden.log:ro #Logs Vaultwarden
     ports:
       - 443:443
     networks:
       - cloud
       - crowdsec
-      - dns
       - duplicati
       - homepage
       - librespeed
       - portainer
+      - vaultwarden
       - web
 
   crowdsec:
@@ -56,19 +66,22 @@ services:
     labels:
       diun.enable: true
       diun.watch_repos: true
+    depends_on:
+      - authelia
     environment:
       PUID: 1000
       PGID: 1000
       TZ: Europe/Paris
       CUSTOM_HOSTNAME: crowdsec
       BOUNCER_KEY_SWAG: ${CROWDSEC_API_KEY}
-      COLLECTIONS: crowdsecurity/http-cve crowdsecurity/whitelist-good-actors crowdsecurity/nginx crowdsecurity/nextcloud LePresidente/authelia
+      COLLECTIONS: crowdsecurity/http-cve crowdsecurity/whitelist-good-actors crowdsecurity/nginx crowdsecurity/nextcloud LePresidente/authelia Dominic-Wagner/vaultwarden
     volumes:
       - /home/docker/crowdsec/config:/etc/crowdsec #Config Crowdsec
       - /home/docker/crowdsec/data:/var/lib/crowdsec/data/ #Config Crowdsec
       - /home/docker/swag/log/nginx:/var/log/nginx:ro #Logs Swag
       - /home/docker/authelia/config/authelia.log:/var/log/authelia.log:ro #Logs Authelia
       - /home/docker/nextcloud/config/nextcloud.log:/var/log/nextcloud.log:ro #Logs Nextcloud
+      - /home/docker/vaultwarden/vaultwarden.log:/var/log/vaultwarden.log:ro #Logs Vaultwarden
     networks:
       - crowdsec
 
@@ -88,45 +101,16 @@ services:
       TZ: Europe/Paris
     volumes:
       - /home/docker/authelia/config:/config
-      - /home/docker/authelia/log:/var/log
     expose:
       - 9091
     networks:
-      - authelia-back
       - web
 
-  mariadb:
-    restart: always
-    image: ghcr.io/linuxserver/mariadb
-    container_name: authelia_db
-    hostname: authelia_db
-    security_opt:
-      - no-new-privileges=true
-    labels:
-      diun.enable: true
-      diun.watch_repos: true
-    environment:
-      PUID: 1000
-      PGID: 1000
-      TZ: Europe/Paris
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_USER}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    volumes:
-      - /home/docker/authelia/mariadb:/config
-    networks:
-      - authelia-back
-
 networks:
-  authelia-back:
-    name: authelia-back
   cloud:
     name: cloud
   crowdsec:
     name: crowdsec
-  dns:
-    name: dns
   duplicati:
     name: duplicati
   homepage:
@@ -135,5 +119,7 @@ networks:
     name: librespeed
   portainer:
     name: portainer
+  vaultwarden:
+    name: vaultwarden
   web:
     external: true

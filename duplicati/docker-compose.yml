@@ -1,9 +1,7 @@
-version: '3.8'
-
 services:
   duplicati:
     restart: unless-stopped
-    image: ghcr.io/linuxserver/duplicati
+    image: lscr.io/linuxserver/duplicati
     container_name: duplicati
     hostname: duplicati
     labels:

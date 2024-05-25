@@ -1,8 +1,7 @@
-version: "2"
 services:
   nextcloud:
     restart: unless-stopped
-    image: ghcr.io/linuxserver/nextcloud
+    image: lscr.io/linuxserver/nextcloud
     hostname: nextcloud
     container_name: nextcloud
     environment:
@@ -22,7 +21,7 @@ services:
 
   mariadb:
     restart: unless-stopped
-    image: ghcr.io/linuxserver/mariadb
+    image: lscr.io/linuxserver/mariadb
     container_name: nextcloud_db
     hostname: nextcloud_db
     environment:

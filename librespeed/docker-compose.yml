@@ -1,9 +1,7 @@
-version: '2.1'
-
 services:
   librespeed:
     restart: unless-stopped
-    image: ghcr.io/linuxserver/librespeed
+    image: lscr.io/linuxserver/librespeed
     container_name: librespeed
     hostname: librespeed
     labels:
