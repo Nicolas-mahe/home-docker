@@ -10,4 +10,5 @@ docker_packages="$docker_packages containerd.io"
 for pkg in $docker_packages; do
     echo "Holding $pkg"
     sudo apt-mark hold $pkg
+    # sudo apt-mark unhold $pkg
 done
