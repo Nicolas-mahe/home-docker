@@ -35,3 +35,7 @@ to generate a new password:
 ## Fail2Ban
 `fail2ban-client status`
 `fail2ban-client set [nom du jail] unbanip [IP concerné]`
+
+## Docker config
+Add in `[Service]` section: TimeoutStopSec=120 and run this to apply:
+`sudo systemctl daemon-reload && sudo systemctl restart docker`
