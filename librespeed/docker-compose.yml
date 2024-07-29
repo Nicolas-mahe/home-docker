@@ -15,8 +15,8 @@ services:
     volumes:
       - /home/docker/librespeed:/config
     networks:
-    - web
+    - librespeed
 
 networks:
-  web:
-    external: true
+  librespeed:
+    name: librespeed
