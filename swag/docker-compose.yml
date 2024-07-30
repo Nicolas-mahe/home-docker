@@ -55,6 +55,7 @@ services:
       - librespeed
       - local
       - portainer
+      - skyblog
       - vaultwarden
       - web
 
@@ -121,10 +122,10 @@ networks:
     name: homepage
   librespeed:
     name: librespeed
-  local:
-    name: local
   portainer:
     name: portainer
+  skyblog:
+    name: skyblog
   vaultwarden:
     name: vaultwarden
   web:
