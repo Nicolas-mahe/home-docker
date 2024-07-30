@@ -43,7 +43,7 @@ status: `cat /proc/mdstat`
 
 ## Update command
 Portainer :
-sudo apt update && sudo apt full-upgrade -y && sudo apt autoremove && docker pull portainer/portainer-ee:alpine-sts && docker compose -f /home/docker/home-docker/Portainer/docker-compose.yml up -d --force-recreate && docker image prune --filter "dangling=true" -f
+sudo apt update && sudo apt full-upgrade -y && sudo apt autoremove -y && docker pull portainer/portainer-ee:alpine-sts && docker compose -f /home/docker/home-docker/Portainer/docker-compose.yml up -d --force-recreate && docker image prune --filter "dangling=true" -f
 
 Agent:
-sudo apt update && sudo apt full-upgrade -y && sudo apt autoremove && docker pull portainer/agent:alpine-sts && docker compose -f /home/docker/home-docker/Portainer/agent/docker-compose.yml up -d --force-recreate && docker image prune --filter "dangling=true" -f
+sudo apt update && sudo apt full-upgrade -y && sudo apt autoremove -y && docker pull portainer/agent:alpine-sts && docker compose -f /home/docker/home-docker/Portainer/agent/docker-compose.yml up -d --force-recreate && docker image prune --filter "dangling=true" -f
