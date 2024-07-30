@@ -1,0 +1,48 @@
+services:
+  wordpress:
+    restart: unless-stopped
+    image: wordpress
+    container_name: wordpress
+    hostname: wordpress
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+    ports:
+      - 80:80
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Paris
+      WORDPRESS_DB_HOST: wordpress_db
+      WORDPRESS_DB_USER: ${DB_USER}
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
+      WORDPRESS_DB_NAME: ${DB_NAME}
+    volumes:
+      - /home/docker/wordpress/data:/var/www/html
+    networks:
+      - web
+
+  wordpress_db:
+    restart: unless-stopped
+    image: lscr.io/linuxserver/mariadb
+    container_name: wordpress_db
+    hostname: wordpress_db
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Paris
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${ROOT_PWD}
+    volumes:
+      - /home/docker/wordpress/mariadb:/config
+    networks:
+      - web
+
+networks:
+  web:
+    external: true
