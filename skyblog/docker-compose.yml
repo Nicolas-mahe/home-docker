@@ -8,7 +8,7 @@ services:
       diun.enable: true
       diun.watch_repos: true
     volumes:
-     - /home/docker/skyblog/${SKYBLOG1}.skyrock.com:/usr/share/nginx/html
+     - /home/docker/skyblog/${SKYBLOG1}.skyrock.com:/usr/share/nginx/html:ro
     environment:
       PUID: 1000
       PGID: 1000
@@ -23,7 +23,7 @@ services:
     container_name: skyblog2
     hostname: skyblog2
     volumes:
-     - /home/docker/skyblog/${SKYBLOG2}.skyrock.com:/usr/share/nginx/html
+     - /home/docker/skyblog/${SKYBLOG2}.skyrock.com:/usr/share/nginx/html:ro
     environment:
       PUID: 1000
       PGID: 1000
