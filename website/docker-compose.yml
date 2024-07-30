@@ -1,0 +1,37 @@
+services:
+  skyblog1:
+    restart: unless-stopped
+    image: docker.io/nginx
+    container_name: skyblog1
+    hostname: skyblog1
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+    volumes:
+     - /home/docker/skyblog/${SKYBLOG1}.skyrock.com:/usr/share/nginx/html
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Paris
+      NGINX_HOST: ${SKYBLOG1}.${PERSONAL_DOMAINE_NAME}
+    networks:
+      - skyblog
+
+  skyblog2:
+    restart: unless-stopped
+    image: docker.io/nginx
+    container_name: skyblog2
+    hostname: skyblog2
+    volumes:
+     - /home/docker/skyblog/${SKYBLOG2}.skyrock.com:/usr/share/nginx/html
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Paris
+      NGINX_HOST: ${SKYBLOG2}.${PERSONAL_DOMAINE_NAME}
+    networks:
+      - skyblog
+
+networks:
+  skyblog:
+    name: skyblog
