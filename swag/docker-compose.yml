@@ -45,13 +45,15 @@ services:
       - /home/docker/nextcloud/config/nextcloud.log:/nextcloud/nextcloud.log:ro #Logs Nextcloud
       - /home/docker/vaultwarden/vaultwarden.log:/vaultwarden/vaultwarden.log:ro #Logs Vaultwarden
     ports:
-      - 443:443
+      - 172.18.0.2:443:443
     networks:
+      - authelia
       - cloud
       - crowdsec
       - duplicati
       - homepage
       - librespeed
+      - local
       - portainer
       - vaultwarden
       - web
@@ -104,9 +106,11 @@ services:
     expose:
       - 9091
     networks:
-      - web
+      - authelia
 
 networks:
+  authelia:
+    name: authelia
   cloud:
     name: cloud
   crowdsec:
@@ -117,6 +121,8 @@ networks:
     name: homepage
   librespeed:
     name: librespeed
+  local:
+    name: local
   portainer:
     name: portainer
   vaultwarden:

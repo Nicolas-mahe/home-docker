@@ -14,8 +14,8 @@ services:
       TZ: Europe/Paris
       DELETE_ON_STOP: true
     networks:
-      - web
+      - cloudflare-ddns
 
 networks:
-  web:
-    external: true
+  cloudflare-ddns:
+    name: cloudflare-ddns
