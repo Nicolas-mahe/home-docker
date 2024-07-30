@@ -17,8 +17,8 @@ services:
       - /home/docker/portainer:/data
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
-    - web
+    - portainer
 
 networks:
-  web:
-    external: true
+  portainer:
+    name: portainer
