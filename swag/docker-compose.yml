@@ -45,7 +45,7 @@ services:
       - /home/docker/nextcloud/config/nextcloud.log:/nextcloud/nextcloud.log:ro #Logs Nextcloud
       - /home/docker/vaultwarden/vaultwarden.log:/vaultwarden/vaultwarden.log:ro #Logs Vaultwarden
     ports:
-      - 172.18.0.2:443:443
+      - 443:443
     networks:
       - authelia
       - cloud
