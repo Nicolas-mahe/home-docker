@@ -1,7 +1,7 @@
 services:
   skyblog1:
     restart: unless-stopped
-    image: docker.io/nginx
+    image: docker.io/nginx:alpine
     container_name: skyblog1
     hostname: skyblog1
     labels:
@@ -19,7 +19,7 @@ services:
 
   skyblog2:
     restart: unless-stopped
-    image: docker.io/nginx
+    image: docker.io/nginx:alpine
     container_name: skyblog2
     hostname: skyblog2
     volumes:
