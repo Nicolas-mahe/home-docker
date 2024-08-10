@@ -16,6 +16,7 @@ services:
     volumes:
       - /home/docker/portainer:/data
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /home/docker/home-docker/timezone:/etc/timezone:ro
     networks:
     - portainer
 
