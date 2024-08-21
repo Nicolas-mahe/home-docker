@@ -16,11 +16,13 @@ services:
       - /home/docker/homepage/images:/app/public/images
       - /home/docker/homepage/icons:/app/public/icons
       - /var/run/docker.sock:/var/run/docker.sock
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
+      - /home/docker/home-docker/timezone:/etc/timezone:ro
     networks:
       - homepage
+      - crowdsec
 
 networks:
+  crowdsec:
+    name: crowdsec
   homepage:
     name: homepage
