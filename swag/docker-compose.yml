@@ -46,6 +46,8 @@ services:
       - /home/docker/vaultwarden/vaultwarden.log:/vaultwarden/vaultwarden.log:ro #Logs Vaultwarden
     ports:
       - 443:443
+    expose:
+      - 81
     networks:
       - authelia
       - cloud
