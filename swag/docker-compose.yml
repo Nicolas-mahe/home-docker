@@ -44,6 +44,7 @@ services:
       - /home/docker/authelia/config/authelia.log:/authelia/authelia.log:ro #Logs Authelia
       - /home/docker/nextcloud/config/nextcloud.log:/nextcloud/nextcloud.log:ro #Logs Nextcloud
       - /home/docker/vaultwarden/vaultwarden.log:/vaultwarden/vaultwarden.log:ro #Logs Vaultwarden
+      - /home/docker/home-docker/timezone:/etc/timezone:ro
     ports:
       - 443:443
     expose:
@@ -86,6 +87,9 @@ services:
       - /home/docker/authelia/config/authelia.log:/var/log/authelia.log:ro #Logs Authelia
       - /home/docker/nextcloud/config/nextcloud.log:/var/log/nextcloud.log:ro #Logs Nextcloud
       - /home/docker/vaultwarden/vaultwarden.log:/var/log/vaultwarden.log:ro #Logs Vaultwarden
+      - /home/docker/home-docker/timezone:/etc/timezone:ro
+    expose:
+      - 8080
     networks:
       - crowdsec
 
@@ -105,6 +109,7 @@ services:
       TZ: Europe/Paris
     volumes:
       - /home/docker/authelia/config:/config
+      - /home/docker/home-docker/timezone:/etc/timezone:ro
     expose:
       - 9091
     networks:
