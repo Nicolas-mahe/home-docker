@@ -144,7 +144,7 @@ for key, ext_dict in file_dict.items():
 # Delete local files that are not on the remote server, except for the log file
 remote_files_set = set(remote_files)
 for local_file in local_files:
-    if local_file not in remote_files_set and not local_file.endswith('.logs'):
+    if local_file not in remote_files_set and not local_file.endswith('.logs') and not local_file != log_directory:
         local_path = os.path.join(local_directory, local_file)
         try:
             os.remove(local_path)
@@ -168,7 +168,7 @@ for key in sorted_keys:
                 local_path
             ]
             try:
-                logger.info(f"Copying file {remote_path} to {local_path}...")
+                logger.debug(f"Copying file {remote_path} to {local_path}...")
                 subprocess.run(scp_command, check=True)
                 logger.info(f"Copy successful: {local_path}")
             except subprocess.CalledProcessError as e:
