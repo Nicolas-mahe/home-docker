@@ -20,7 +20,8 @@ services:
     ports:
       - 450:443
     networks:
-      - web
+      - cloud
+      - cloud-db
 
   mariadb:
     restart: unless-stopped
@@ -38,8 +39,10 @@ services:
     volumes:
       - /home/docker/nextcloud/mariadb:/config
     networks:
-      - web
+      - cloud-db
 
 networks:
-  web:
-    external: true
+  cloud:
+    name: cloud
+  cloud-db:
+    name: cloud-db
