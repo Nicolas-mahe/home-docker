@@ -4,39 +4,60 @@ from datetime import datetime
 from collections import defaultdict
 import subprocess
 import logging
+from logging.handlers import RotatingFileHandler
+import json
 
-# Remote machine details
-remote_user = "xxx"
-remote_host = "xxx"
-remote_directory = "xxx"
-ssh_key_path = "xxx"  # Path to your SSH private key
+# Function to set logging with date-based filenames and rotation
+def setup_logging(log_directory, max_log_files=10, max_log_size=10*1024*1024):
+    log_directory = os.path.join(log_directory, 'LOGS')
+    
+    # Ensure the log directory exists
+    if not os.path.exists(log_directory):
+        os.makedirs(log_directory)
+    
+    # Create a log filename with the current date and time
+    log_filename = datetime.now().strftime("backups_dumps_%Y-%m-%d_%H-%M-%S.logs")
+    log_file_path = os.path.join(log_directory, log_filename)
+    
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+    
+    # Set the logging rotation
+    file_handler = RotatingFileHandler(
+        log_file_path,
+        maxBytes=max_log_size,
+        backupCount=max_log_files - 1  # Keep the most recent `max_log_files` logs
+    )
+    file_handler.setLevel(logging.INFO)
+    
+    # Stream handler for standard output
+    stream_handler = logging.StreamHandler()
+    stream_handler.setLevel(logging.INFO)
+    
+    # Log format
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    file_handler.setFormatter(formatter)
+    stream_handler.setFormatter(formatter)
+    
+    # Add handlers to the logger
+    logger.addHandler(file_handler)
+    logger.addHandler(stream_handler)
+    
+    # Clean up old log files
+    cleanup_old_logs(log_directory, max_log_files, logger)
+    
+    return logger, log_file_path
 
-# Local directory path where files will be copied
-local_directory = "xxx"
-
-# Logging configuration
-log_file_path = os.path.join(local_directory, "backups_dumps.logs")
-
-# Logger configuration
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-
-# File handler for logging
-file_handler = logging.FileHandler(log_file_path)
-file_handler.setLevel(logging.INFO)
-
-# Stream handler for standard output
-stream_handler = logging.StreamHandler()
-stream_handler.setLevel(logging.INFO)
-
-# Log format
-formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-file_handler.setFormatter(formatter)
-stream_handler.setFormatter(formatter)
-
-# Add handlers to the logger
-logger.addHandler(file_handler)
-logger.addHandler(stream_handler)
+# Function to clean up old log files, keeping only the latest `max_log_files` files
+def cleanup_old_logs(log_directory, max_log_files, logger):
+    all_logs = sorted(
+        [os.path.join(log_directory, f) for f in os.listdir(log_directory) if f.endswith('.logs')],
+        key=os.path.getmtime
+    )
+    while len(all_logs) > max_log_files:
+        oldest_log = all_logs.pop(0)
+        os.remove(oldest_log)
+        logger.info(f"Deleted old log file: {oldest_log}")
 
 # Function to extract key, date and time, and extension from filename
 def extract_info_from_filename(filename):
@@ -51,7 +72,7 @@ def extract_info_from_filename(filename):
     return None, None, None
 
 # Function to get the list of remote files
-def get_remote_files():
+def get_remote_files(remote_user, remote_host, remote_directory, ssh_key_path):
     ssh_command = [
         "ssh",
         "-i", ssh_key_path,
@@ -75,8 +96,32 @@ def get_local_files(local_directory):
         logger.error(f"Error retrieving local files: {e}")
         return []
 
+# Function to load configuration from a JSON file
+def load_config(config_file):
+    with open(config_file, 'r') as file:
+        config = json.load(file)
+    return config
+
+# Load configuration
+config_file = os.path.expanduser('~/home-docker/SCRIPT/secret.json')  # Path to the configuration file
+config = load_config(config_file)
+
+# Extract variables from configuration
+remote_user = config.get('remote_user')
+remote_host = config.get('remote_host')
+remote_directory = config.get('remote_directory')
+ssh_key_path = config.get('ssh_key_path')
+local_directory = config.get('local_directory')
+log_directory = config.get('log_directory', local_directory)  # Default to local_directory if not specified
+
+if not all([remote_user, remote_host, remote_directory, ssh_key_path, local_directory]):
+    raise ValueError("One or more configuration values are missing. Please check your config file.")
+
+# Setup logging
+logger, log_file_path = setup_logging(log_directory)
+
 # Retrieve remote and local files
-remote_files = get_remote_files()
+remote_files = get_remote_files(remote_user, remote_host, remote_directory, ssh_key_path)
 local_files = get_local_files(local_directory)
 
 # Group files by key, extension, and date/time
@@ -99,7 +144,7 @@ for key, ext_dict in file_dict.items():
 # Delete local files that are not on the remote server, except for the log file
 remote_files_set = set(remote_files)
 for local_file in local_files:
-    if local_file not in remote_files_set and local_file != os.path.basename(log_file_path):
+    if local_file not in remote_files_set and not local_file.endswith('.logs'):
         local_path = os.path.join(local_directory, local_file)
         try:
             os.remove(local_path)
