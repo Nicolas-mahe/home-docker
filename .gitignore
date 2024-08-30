@@ -10,3 +10,4 @@ vars_test.yml
 /minecraft/data
 /minecraft/modpacks
 .vscode
+secret.json
