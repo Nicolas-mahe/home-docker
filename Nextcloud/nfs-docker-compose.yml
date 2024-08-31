@@ -4,6 +4,9 @@ services:
     image: lscr.io/linuxserver/nextcloud
     hostname: nextcloud
     container_name: nextcloud
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
     environment:
       PUID: 1000
       PGID: 1000
@@ -11,19 +14,24 @@ services:
       NEXTCLOUD_TRUSTED_DOMAINS: ${HOST}
     volumes:
       - /home/docker/nextcloud/config:/config
-      - nextcloud_data:/data
+      - /home/docker/nextcloud/data:/data
+      - nfs-films:/mnt/nfs-films
     depends_on:
       - mariadb
     ports:
       - 450:443
     networks:
-      - web
+      - cloud
+      - cloud-db
 
   mariadb:
     restart: unless-stopped
     image: lscr.io/linuxserver/mariadb
     container_name: nextcloud_db
     hostname: nextcloud_db
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
     environment:
       PUID: 1000
       PGID: 1000
@@ -32,15 +40,20 @@ services:
     volumes:
       - /home/docker/nextcloud/mariadb:/config
     networks:
-      - web
+      - cloud-db
 
 volumes:
-  nextcloud_data:
+  nfs-films:
+    name:
+      nextcloud-nfs-films
+    driver: local
     driver_opts:
-      type: nfs
-      o: "addr=192.168.1.1,rw,nolock,nfsvers=4"
-      device: ":/export/nextcloud/data"
+      type: "nfs"
+      o: "addr=omv-vm,rw,nfsvers=3"
+      device: ":/export/films"
 
 networks:
-  web:
-    external: true
+  cloud:
+    name: cloud
+  cloud-db:
+    name: cloud-db
