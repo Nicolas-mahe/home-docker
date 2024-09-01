@@ -13,8 +13,8 @@ services:
       TZ: Europe/Paris
     volumes:
       - /home/docker/duplicati:/config
-      - /srv/${PATH_DATA}/backups:/backups
-      - /srv/${PATH_DATA}/partage:/source
+      - ${PATH_DATA}/backups:/backups
+      - ${PATH_DATA}/partage:/source
     ports:
       - 8200:8200
     networks:
