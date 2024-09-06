@@ -16,15 +16,17 @@ services:
       PUID: 1000
       PGID: 1000
       TZ: Europe/Paris
-      SERVERURL: auto
-      SERVERPORT: ${PERSONAL_PORT_WIREGUARD}
+      ALLOWEDIPS: 0.0.0.0/0
+      INTERFACE: eth0
+      INTERNAL_SUBNET: ${PERSONAL_VPN_MASK}
+      LOG_CONFS: true
       PEERS: ${PERSONAL_PEER_LIST}
       PEERDNS: auto
-      INTERNAL_SUBNET: ${PERSONAL_VPN_MASK}
-      ALLOWEDIPS: 0.0.0.0/0
-      LOG_CONFS: true
+      PERSISTENTKEEPALIVE_PEERS: all
+      SERVERURL: auto
+      SERVERPORT: ${PERSONAL_PORT_WIREGUARD}
     ports:
-      - ${PERSONAL_PORT_WIREGUARD}:51820/udp
+      - ${PERSONAL_PORT_WIREGUARD}:${PERSONAL_PORT_WIREGUARD}/udp
     volumes:
       - /home/docker/wireguard:/config
       - /lib/modules:/lib/modules
@@ -33,4 +35,4 @@ services:
 
 networks:
   vpn:
-    external: true
+    name: vpn
