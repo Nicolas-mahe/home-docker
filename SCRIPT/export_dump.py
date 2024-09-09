@@ -141,16 +141,22 @@ for key, ext_dict in file_dict.items():
         latest_file = max(files, key=lambda x: x[0])[1]
         latest_files[key][ext] = latest_file
 
-# Delete local files that are not on the remote server, except for the log file
+# Delete local files that are not on the remote server, except for the LOGS files and directories
 remote_files_set = set(remote_files)
 for local_file in local_files:
-    if local_file not in remote_files_set and not local_file.endswith('.logs') and not local_file != log_directory:
-        local_path = os.path.join(local_directory, local_file)
-        try:
-            os.remove(local_path)
-            logger.info(f"Deleted file: {local_path}")
-        except OSError as e:
-            logger.error(f"Error deleting file {local_path}: {e}")
+    local_path = os.path.join(local_directory, local_file)
+    
+    # Check if it's a file and not a directory
+    if os.path.isfile(local_path):
+        if local_file not in remote_files_set and not local_file.endswith('.logs'):
+            try:
+                os.remove(local_path)
+                logger.info(f"Deleted file: {local_path}")
+            except OSError as e:
+                logger.error(f"Error deleting file {local_path}: {e}")
+    else:
+        logger.info(f"Skipping directory: {local_path}")
+
 
 # Sort keys in ascending order
 sorted_keys = sorted(latest_files.keys(), key=int)
