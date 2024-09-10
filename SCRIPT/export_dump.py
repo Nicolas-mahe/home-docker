@@ -102,6 +102,25 @@ def load_config(config_file):
         config = json.load(file)
     return config
 
+# Function to delete local files not in the recent files list
+def delete_files_not_in_recent_list(local_files, recent_files, local_directory, logger):
+    recent_files_set = set(recent_files)
+    for local_file in local_files:
+        local_path = os.path.join(local_directory, local_file)
+        
+        # Check if it's a file and not a directory
+        if os.path.isfile(local_path):
+            if local_file not in recent_files_set and not local_file.endswith('.logs'):
+                try:
+                    os.remove(local_path)
+                    logger.info(f"Deleted file: {local_path}")
+                except OSError as e:
+                    logger.error(f"Error deleting file {local_path}: {e}")
+            else:
+                logger.info(f"Keeping file: {local_file} (in recent files list)")
+        else:
+            logger.info(f"Skipping directory: {local_path}")
+
 # Load configuration
 config_file = os.path.expanduser('~/home-docker/SCRIPT/secret.json')  # Path to the configuration file
 config = load_config(config_file)
@@ -141,21 +160,17 @@ for key, ext_dict in file_dict.items():
         latest_file = max(files, key=lambda x: x[0])[1]
         latest_files[key][ext] = latest_file
 
-# Delete local files that are not on the remote server, except for the LOGS files and directories
-remote_files_set = set(remote_files)
-for local_file in local_files:
-    local_path = os.path.join(local_directory, local_file)
-    
-    # Check if it's a file and not a directory
-    if os.path.isfile(local_path):
-        if local_file not in remote_files_set and not local_file.endswith('.logs'):
-            try:
-                os.remove(local_path)
-                logger.info(f"Deleted file: {local_path}")
-            except OSError as e:
-                logger.error(f"Error deleting file {local_path}: {e}")
-    else:
-        logger.info(f"Skipping directory: {local_path}")
+# Load the list of recent files (could be remote files, or another custom list)
+# Example: This could be the `latest_files` dictionary you've already built
+recent_files = []
+for key, ext_dict in latest_files.items():
+    for ext, file in ext_dict.items():
+        recent_files.append(file)
+
+# Call the updated delete function
+delete_files_not_in_recent_list(local_files, recent_files, local_directory, logger)
+
+logger.info("File cleanup completed.\n")
 
 
 # Sort keys in ascending order
