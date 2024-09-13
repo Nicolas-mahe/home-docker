@@ -28,6 +28,30 @@ services:
     networks:
       - diun
 
+  cadvisor:
+    restart: unless-stopped
+    image: gcr.io/cadvisor/cadvisor:v0.50.0
+    container_name: cadvisor
+    hostname: cadvisor
+    privileged: true
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+    environment:
+      TZ: Europe/Paris
+    volumes:
+      - /:/rootfs:ro
+      - /run:/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    devices:
+      - /dev/kmsg
+    ports:
+      - ${PERSONAL_CADVISOR_PORT}:8080
+    networks:
+      - diun
+
 networks:
   diun:
     name: diun
