@@ -35,7 +35,7 @@ services:
       DOCKER_MODS: |
         lscr.io/linuxserver/mods:swag-auto-reload
         lscr.io/linuxserver/mods:swag-cloudflare-real-ip
-        lscr.io/linuxserver/mods:swag-crowdsec
+        lscr.io/linuxserver/mods:swag-crowdsec${PERSONAL_CROWDSEC_VERSION}
         lscr.io/linuxserver/mods:swag-dashboard
         lscr.io/linuxserver/mods:swag-dbip
         lscr.io/linuxserver/mods:swag-f2bdiscord
@@ -48,7 +48,7 @@ services:
     ports:
       - 443:443
     expose:
-      - 81 #dashboard
+      - 81
     networks:
       - authelia
       - cloud
