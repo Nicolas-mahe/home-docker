@@ -14,6 +14,8 @@ services:
       PGID: 1000
       TZ: Europe/Paris
       NGINX_HOST: ${SKYBLOG1}.${PERSONAL_DOMAINE_NAME}
+    expose:
+      - 80
     networks:
       - skyblog
 
@@ -29,6 +31,8 @@ services:
       PGID: 1000
       TZ: Europe/Paris
       NGINX_HOST: ${SKYBLOG2}.${PERSONAL_DOMAINE_NAME}
+    expose:
+      - 80
     networks:
       - skyblog
 
