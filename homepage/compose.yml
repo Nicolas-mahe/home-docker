@@ -23,6 +23,7 @@ services:
       - duplicati
       - homepage
       - librespeed
+      - monitoring
       - skyblog
 
 networks:
@@ -36,5 +37,7 @@ networks:
     name: homepage
   librespeed:
     name: librespeed
+  monitoring:
+    name: monitoring
   skyblog:
     name: skyblog
