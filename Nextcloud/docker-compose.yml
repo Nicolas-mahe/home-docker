@@ -19,6 +19,8 @@ services:
       - mariadb
     ports:
       - 450:443
+    expose:
+      - 443
     networks:
       - cloud
       - cloud-db

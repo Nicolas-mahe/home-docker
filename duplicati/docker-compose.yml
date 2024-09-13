@@ -17,6 +17,8 @@ services:
       - ${PATH_DATA}/partage:/source
     ports:
       - 8200:8200
+    expose:
+      - 8200
     networks:
       - duplicati
 

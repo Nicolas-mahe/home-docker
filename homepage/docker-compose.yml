@@ -18,11 +18,23 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /home/docker/home-docker/timezone:/etc/timezone:ro
     networks:
-      - homepage
+      - cloud
       - crowdsec
+      - duplicati
+      - homepage
+      - librespeed
+      - skyblog
 
 networks:
+  cloud:
+    name: cloud
   crowdsec:
     name: crowdsec
+  duplicati:
+    name: duplicati
   homepage:
     name: homepage
+  librespeed:
+    name: librespeed
+  skyblog:
+    name: skyblog

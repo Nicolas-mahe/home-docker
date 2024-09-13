@@ -14,6 +14,8 @@ services:
       PASSWORD: ${PERSONAL_LIBRESPEED_PWD}
     volumes:
       - /home/docker/librespeed:/config
+    expose:
+      - 80
     networks:
     - librespeed
 
