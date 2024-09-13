@@ -1,0 +1,126 @@
+services:
+  grafana:
+    image: docker.io/grafana/grafana-oss
+    container_name: grafana
+    hostname: grafana
+    user: "1000"
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Paris
+    volumes:
+      - /home/docker/grafana/data:/var/lib/grafana
+    ports:
+      - 3000:3000
+    networks:
+      - monitoring
+
+  # cadvisor:
+  #   restart: unless-stopped
+  #   image: gcr.io/cadvisor/cadvisor
+  #   container_name: cadvisor
+  #   hostname: cadvisor
+  #   privileged: true
+  #   labels:
+  #     diun.enable: true
+  #     diun.watch_repos: true
+  #   environment:
+  #     TZ: Europe/Paris
+  #   volumes:
+  #     - /:/rootfs:ro
+  #     - /run:/run:ro
+  #     - /sys:/sys:ro
+  #     - /var/lib/docker/:/var/lib/docker:ro
+  #     - /dev/disk/:/dev/disk:ro
+  #   devices:
+  #     - /dev/kmsg
+  #   expose:
+  #     - 8080
+  #   networks:
+  #     - monitoring
+
+# Run on truenas but works 
+  # prometheus:
+  #   restart: unless-stopped
+  #   image: docker.io/prom/prometheus
+  #   container_name: prometheus
+  #   hostname: prometheus
+  #   labels:
+  #     diun.enable: true
+  #     diun.watch_repos: true
+  #   environment:
+  #     TZ: Europe/Paris
+  #   volumes:
+  #     - /home/docker/home-docker/grafana/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
+  #     - prometheus-data:/prometheus
+  #   ports:
+  #     - 9090:9090
+  #   command: --config.file=/etc/prometheus/prometheus.yaml
+  #   networks:
+  #     - monitoring
+
+# Run on truenas but works 
+  # influxdb:
+  #   restart: unless-stopped
+  #   image: docker.io/library/influxdb:2.7.10-alpine
+  #   container_name: influxdb
+  #   hostname: influxdb
+  #   labels:
+  #     diun.enable: true
+  #     diun.watch_repos: true
+  #     # - traefik.enable=true
+  #     # - traefik.http.services.influxdb.loadbalancer.server.port=8086
+  #     # - traefik.http.services.influxdb.loadbalancer.server.scheme=https
+  #     # - traefik.http.routers.influxdb-https.entrypoints=websecure
+  #     # - traefik.http.routers.influxdb-https.rule=Host(`your-server-url`)
+  #     # - traefik.http.routers.influxdb-https.tls=true
+  #     # - traefik.http.routers.influxdb-https.tls.certresolver=your-certresolver
+  #   environment:
+  #     TZ: Europe/Paris
+  #     # DOCKER_INFLUXDB_INIT_MODE: setup #Only on first start
+  #     DOCKER_INFLUXDB_INIT_USERNAME: ${PERSONAL_INFLUXDB_USER}
+  #     DOCKER_INFLUXDB_INIT_PASSWORD: ${PERSONAL_INFLUXDB_PWD}
+  #     DOCKER_INFLUXDB_INIT_ORG: ${PERSONAL_INFLUXDB_ORG}
+  #     DOCKER_INFLUXDB_INIT_BUCKET: ${PERSONAL_INFLUXDB_BUCKET}
+  #   # (Optional) change retention time
+  #   #   - DOCKER_INFLUXDB_INIT_RETENTION=1w  # (optional) configure data retention 1 week
+  #   # (Optional) add admin token
+  #   #   - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-super-secret-auth-token  # (optional) set admin token
+  #   ports:
+  #     - 8086:8086
+  #   volumes:
+  #     - influxdb-data:/var/lib/influxdb2
+  #     - /etc/influxdb2:/etc/influxdb2
+  #   networks:
+  #     - monitoring
+
+
+# Not used but works  
+  # node_exporter:
+  #   restart: unless-stopped
+  #   image: quay.io/prometheus/node-exporter
+  #   container_name: node_exporter
+  #   hostname: node_exporter
+  #   pid: host
+  #   labels:
+  #     diun.enable: true
+  #     diun.watch_repos: true
+  #   environment:
+  #     TZ: Europe/Paris
+  #   volumes:
+  #     - /:/host:ro,rslave
+  #   command: --path.rootfs=/host
+  #   networks:
+  #     - monitoring
+
+# volumes:
+#   influxdb-data: 
+#   prometheus-data:
+
+networks:
+  monitoring:
+    name: monitoring
+  

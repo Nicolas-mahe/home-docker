@@ -56,6 +56,7 @@ services:
       - duplicati
       - homepage
       - librespeed
+      - monitoring
       - portainer
       - skyblog
       - vaultwarden
@@ -128,6 +129,8 @@ networks:
     name: homepage
   librespeed:
     name: librespeed
+  monitoring:
+    name: monitoring
   portainer:
     name: portainer
   skyblog:
