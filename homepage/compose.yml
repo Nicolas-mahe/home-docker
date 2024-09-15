@@ -26,9 +26,12 @@ services:
       - /home/docker/homepage/images:/app/public/images
       - /home/docker/homepage/icons:/app/public/icons
     networks:
+      - homepage
       - webinternal
 
 networks:
+  homepage:
+    name: homepage
   webinternal:
     name: webinternal
     internal: true
