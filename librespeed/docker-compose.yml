@@ -7,18 +7,27 @@ services:
     labels:
       diun.enable: true
       diun.watch_repos: true
+      traefik.http.routers.librespeed.tls: true
+      traefik.http.routers.librespeed.tls.certresolver: production
+      traefik.http.routers.librespeed.middlewares: authentik@docker
+      traefik.http.routers.librespeed.entrypoints: web, websecure
+      traefik.http.routers.librespeed.rule: Host(`librespeed.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.librespeed.service: librespeed
+      traefik.http.services.librespeed.loadBalancer.server.port: 80
     environment:
       PUID: 1000
       PGID: 1000
       TZ: Europe/Paris
       PASSWORD: ${PERSONAL_LIBRESPEED_PWD}
     volumes:
+      - /home/docker/home-docker/timezone:/etc/timezone:ro
       - /home/docker/librespeed:/config
     expose:
       - 80
     networks:
-    - librespeed
+    - webinternal
 
 networks:
-  librespeed:
-    name: librespeed
+  webinternal:
+    name: webinternal
+    internal: true

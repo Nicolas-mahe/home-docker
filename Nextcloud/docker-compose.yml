@@ -7,23 +7,33 @@ services:
     labels:
       diun.enable: true
       diun.watch_repos: true
+      traefik.enable: true
+      traefik.http.routers.nextcloud.tls: true
+      traefik.http.routers.nextcloud.tls.certresolver: production
+      traefik.http.routers.nextcloud.middlewares: authentik@docker
+      traefik.http.routers.nextcloud.entrypoints: web, websecure
+      traefik.http.routers.nextcloud.rule: Host(`cloud.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.nextcloud.service: nextcloud
+      traefik.http.services.nextcloud.loadBalancer.server.port: 80
     environment:
       PUID: 1000
       PGID: 1000
       TZ: Europe/Paris
-      NEXTCLOUD_TRUSTED_DOMAINS: ${HOST}
+      NEXTCLOUD_TRUSTED_DOMAINS: cloud.${PERSONAL_DOMAINE_NAME}
     volumes:
+      - /home/docker/home-docker/timezone:/etc/timezone:ro
       - /home/docker/nextcloud/config:/config
       - /home/docker/nextcloud/data:/data
     depends_on:
       - mariadb
-    ports:
-      - 450:443
+    # ports:
+    #   - 450:443
     expose:
+      - 80
       - 443
     networks:
-      - cloud
       - cloud-db
+      - webinternal
 
   mariadb:
     restart: unless-stopped
@@ -39,12 +49,15 @@ services:
       TZ: Europe/Paris
       MYSQL_ROOT_PASSWORD: ${ROOT_PWD}
     volumes:
+      - /home/docker/home-docker/timezone:/etc/timezone:ro
       - /home/docker/nextcloud/mariadb:/config
     networks:
       - cloud-db
 
 networks:
-  cloud:
-    name: cloud
   cloud-db:
     name: cloud-db
+    internal: true
+  webinternal:
+    name: webinternal
+    internal: true

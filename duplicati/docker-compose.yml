@@ -7,21 +7,28 @@ services:
     labels:
       diun.enable: true
       diun.watch_repos: true
+      traefik.http.routers.duplicati.tls: true
+      traefik.http.routers.duplicati.tls.certresolver: production
+      traefik.http.routers.duplicati.middlewares: authentik@docker
+      traefik.http.routers.duplicati.entrypoints: web, websecure
+      traefik.http.routers.duplicati.rule: Host(`duplicati.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.duplicati.service: duplicati
+      traefik.http.services.duplicati.loadBalancer.server.port: 8200
     environment:
       PUID: 1002
       PGID: 100
       TZ: Europe/Paris
     volumes:
+      - /home/docker/home-docker/timezone:/etc/timezone:ro
       - /home/docker/duplicati:/config
       - ${PATH_DATA}/backups:/backups
       - ${PATH_DATA}/partage:/source
-    ports:
-      - 8200:8200
     expose:
       - 8200
     networks:
-      - duplicati
+      - webinternal
 
 networks:
-  duplicati:
-    name: duplicati
+  webinternal:
+    name: webinternal
+    internal: true
