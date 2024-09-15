@@ -4,66 +4,66 @@
 
 services:
   server:
+    restart: unless-stopped
+    image: itzg/minecraft-server:java17-jdk
     container_name: minecraft-server
-    image: itzg/minecraft-server:2023.3.0
+    hostname: minecraft-server
+    tty: true
+    stdin_open: true
     labels:
-      traefik.enable: true
-      traefik.http.routers.minecraft.tls: true
-      traefik.http.routers.minecraft.entrypoints: websecure
-      traefik.http.routers.minecraft.rule: Host(`play.${PERSONAL_DOMAINE_NAME}`)
-      traefik.http.services.minecraft.loadbalancer.server.port: ${PERSONAL_PORT_MINECRAFT}
       diun.enable: true
       diun.watch_repos: true
     environment:
-      EULA: TRUE
-      MOTD: "§b§l§oRaBByT Season V3\\n§f§kMinecraft docker Server"
-      VERSION: 1.18.2
-      TYPE: FORGE
-      FORGE_VERSION: 40.2.2
-      MEMORY: ""
-      JVM_XX_OPTS: "-XX:MaxRAMPercentage=95"
-      MAX_PLAYERS: 10
-      SPAWN_PROTECTION: 0
-      VIEW_DISTANCE: 12
-      SIMULATION_DISTANCE: 10
-      MAX_BUILD_HEIGHT: 320 # only under 320
-      ENABLE_WHITELIST: TRUE
-      DIFFICULTY: normal
-      OPS: "RaBByt_Tv,TBMPQF"
-      ALLOW_NETHER: TRUE
-      ANNOUNCE_PLAYER_ACHIEVEMENTS: TRUE
-      GENERATE_STRUCTURES: TRUE
-      SNOOPER_ENABLED: FALSE
-      MODE: survival # 0=survival, 1=creative, 2=adventure, 3=spectator // not sure it work
-      FORCE_GAMEMODE: TRUE # force default gamemode at connection
-      HARDCORE: FALSE
+      PGID: 1000
+      PUID: 1000
+      TZ: Europe/Paris
       ALLOW_FLIGHT: TRUE
-      MAX_WORLD_SIZE: 10000000
-      SPAWN_ANIMALS: TRUE
-      SPAWN_MONSTERS: TRUE
-      SPAWN_NPCS: TRUE
-      PVP: TRUE
-      LEVEL_TYPE: normal # type of generating world
-      SERVER_NAME: RaBByT_S3
-      ICON: /mods/RaBByT-S3.jpg
+      BROADCAST_CONSOLE_TO_OPS: TRUE
+      BROADCAST_RCON_TO_OPS: TRUE
+      CF_API_KEY: ${CF_API_KEY}
+      CF_BASE_DIR: "/data"
+      DIFFICULTY: normal
+      EULA: TRUE
+      ENABLE_STATUS: TRUE
+      ENABLE_QUERY: TRUE
       ENABLE_RCON: TRUE
+      ENABLE_WHITELIST: TRUE
+      FORCE_GAMEMODE: TRUE
+      FORGE_VERSION: "47.2.32"
+      ICON: /RaBByT-S4.jpg
+      MAX_BUILD_HEIGHT: 320 # only under 320
+      MAX_PLAYERS: 5
+      MAX_WORLD_SIZE: 10000000
+      MEMORY: "8G"
+      MODE: survival # 0=survival, 1=creative, 2=adventure, 3=spectator
+      MOTD: "§b§l§oRaBByT Season Perso\n§f§kMinecraft docker Server"
+      OPS: "RaBByt_Tv,TBMPQF"
+      OVERRIDE_ICON: TRUE
+      PERSONAL_PORT_MINECRAFT_RCON: ${PERSONAL_PORT_MINECRAFT_RCON}
+      PERSONAL_RCON_PWD: ${PERSONAL_RCON_PWD}
+      PVP: TRUE
+      QUERY_PORT: ${PERSONAL_PORT_MINECRAFT}
+      RCON_CMDS_STARTUP: |-
+        gamerule playersSleepingPercentage 1
       RCON_PASSWORD: ${PERSONAL_RCON_PWD}
       RCON_PORT: ${PERSONAL_PORT_MINECRAFT_RCON}
-      RCON_CMDS_STARTUP:  |-
-        gamerule playersSleepingPercentage 1
-        kill @e[type=item]
-    deploy:
-      resources:
-        limits:
-          memory: 28G
-          cpus: '8'
+      SERVER_NAME: RaBByT_S4
+      SIMULATION_DISTANCE: 7
+      SNOOPER_ENABLED: FALSE
+      SPAWN_PROTECTION: 0
+      STOP_DURATION: 180
+      TYPE: FORGE
+      VERSION: "1.20.1"
+      VIEW_DISTANCE: 10
     volumes:
+      - /home/docker/mc-perso/:/data
+      - /home/docker/mc-s4/RaBByT-S4.jpg:/RaBByT-S4.jpg:ro
       - /home/docker/home-docker/timezone:/etc/timezone:ro
-      - data:/data
-      - modpacks:/modpacks
-    stdin_open: true
-    tty: true
-    restart: unless-stopped
     ports:
       - ${PERSONAL_PORT_MINECRAFT}:25565
-    network_mode: bridge
+    networks:
+      - web
+
+networks:
+  web:
+    name: true
