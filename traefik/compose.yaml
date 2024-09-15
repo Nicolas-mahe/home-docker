@@ -1,0 +1,246 @@
+services:
+  ################# Traefik #################
+  traefik:
+    restart: unless-stopped
+    image: docker.io/library/traefik:v3.1.2
+    container_name: traefik
+    hostname: container_name
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+      traefik.enable: true
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Paris
+      CF_DNS_API_TOKEN: ${PERSONAL_CF_DNS_API}
+    volumes:
+      - /home/docker/home-docker/timezone:/etc/timezone:ro
+      - /run/docker.sock:/run/docker.sock:ro
+      # - /home/docker/traefik/traefik.yaml:/etc/traefik/traefik.yaml:ro # if static config
+      - /home/docker/traefik/conf/:/etc/traefik/conf/
+      - /home/docker/traefik/certs/:/etc/traefik/certs/
+      - /home/docker/traefik/logs/:/var/log/traefik/
+    ports:
+      - 80:80
+      - 443:443
+      - 8080:8080
+      - 25567:25565/udp
+    command:
+      - --log.level=INFO
+      - --log.format=common
+      - --log.filePath=/var/log/traefik/traefik.log
+      - --accesslog.format=common
+      - --accesslog.filePath=/var/log/traefik/access.log
+      - --api # need for authentik-proxy
+      - --api.dashboard=true
+      - --api.insecure=true
+      - --entrypoints.web.address=:80
+      - --entrypoints.web.http.redirections.entryPoint.to=websecure
+      - --entrypoints.web.http.redirections.entryPoint.scheme=https
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.minecraft.address=:25565/udp
+      - --certificatesresolvers.staging.acme.email=${PERSONAL_CF_MAIL}
+      - --certificatesresolvers.staging.acme.storage=/etc/traefik/certs/acme.json
+      - --certificatesresolvers.staging.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory
+      - --certificatesresolvers.staging.acme.httpChallenge.entryPoint=web
+      - --certificatesresolvers.production.acme.email=${PERSONAL_CF_MAIL}
+      - --certificatesresolvers.production.acme.storage=/etc/traefik/certs/acme.json
+      - --certificatesresolvers.production.acme.caServer=https://acme-v02.api.letsencrypt.org/directory
+      - --certificatesresolvers.production.acme.httpChallenge.entryPoint=web
+      - --serversTransport.insecureSkipVerify=true  # need to put a validate cert everywhere for delete it
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=webinternal
+      - --providers.file.directory=/etc/traefik/conf
+      - --providers.file.watch=true
+    networks:
+      - webexpose
+      - webinternal
+
+  whoami:
+    restart: unless-stopped
+    image: docker.io/traefik/whoami
+    container_name: whoami
+    hostname: whoami
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+      traefik.enable: true
+      traefik.http.routers.whoami.tls: true
+      traefik.http.routers.whoami.tls.certresolver: production
+      traefik.http.routers.whoami.middlewares: authentik@file
+      traefik.http.routers.whoami.entrypoints: web, websecure
+      traefik.http.routers.whoami.rule: Host(`whoami.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.whoami.service: whoami
+      traefik.http.services.whoami.loadBalancer.server.port: 80
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Paris
+    volumes:
+      - /home/docker/home-docker/timezone:/etc/timezone:ro
+    expose:
+      - 80
+    networks:
+      - webinternal
+    depends_on: 
+      - traefik
+
+  ################# Authentik #################
+  postgresql:
+    image: docker.io/library/postgres:16-alpine
+    restart: unless-stopped
+    container_name: authentik-postgresql
+    hostname: authentik-postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_AUTHENTIK_DB} -U $${POSTGRES_AUTHENTIK_USER}"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 5s
+    user: root
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+    environment:
+      TZ: Europe/Paris
+      POSTGRES_PASSWORD: ${POSTGRES_AUTHENTIK_PASSWORD:?database password required}
+      POSTGRES_USER: ${POSTGRES_AUTHENTIK_USER:?database user required}
+      POSTGRES_DB: ${POSTGRES_AUTHENTIK_DB:?database name required}
+    volumes:
+      - /home/docker/home-docker/timezone:/etc/timezone:ro
+      - database:/var/lib/postgresql/data
+    networks:
+      - authentik
+
+  redis:
+    image: docker.io/library/redis:alpine
+    command: --save 60 1 --loglevel warning
+    restart: unless-stopped
+    container_name: authentik-redis
+    hostname: authentik-redis
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 3s
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+    environment:
+      PUID: 1000
+      GUID: 1000      
+      TZ: Europe/Paris
+    volumes:
+      - /home/docker/home-docker/timezone:/etc/timezone:ro
+      - redis:/data
+    networks:
+      - authentik
+
+  server:
+    image: ghcr.io/goauthentik/server:${AUTHENTIK_TAG:-2024.8.1}
+    restart: unless-stopped
+    container_name: authentik-server
+    hostname: authentik-server
+    command: server
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+      traefik.enable: true
+      traefik.http.routers.authentik-server.tls: true
+      traefik.http.routers.authentik-server.tls.certresolver: production
+      traefik.http.routers.authentik-server.entrypoints: web, websecure
+      traefik.http.routers.authentik-server.rule: Host(`auth.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.authentik-server.service: authentik-server
+      traefik.http.services.authentik-server.loadBalancer.server.port: 9000
+    environment:
+      PUID: 1000
+      GUID: 1000
+      TZ: Europe/Paris
+      AUTHENTIK_COOKIE_DOMAIN: ${PERSONAL_DOMAINE_NAME}
+      AUTHENTIK_ERROR_REPORTING__ENABLED: false
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:?authentik secret key required}
+      AUTHENTIK_REDIS__HOST: redis
+      AUTHENTIK_POSTGRESQL__HOST: postgresql
+      AUTHENTIK_POSTGRESQL__USER: ${POSTGRES_AUTHENTIK_USER}
+      AUTHENTIK_POSTGRESQL__NAME: ${POSTGRES_AUTHENTIK_DB}
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${POSTGRES_AUTHENTIK_PASSWORD}
+      AUTHENTIK_EMAIL__HOST: smtp-mail.outlook.com
+      AUTHENTIK_EMAIL__PORT: 587
+      AUTHENTIK_EMAIL__USERNAME: ${PERSONAL_EMAIL_SMTP}
+      AUTHENTIK_EMAIL__PASSWORD: ${PERSONAL_PWD_SMTP}
+      AUTHENTIK_EMAIL__USE_TLS: true
+      AUTHENTIK_EMAIL__USE_SSL: true
+      AUTHENTIK_EMAIL__TIMEOUT: 10
+      AUTHENTIK_EMAIL__FROM: ${PERSONAL_EMAIL_SMTP}
+    volumes:
+      - /home/docker/home-docker/timezone:/etc/timezone:ro
+      - /home/docker/authentik/media:/media
+      - /home/docker/authentik/custom-templates:/templates
+    expose:
+      - 9000
+      - 9443
+    depends_on:
+      - traefik
+      - postgresql
+      - redis
+    networks:
+      - webinternal
+      - authentik
+
+  worker:
+    image: ghcr.io/goauthentik/server:${AUTHENTIK_TAG:-2024.8.1}
+    restart: unless-stopped
+    command: worker
+    container_name: authentik-worker
+    hostname: authentik-worker
+    environment:
+      PUID: 1000
+      GUID: 1000
+      TZ: Europe/Paris
+      AUTHENTIK_COOKIE_DOMAIN: ${PERSONAL_DOMAINE_NAME}
+      AUTHENTIK_ERROR_REPORTING__ENABLED: false
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:?authentik secret key required}
+      AUTHENTIK_REDIS__HOST: redis
+      AUTHENTIK_POSTGRESQL__HOST: postgresql
+      AUTHENTIK_POSTGRESQL__USER: ${POSTGRES_AUTHENTIK_USER}
+      AUTHENTIK_POSTGRESQL__NAME: ${POSTGRES_AUTHENTIK_DB}
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${POSTGRES_AUTHENTIK_PASSWORD}
+      AUTHENTIK_EMAIL__HOST: smtp-mail.outlook.com
+      AUTHENTIK_EMAIL__PORT: 587
+      AUTHENTIK_EMAIL__USERNAME: ${PERSONAL_EMAIL_SMTP}
+      AUTHENTIK_EMAIL__PASSWORD: ${PERSONAL_PWD_SMTP}
+      AUTHENTIK_EMAIL__USE_TLS: true
+      AUTHENTIK_EMAIL__USE_SSL: true
+      AUTHENTIK_EMAIL__TIMEOUT: 10
+      AUTHENTIK_EMAIL__FROM: ${PERSONAL_EMAIL_SMTP}
+    volumes:
+      - /home/docker/home-docker/timezone:/etc/timezone:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /home/docker/authentik/media:/media
+      - /home/docker/authentik/certs:/certs
+      - /home/docker/authentik/custom-templates:/templates
+    depends_on:
+      - traefik
+      - postgresql
+      - redis
+    networks:
+      - authentik
+
+volumes:  
+  database:
+    driver: local
+  redis:
+    driver: local
+
+networks:
+  authentik:
+    name: authentik
+    internal: true
+  webexpose:
+    name: webexpose
+    driver: bridge
+  webinternal:
+    name: webinternal
+    internal: true
