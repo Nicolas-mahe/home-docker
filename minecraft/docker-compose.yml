@@ -66,4 +66,4 @@ services:
 
 networks:
   web:
-    name: true
+    name: web
