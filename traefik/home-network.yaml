@@ -6,21 +6,21 @@ http:
       tls:
         certResolver: staging
       middlewares:
-        - authentik@file
+        - authentik@docker
     portainer-test:
       rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`) && PathPrefix(`/`)"
       service: portainer-test
       tls:
         certResolver: staging
       middlewares:
-        - authentik@file
+        - authentik@docker
     proxmox:
       rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`) && PathPrefix(`/`)"
       service: proxmox
       tls:
         certResolver: staging
       middlewares:
-        - authentik@file
+        - authentik@docker
 
   services:
     truenas:
@@ -36,9 +36,6 @@ http:
         servers:
           - url: "https://${PERSONAL_NETWORK}.2:8006"
     
-
-
-
 
   #  minecraft:
   #     loadBalancer:
