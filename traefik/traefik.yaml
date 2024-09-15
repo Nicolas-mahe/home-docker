@@ -1,0 +1,111 @@
+# global:
+#   checkNewVersion: true
+#   sendAnonymousUsage: true
+
+# # -- (Optional) Change Log Level and Format here...
+# #     - loglevels [DEBUG, INFO, WARNING, ERROR, CRITICAL]
+# #     - format [common, json, logfmt]
+# log:
+#  level: INFO
+#  format: common
+#  filePath: /var/log/traefik/traefik.log
+
+# # -- (Optional) Enable Accesslog and change Format here...
+# #     - format [common, json, logfmt]
+# accesslog:
+#   format: common
+#   filePath: /var/log/traefik/access.log
+
+# # -- (Optional) Enable API and Dashboard here, don't do in production
+# api:
+#   dashboard: true
+#   disableDashboardAd: true
+#   insecure: true
+
+# # -- Change EntryPoints here...
+# entryPoints:
+#   web:
+#     address: :80
+#     http:
+#       redirections:
+#         entryPoint:
+#           to: websecure
+#           scheme: https
+#   websecure:
+#     address: :443
+#   minecraft:
+#     address: ":25565/udp"
+
+# # -- Configure your CertificateResolver here...
+# certificatesResolvers:
+#   staging:
+#     acme:
+#       email: ${PERSONAL_CF_MAIL}
+#       storage: /etc/traefik/certs/acme.json
+#       caServer: "https://acme-staging-v02.api.letsencrypt.org/directory"
+#       # -- (Optional) Remove this section, when using DNS Challenge
+#       httpChallenge:
+#         entryPoint: web
+#       # -- (Optional) Configure DNS Challenge
+#       # dnsChallenge:
+#       #   provider: cloudflare
+#       #   resolvers:
+#       #     - "drew.ns.cloudflare.com:53"
+#       #     - "lovisa.ns.cloudflare.com:53"
+#   production:
+#     acme:
+#       email: ${PERSONAL_CF_MAIL}
+#       storage: /etc/traefik/certs/acme.json
+#       caServer: "https://acme-v02.api.letsencrypt.org/directory"
+#       # -- (Optional) Remove this section, when using DNS Challenge
+#       httpChallenge:
+#         entryPoint: web
+#       # -- (Optional) Configure DNS Challenge
+#       # dnsChallenge:
+#       #   provider: cloudflare
+#       #   resolvers:
+#       #     - "drew.ns.cloudflare.com:53"
+#       #     - "lovisa.ns.cloudflare.com:53"
+
+# # -- (Optional) Disable TLS Cert verification check
+# serversTransport:
+#   insecureSkipVerify: true
+
+# # -- (Optional) Overwrite Default Certificates
+# # tls:
+# #   stores:
+# #     default:
+# #       defaultCertificate:
+# #         certFile: /etc/traefik/certs/cert.pem
+# #         keyFile: /etc/traefik/certs/cert-key.pem
+# # -- (Optional) Disable TLS version 1.0 and 1.1
+# #   options:
+# #     default:
+# #       minVersion: VersionTLS12
+
+# providers:
+#   docker:
+#     # -- (Optional) Enable this, if you want to expose all containers automatically
+#     exposedByDefault: false
+#   file:
+#     directory: /etc/traefik/conf
+#     watch: true
+
+# http:
+#     middlewares:
+#         authentik:
+#             forwardAuth:
+#                 address: http://authentik-server:9000/outpost.goauthentik.io/auth/traefik
+#                 trustForwardHeader: true
+#                 authResponseHeaders:
+#                     - X-authentik-username
+#                     - X-authentik-groups
+#                     - X-authentik-email
+#                     - X-authentik-name
+#                     - X-authentik-uid
+#                     - X-authentik-jwt
+#                     - X-authentik-meta-jwks
+#                     - X-authentik-meta-outpost
+#                     - X-authentik-meta-provider
+#                     - X-authentik-meta-app
+#                     - X-authentik-meta-version
