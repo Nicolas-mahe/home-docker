@@ -9,6 +9,12 @@ services:
       diun.enable: true
       diun.watch_repos: true
       traefik.enable: true
+      traefik.http.routers.dashboard.tls: true
+      traefik.http.routers.dashboard.tls.certresolver: production
+      traefik.http.routers.dashboard.middlewares: authentik@docker
+      traefik.http.routers.dashboard.entrypoints: web, websecure
+      traefik.http.routers.dashboard.rule: Host(`traefik.${PERSONAL_DOMAINE_NAME}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      traefik.http.routers.dashboard.service: api@internal
     environment:
       PUID: 1000
       PGID: 1000
@@ -24,17 +30,17 @@ services:
     ports:
       - 80:80
       - 443:443
-      - 8080:8080
-      - 25567:25565/udp
+      - 25565:25565/udp
+    networks:
+      - webexpose
+      - webinternal
     command:
       - --log.level=INFO
       - --log.format=common
       - --log.filePath=/var/log/traefik/traefik.log
       - --accesslog.format=common
       - --accesslog.filePath=/var/log/traefik/access.log
-      - --api # need for authentik-proxy
       - --api.dashboard=true
-      - --api.insecure=true
       - --entrypoints.web.address=:80
       - --entrypoints.web.http.redirections.entryPoint.to=websecure
       - --entrypoints.web.http.redirections.entryPoint.scheme=https
@@ -53,9 +59,6 @@ services:
       - --providers.docker.network=webinternal
       - --providers.file.directory=/etc/traefik/conf
       - --providers.file.watch=true
-    networks:
-      - webexpose
-      - webinternal
 
   whoami:
     restart: unless-stopped
@@ -68,7 +71,7 @@ services:
       traefik.enable: true
       traefik.http.routers.whoami.tls: true
       traefik.http.routers.whoami.tls.certresolver: production
-      traefik.http.routers.whoami.middlewares: authentik@file
+      traefik.http.routers.whoami.middlewares: authentik@docker
       traefik.http.routers.whoami.entrypoints: web, websecure
       traefik.http.routers.whoami.rule: Host(`whoami.${PERSONAL_DOMAINE_NAME}`)
       traefik.http.routers.whoami.service: whoami
@@ -87,57 +90,6 @@ services:
       - traefik
 
   ################# Authentik #################
-  postgresql:
-    image: docker.io/library/postgres:16-alpine
-    restart: unless-stopped
-    container_name: authentik-postgresql
-    hostname: authentik-postgresql
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_AUTHENTIK_DB} -U $${POSTGRES_AUTHENTIK_USER}"]
-      start_period: 20s
-      interval: 30s
-      retries: 5
-      timeout: 5s
-    user: root
-    labels:
-      diun.enable: true
-      diun.watch_repos: true
-    environment:
-      TZ: Europe/Paris
-      POSTGRES_PASSWORD: ${POSTGRES_AUTHENTIK_PASSWORD:?database password required}
-      POSTGRES_USER: ${POSTGRES_AUTHENTIK_USER:?database user required}
-      POSTGRES_DB: ${POSTGRES_AUTHENTIK_DB:?database name required}
-    volumes:
-      - /home/docker/home-docker/timezone:/etc/timezone:ro
-      - database:/var/lib/postgresql/data
-    networks:
-      - authentik
-
-  redis:
-    image: docker.io/library/redis:alpine
-    command: --save 60 1 --loglevel warning
-    restart: unless-stopped
-    container_name: authentik-redis
-    hostname: authentik-redis
-    healthcheck:
-      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
-      start_period: 20s
-      interval: 30s
-      retries: 5
-      timeout: 3s
-    labels:
-      diun.enable: true
-      diun.watch_repos: true
-    environment:
-      PUID: 1000
-      GUID: 1000      
-      TZ: Europe/Paris
-    volumes:
-      - /home/docker/home-docker/timezone:/etc/timezone:ro
-      - redis:/data
-    networks:
-      - authentik
-
   server:
     image: ghcr.io/goauthentik/server:${AUTHENTIK_TAG:-2024.8.1}
     restart: unless-stopped
@@ -148,12 +100,16 @@ services:
       diun.enable: true
       diun.watch_repos: true
       traefik.enable: true
+      traefik.port: 9000
       traefik.http.routers.authentik-server.tls: true
       traefik.http.routers.authentik-server.tls.certresolver: production
       traefik.http.routers.authentik-server.entrypoints: web, websecure
-      traefik.http.routers.authentik-server.rule: Host(`auth.${PERSONAL_DOMAINE_NAME}`)
-      traefik.http.routers.authentik-server.service: authentik-server
-      traefik.http.services.authentik-server.loadBalancer.server.port: 9000
+      traefik.http.routers.authentik-server.rule: Host(`auth.${PERSONAL_DOMAINE_NAME}`) && PathPrefix(`/outpost.goauthentik.io/`)
+      traefik.http.routers.authentik-server.service: authentik-server  
+      traefik.http.services.authentik-server.loadBalancer.server.port: 9000 
+      traefik.http.middlewares.authentik.forwardauth.address: http://authentik-server:9000/outpost.goauthentik.io/auth/traefik
+      traefik.http.middlewares.authentik.forwardauth.trustForwardHeader: true
+      traefik.http.middlewares.authentik.forwardauth.authResponseHeaders: X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid,X-authentik-jwt,X-authentik-meta-jwks,X-authentik-meta-outpost,X-authentik-meta-provider,X-authentik-meta-app,X-authentik-meta-version
     environment:
       PUID: 1000
       GUID: 1000
@@ -225,6 +181,58 @@ services:
       - traefik
       - postgresql
       - redis
+    networks:
+      - authentik
+
+  ################# Authentik_ BDD #################
+  postgresql:
+    image: docker.io/library/postgres:16-alpine
+    restart: unless-stopped
+    container_name: authentik-postgresql
+    hostname: authentik-postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_AUTHENTIK_DB} -U $${POSTGRES_AUTHENTIK_USER}"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 5s
+    user: root
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+    environment:
+      TZ: Europe/Paris
+      POSTGRES_PASSWORD: ${POSTGRES_AUTHENTIK_PASSWORD:?database password required}
+      POSTGRES_USER: ${POSTGRES_AUTHENTIK_USER:?database user required}
+      POSTGRES_DB: ${POSTGRES_AUTHENTIK_DB:?database name required}
+    volumes:
+      - /home/docker/home-docker/timezone:/etc/timezone:ro
+      - database:/var/lib/postgresql/data
+    networks:
+      - authentik
+
+  redis:
+    image: docker.io/library/redis:alpine
+    command: --save 60 1 --loglevel warning
+    restart: unless-stopped
+    container_name: authentik-redis
+    hostname: authentik-redis
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 3s
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+    environment:
+      PUID: 1000
+      GUID: 1000      
+      TZ: Europe/Paris
+    volumes:
+      - /home/docker/home-docker/timezone:/etc/timezone:ro
+      - redis:/data
     networks:
       - authentik
 
