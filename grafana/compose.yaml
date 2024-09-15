@@ -25,6 +25,7 @@ services:
     expose:
       - 3000
     networks:
+      - grafana
       - webinternal
 
   # cadvisor:
@@ -135,7 +136,6 @@ services:
 networks:
   grafana:
     name: grafana
-    internal: true
   webinternal:
     name: webinternal
     internal: true
