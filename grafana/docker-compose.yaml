@@ -7,12 +7,20 @@ services:
     labels:
       diun.enable: true
       diun.watch_repos: true
+      traefik.http.routers.gafana.tls: true
+      traefik.http.routers.gafana.tls.certresolver: production
+      traefik.http.routers.gafana.middlewares: authentik@docker
+      traefik.http.routers.gafana.entrypoints: web, websecure
+      traefik.http.routers.gafana.rule: Host(`monitoring.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.gafana.service: gafana
+      traefik.http.services.gafana.loadBalancer.server.port: 80
     environment:
       PUID: 1000
       PGID: 1000
       TZ: Europe/Paris
     volumes:
-      - /home/docker/grafana/grafana-data:/var/lib/grafana
+      - /home/docker/home-docker/timezone:/etc/timezone:ro
+      - /home/docker/grafana:/var/lib/grafana
     ports:
       - 3000:3000
 
@@ -27,6 +35,7 @@ services:
     environment:
       TZ: Europe/Paris
     volumes:
+      - /home/docker/home-docker/timezone:/etc/timezone:ro
       - /home/docker/home-docker/grafana/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
       - prometheus-data:/prometheus
     ports:
@@ -45,6 +54,7 @@ services:
     environment:
       TZ: Europe/Paris
     volumes:
+      - /home/docker/home-docker/timezone:/etc/timezone:ro
       - /:/host:ro,rslave
     command: --path.rootfs=/host
 
@@ -99,6 +109,7 @@ services:
     ports:
       - 8086:8086
     volumes:
+      - /home/docker/home-docker/timezone:/etc/timezone:ro
       - influxdb-data:/var/lib/influxdb2
       - /etc/influxdb2:/etc/influxdb2
     # networks:

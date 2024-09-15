@@ -58,10 +58,9 @@ services:
           memory: 28G
           cpus: '8'
     volumes:
+      - /home/docker/home-docker/timezone:/etc/timezone:ro
       - data:/data
       - modpacks:/modpacks
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
     stdin_open: true
     tty: true
     restart: unless-stopped
