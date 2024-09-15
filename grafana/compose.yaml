@@ -7,18 +7,24 @@ services:
     labels:
       diun.enable: true
       diun.watch_repos: true
+      traefik.http.routers.gafana.tls: true
+      traefik.http.routers.gafana.tls.certresolver: production
+      traefik.http.routers.gafana.middlewares: authentik@docker
+      traefik.http.routers.gafana.entrypoints: web, websecure
+      traefik.http.routers.gafana.rule: Host(`monitoring.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.gafana.service: gafana
+      traefik.http.services.gafana.loadBalancer.server.port: 3000
     environment:
       PUID: 1000
       PGID: 1000
       TZ: Europe/Paris
     volumes:
+      - /home/docker/home-docker/timezone:/etc/timezone:ro
       - /home/docker/grafana:/var/lib/grafana
-    ports:
-      - 3000:3000
     expose:
       - 3000
     networks:
-      - monitoring
+      - webinternal
 
   # cadvisor:
   #   restart: unless-stopped
@@ -32,6 +38,7 @@ services:
   #   environment:
   #     TZ: Europe/Paris
   #   volumes:
+  #     - /home/docker/home-docker/timezone:/etc/timezone:ro
   #     - /:/rootfs:ro
   #     - /run:/run:ro
   #     - /sys:/sys:ro
@@ -42,9 +49,9 @@ services:
   #   expose:
   #     - 8080
   #   networks:
-  #     - monitoring
+  #     - grafana
 
-# Run on truenas but works 
+# Works but I run it on TrueNAS-Scale 
   # prometheus:
   #   restart: unless-stopped
   #   image: docker.io/prom/prometheus
@@ -56,13 +63,14 @@ services:
   #   environment:
   #     TZ: Europe/Paris
   #   volumes:
+  #     - /home/docker/home-docker/timezone:/etc/timezone:ro
   #     - /home/docker/home-docker/grafana/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
   #     - prometheus-data:/prometheus
   #   ports:
   #     - 9090:9090
   #   command: --config.file=/etc/prometheus/prometheus.yaml
   #   networks:
-  #     - monitoring
+  #     - grafana
 
 # Run on truenas but works 
   # influxdb:
@@ -94,10 +102,11 @@ services:
   #   ports:
   #     - 8086:8086
   #   volumes:
+  #     - /home/docker/home-docker/timezone:/etc/timezone:ro
   #     - influxdb-data:/var/lib/influxdb2
   #     - /etc/influxdb2:/etc/influxdb2
   #   networks:
-  #     - monitoring
+  #     - grafana
 
 
 # Not used but works  
@@ -116,13 +125,17 @@ services:
   #     - /:/host:ro,rslave
   #   command: --path.rootfs=/host
   #   networks:
-  #     - monitoring
+  #     - grafana
 
 # volumes:
 #   influxdb-data: 
 #   prometheus-data:
 
 networks:
-  monitoring:
-    name: monitoring
+  grafana:
+    name: grafana
+    internal: true
+  webinternal:
+    name: webinternal
+    internal: true
   
