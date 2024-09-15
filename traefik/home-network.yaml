@@ -1,0 +1,54 @@
+http:
+  routers:
+    truenas:
+      rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`) && PathPrefix(`/ui/`)"
+      service: truenas
+      tls:
+        certResolver: staging
+      middlewares:
+        - authentik@file
+    portainer-test:
+      rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`) && PathPrefix(`/`)"
+      service: portainer-test
+      tls:
+        certResolver: staging
+      middlewares:
+        - authentik@file
+    proxmox:
+      rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`) && PathPrefix(`/`)"
+      service: proxmox
+      tls:
+        certResolver: staging
+      middlewares:
+        - authentik@file
+
+  services:
+    truenas:
+      loadBalancer:
+        servers:
+          - url: "https://${PERSONAL_NETWORK}.1:443"
+    portainer-test:
+      loadBalancer:
+        servers:
+          - url: "http://${PERSONAL_NETWORK}.15:${PERSONAL_PORTAINER_PORT}"
+    proxmox:
+      loadBalancer:
+        servers:
+          - url: "https://${PERSONAL_NETWORK}.2:8006"
+    
+
+
+
+
+  #  minecraft:
+  #     loadBalancer:
+  #       servers:
+  #         - url: "udp://${PERSONAL_NETWORK}.6:25565"
+
+# udp:
+#   routers:
+#     minecraft:
+#       rule: "Host(`play.${PERSONAL_DOMAINE_NAME}`)"
+#       service: minecraft
+#       tls:
+#         certResolver: staging
