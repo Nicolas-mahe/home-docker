@@ -13,6 +13,8 @@ services:
       PROXIED: true
       TZ: Europe/Paris
       DELETE_ON_STOP: true
+    volumes:
+      - /home/docker/home-docker/timezone:/etc/timezone:ro
     networks:
       - cloudflare-ddns
 

@@ -18,6 +18,7 @@ services:
       WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
       WORDPRESS_DB_NAME: ${DB_NAME}
     volumes:
+      - /home/docker/home-docker/timezone:/etc/timezone:ro
       - /home/docker/wordpress/data:/var/www/html
     networks:
       - web
@@ -39,6 +40,7 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${ROOT_PWD}
     volumes:
+      - /home/docker/home-docker/timezone:/etc/timezone:ro
       - /home/docker/wordpress/mariadb:/config
     networks:
       - web
