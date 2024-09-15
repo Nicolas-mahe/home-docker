@@ -13,7 +13,7 @@ services:
       traefik.http.routers.homepage.entrypoints: web, websecure
       traefik.http.routers.homepage.rule: Host(`www.${PERSONAL_DOMAINE_NAME}`)
       traefik.http.routers.homepage.service: homepage
-      traefik.http.services.homepage.loadBalancer.server.port: 80
+      traefik.http.services.homepage.loadBalancer.server.port: 3000
     environment:
       PUID: 1000
       PGID: 1000
