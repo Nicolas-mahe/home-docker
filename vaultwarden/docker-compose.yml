@@ -17,7 +17,7 @@ services:
       # API
       traefik.http.routers.vaultwardenapi.tls: true
       traefik.http.routers.vaultwardenapi.tls.certresolver: production
-      traefik.http.routers.vaultwardenapi.middlewares: authentik@docker
+      # traefik.http.routers.vaultwardenapi.middlewares: authentik@docker
       traefik.http.routers.vaultwardenapi.entrypoints: web, websecure
       traefik.http.routers.vaultwardenapi.rule: Host(`vault.${PERSONAL_DOMAINE_NAME}`) && PathPrefix(`/api`) || PathPrefix(`/admin`)
       traefik.http.routers.vaultwardenapi.service: vaultwardenapi
