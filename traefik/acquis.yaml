@@ -1,0 +1,25 @@
+---
+filenames:
+  - /var/log/nextcloud.log
+labels:
+  type: nextcloud
+---
+---
+filenames:
+  - /var/log/traefik/*.log
+labels:
+  type: traefik
+---
+source: docker
+container_name:
+ - authentik-server
+labels:
+  type: authentik
+---
+---
+source: docker
+container_name:
+ - vaultwarden
+labels:
+  type: Vaultwarden
+---
