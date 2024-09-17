@@ -19,6 +19,17 @@ services:
       PUID: 1000
       PGID: 1000
       TZ: Europe/Paris
+      GF_AUTH_GENERIC_OAUTH_ENABLED: "true"
+      GF_AUTH_GENERIC_OAUTH_NAME: "Authentik - ${PERSONAL_DOMAINE_NAME}"
+      GF_AUTH_GENERIC_OAUTH_CLIENT_ID: "${GF_AUTH_GENERIC_OAUTH_CLIENT_ID}"
+      GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: "${GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET}"
+      GF_AUTH_GENERIC_OAUTH_SCOPES: "openid profile email"
+      GF_AUTH_GENERIC_OAUTH_AUTH_URL: "https://auth.${PERSONAL_DOMAINE_NAME}/application/o/authorize/"
+      GF_AUTH_GENERIC_OAUTH_TOKEN_URL: "https://auth.${PERSONAL_DOMAINE_NAME}/application/o/token/"
+      GF_AUTH_GENERIC_OAUTH_API_URL: "https://auth.${PERSONAL_DOMAINE_NAME}/application/o/userinfo/"
+      GF_AUTH_SIGNOUT_REDIRECT_URL: "https://auth.${PERSONAL_DOMAINE_NAME}/application/o/grafana/end-session/"
+      # Optionally enable auto-login (bypasses Grafana login screen)
+      GF_AUTH_OAUTH_AUTO_LOGIN: "false"
     volumes:
       - /home/docker/home-docker/timezone:/etc/timezone:ro
       - /home/docker/grafana:/var/lib/grafana
