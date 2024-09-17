@@ -70,11 +70,10 @@ services:
       - webexpose
       - webinternal
     command:
+      - --global.sendAnonymousUsage
       - --log.level=INFO
-      - --log.format=common
-      # - --log.filePath=/var/log/traefik/traefik.log
-      # - --accesslog.format=common
-      - --accesslog.filePath=/var/log/traefik/access.log
+      - --log.nocolor=true
+      - --accesslog=true
       - --api.dashboard=true
       - --entrypoints.web.address=:80
       - --entrypoints.web.http.redirections.entryPoint.to=websecure
@@ -134,15 +133,25 @@ services:
       TZ: Europe/Paris
       CUSTOM_HOSTNAME: crowdsec
       BOUNCER_KEY_TRAEFIK: ${CROWDSEC_API_TRAEFIK:?crowdsec api required}
-      COLLECTIONS: crowdsecurity/http-cve crowdsecurity/whitelist-good-actors crowdsecurity/nginx crowdsecurity/nextcloud crowdsecurity/traefik Dominic-Wagner/vaultwarden firix/authentik crowdsecurity/linux crowdsecurity/linux-lpe crowdsecurity/appsec-generic-rules crowdsecurity/appsec-virtual-patching 
+      COLLECTIONS: |
+        crowdsecurity/appsec-generic-rules
+        crowdsecurity/appsec-virtual-patching
+        crowdsecurity/whitelist-good-actors
+        crowdsecurity/linux
+        crowdsecurity/linux-lpe
+        firix/authentik
+        LePresidente/grafana
+        crowdsecurity/nginx
+        crowdsecurity/nextcloud
+        crowdsecurity/traefik
+        Dominic-Wagner/vaultwarden
     volumes:
       - /home/docker/home-docker/timezone:/etc/timezone:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro # can read logs from socket!
+      - /var/run/docker.sock:/var/run/docker.sock:ro #Can read logs from socket!
       - /home/docker/traefik/crowdsec/config:/etc/crowdsec #Config Crowdsec
       - /home/docker/traefik/crowdsec/data:/var/lib/crowdsec/data/ #Config Crowdsec
       - /home/docker/traefik/logs/:/var/log/traefik:ro #Logs Traefik
-      - /home/docker/nextcloud/config/:/var/log/nextcloud:ro #Logs Nextcloud
-      - /home/docker/vaultwarden/vaultwarden.log:/var/log/vaultwarden.log:ro #Logs Vaultwarden
+      - /home/docker/nextcloud/config/log/:/var/log/nextcloud/:ro #Logs nginx + php Nextcloud
     expose:
       - 8080
     networks:

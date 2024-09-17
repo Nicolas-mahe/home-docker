@@ -60,4 +60,3 @@ networks:
     internal: true
   webinternal:
     name: webinternal
-    internal: true
