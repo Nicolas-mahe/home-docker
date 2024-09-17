@@ -58,4 +58,3 @@ services:
 networks:
   webinternal:
     name: webinternal
-    internal: true
