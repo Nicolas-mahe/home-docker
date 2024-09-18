@@ -108,25 +108,7 @@ services:
       - swag
 
 networks:
-  authelia:
-    name: authelia
-  cloud:
-    name: cloud
-  crowdsec:
-    name: crowdsec
-  duplicati:
-    name: duplicati
-  homepage:
-    name: homepage
-  librespeed:
-    name: librespeed
-  monitoring:
-    name: monitoring
-  portainer:
-    name: portainer
-  skyblog:
-    name: skyblog
-  vaultwarden:
-    name: vaultwarden
+  swag:
+    name: swag
   webinternal:
     name: webinternal
