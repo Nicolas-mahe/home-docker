@@ -50,17 +50,8 @@ services:
     expose:
       - 81
     networks:
-      - authelia
-      - cloud
-      - crowdsec
-      - duplicati
-      - homepage
-      - librespeed
-      - monitoring
-      - portainer
-      - skyblog
-      - vaultwarden
-      - web
+      - swag
+      - webinternal
 
   crowdsec:
     restart: always
@@ -92,7 +83,7 @@ services:
     expose:
       - 8080
     networks:
-      - crowdsec
+      - swag
 
   authelia:
     restart: always
@@ -114,7 +105,7 @@ services:
     expose:
       - 9091
     networks:
-      - authelia
+      - swag
 
 networks:
   authelia:
@@ -137,5 +128,5 @@ networks:
     name: skyblog
   vaultwarden:
     name: vaultwarden
-  web:
-    name: web
+  webinternal:
+    name: webinternal
