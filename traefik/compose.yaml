@@ -34,7 +34,7 @@ services:
     restart: unless-stopped
     image: docker.io/library/traefik:${TRAEFIK_TAG:-v3.2.1}
     container_name: traefik
-    hostname: container_name
+    hostname: traefik
     labels:
       diun.enable: true
       diun.watch_repos: true
@@ -63,6 +63,8 @@ services:
     depends_on:
       crowdsec:
         condition: service_started
+      redis-bouncer:
+        condition: service_healthy
       server:
         condition: service_started
     networks:
@@ -97,6 +99,31 @@ services:
       - --providers.file.watch=true
       - --experimental.plugins.bouncer.moduleName=github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
       - --experimental.plugins.bouncer.version=${CROWDSEC_PLUGIN_VERSION:?bouncer version required}
+ 
+  redis-bouncer:
+    image: docker.io/library/redis:alpine
+    command: --save 60 1 --loglevel warning
+    restart: unless-stopped
+    container_name: redis-bouncer
+    hostname: redis-bouncer
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 3s
+#    labels:
+#       diun.enable: true
+#       diun.watch_repos: true
+    environment:
+      PUID: 1000
+      GUID: 1000      
+      TZ: Europe/Paris
+    volumes:
+      - /home/docker/home-docker/timezone:/etc/timezone:ro
+      - redis-bouncer:/data
+    networks:
+      - crowdsec
 
   ################# Crowdsec #################
   crowdsec:
@@ -119,19 +146,22 @@ services:
       traefik.http.middlewares.crowdsec.plugin.bouncer.crowdsecLapiKey: ${CROWDSEC_API_TRAEFIK?:crowdsec api required}
       traefik.http.middlewares.crowdsec.plugin.bouncer.crowdsecLapiHost: crowdsec:8080
       traefik.http.middlewares.crowdsec.plugin.bouncer.crowdsecLapiScheme: http
-      traefik.http.middlewares.crowdsec.plugin.bouncer.clientTrustedIPs: ${PERSONAL_IP_RANGE}
-      traefik.http.middlewares.crowdsec.plugin.bouncer.forwardedHeadersCustomName: X-Forwarded-For
+      traefik.http.middlewares.crowdsec.plugin.bouncer.clientTrustedIPs: ${PERSONAL_IP_RANGES}
+      traefik.http.middlewares.crowdsec.plugin.bouncer.forwardedHeadersTrustedIPs: ${CF_PROXY_IP}
+      traefik.http.middlewares.crowdsec.plugin.bouncer.forwardedHeadersCustomName: CF-Connecting-IP,X-Forwarded-For,X-Real-Ip
       traefik.http.middlewares.crowdsec.plugin.bouncer.captchaProvider: recaptcha
       traefik.http.middlewares.crowdsec.plugin.bouncer.captchaSiteKey: ${CROWDSEC_CAPTCHA_SITE_KEY?:captcha key required}
       traefik.http.middlewares.crowdsec.plugin.bouncer.captchaSecretKey: ${CROWDSEC_CAPTCHA_SECRET_KEY?:captcha secret required}
       traefik.http.middlewares.crowdsec.plugin.bouncer.captchaGracePeriodSeconds: 1800
       traefik.http.middlewares.crowdsec.plugin.bouncer.captchaHTMLFilePath: /etc/traefik/conf/captcha.html
       traefik.http.middlewares.crowdsec.plugin.bouncer.banHTMLFilePath: /etc/traefik/conf/ban.html
+      traefik.http.middlewares.crowdsec.plugin.bouncer.RedisCacheHost: redis-bouncer:6379
+      traefik.http.middlewares.crowdsec.plugin.bouncer.RedisCacheEnabled: true
     environment:
       PUID: 1000
       PGID: 1000
       TZ: Europe/Paris
-      CUSTOM_HOSTNAME: crowdsec
+      CUSTOM_HOSTNAME: crowdsec-docker
       BOUNCER_KEY_TRAEFIK: ${CROWDSEC_API_TRAEFIK:?crowdsec api required}
       COLLECTIONS: |
         crowdsecurity/appsec-generic-rules
@@ -187,7 +217,7 @@ services:
       AUTHENTIK_COOKIE_DOMAIN: ${PERSONAL_DOMAINE_NAME}
       AUTHENTIK_ERROR_REPORTING__ENABLED: false
       AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:?authentik secret key required}
-      AUTHENTIK_REDIS__HOST: redis
+      AUTHENTIK_REDIS__HOST: redis-authentik
       AUTHENTIK_POSTGRESQL__HOST: postgresql
       AUTHENTIK_POSTGRESQL__USER: ${POSTGRES_AUTHENTIK_USER}
       AUTHENTIK_POSTGRESQL__NAME: ${POSTGRES_AUTHENTIK_DB}
@@ -210,7 +240,7 @@ services:
     depends_on:
       postgresql:
         condition: service_healthy
-      redis:
+      redis-authentik:
         condition: service_healthy
     networks:
       - webinternal
@@ -229,7 +259,7 @@ services:
       AUTHENTIK_COOKIE_DOMAIN: ${PERSONAL_DOMAINE_NAME}
       AUTHENTIK_ERROR_REPORTING__ENABLED: false
       AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:?authentik secret key required}
-      AUTHENTIK_REDIS__HOST: redis
+      AUTHENTIK_REDIS__HOST: redis-authentik
       AUTHENTIK_POSTGRESQL__HOST: postgresql
       AUTHENTIK_POSTGRESQL__USER: ${POSTGRES_AUTHENTIK_USER}
       AUTHENTIK_POSTGRESQL__NAME: ${POSTGRES_AUTHENTIK_DB}
@@ -251,7 +281,7 @@ services:
     depends_on:
       postgresql:
         condition: service_healthy
-      redis:
+      redis-authentik:
         condition: service_healthy
     networks:
       - authentik
@@ -283,12 +313,12 @@ services:
     networks:
       - authentik
 
-  redis:
+  redis-authentik:
     image: docker.io/library/redis:alpine
     command: --save 60 1 --loglevel warning
     restart: unless-stopped
-    container_name: authentik-redis
-    hostname: authentik-redis
+    container_name: redis-authentik
+    hostname: redis-authentik
     healthcheck:
       test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
       start_period: 20s
@@ -304,14 +334,16 @@ services:
       TZ: Europe/Paris
     volumes:
       - /home/docker/home-docker/timezone:/etc/timezone:ro
-      - redis:/data
+      - redis-auth:/data
     networks:
       - authentik
 
 volumes:  
   database:
     driver: local
-  redis:
+  redis-auth:
+    driver: local
+  redis-bouncer:
     driver: local
 
 networks:
