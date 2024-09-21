@@ -60,6 +60,8 @@ services:
       - 80:80
       - 443:443
       # - 25565:25565/udp # test for minecraft in udp
+    expose:
+      - 8080
     depends_on:
       crowdsec:
         condition: service_started
@@ -77,6 +79,7 @@ services:
       - --log.nocolor=true
       - --accesslog=true
       - --api.dashboard=true
+      - --api.insecure=true
       - --entrypoints.web.address=:80
       - --entrypoints.web.http.redirections.entryPoint.to=websecure
       - --entrypoints.web.http.redirections.entryPoint.scheme=https
