@@ -19,6 +19,7 @@ services:
       PUID: 1000
       PGID: 1000
       TZ: Europe/Paris
+      LOG_TARGETS: stdout
     volumes:
       - /home/docker/home-docker/timezone:/etc/timezone:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
