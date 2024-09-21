@@ -1,21 +1,42 @@
 http:
   routers:
+    adguard:
+      rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`)"
+      service: adguard
+      tls:
+        certResolver: production
+      middlewares:
+        - authentik@docker
+    gc-ups:
+      rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`)"
+      service: gc-ups
+      tls:
+        certResolver: production
+      middlewares:
+        - authentik@docker
+    mailcow:
+      rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`)"
+      service: mailcow
+      tls:
+        certResolver: production
+      middlewares:
+        - authentik@docker
     truenas:
-      rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`) && PathPrefix(`/ui/`)"
+      rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`)"
       service: truenas
       tls:
         certResolver: staging
       middlewares:
         - authentik@docker
-    portainer-test:
-      rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`) && PathPrefix(`/`)"
-      service: portainer-test
+    portainer:
+      rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`)"
+      service: portainer
       tls:
         certResolver: staging
       middlewares:
         - authentik@docker
     proxmox:
-      rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`) && PathPrefix(`/`)"
+      rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`)"
       service: proxmox
       tls:
         certResolver: staging
@@ -23,6 +44,18 @@ http:
         - authentik@docker
 
   services:
+    adguard:
+      loadBalancer:
+        servers:
+          - url: "http://${PERSONAL_NETWORK}.4:${PERSONAL_DNS_PORT}"
+    gc-ups:
+      loadBalancer:
+        servers:
+          - url: "http://${PERSONAL_NETWORK}.4:${PERSONAL_UPS_PORT}"
+    mailcow:
+      loadBalancer:
+        servers:
+          - url: "http://${PERSONAL_NETWORK}.6:${PERSONAL_DNS_PORT}"
     truenas:
       loadBalancer:
         servers:
