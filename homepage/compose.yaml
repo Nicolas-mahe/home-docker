@@ -26,8 +26,11 @@ services:
       - /home/docker/homepage/images:/app/public/images
       - /home/docker/homepage/icons:/app/public/icons
     networks:
+      - crowdsec
       - webinternal
 
 networks:
+  crowdsec:
+    name: crowdsec
   webinternal:
     name: webinternal
