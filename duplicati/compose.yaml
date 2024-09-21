@@ -16,18 +16,32 @@ services:
       traefik.http.routers.duplicati.service: duplicati
       traefik.http.services.duplicati.loadBalancer.server.port: 8200
     environment:
-      PUID: 1002
-      PGID: 100
+      PUID: 1000
+      PGID: 1000
       TZ: Europe/Paris
     volumes:
       - /home/docker/home-docker/timezone:/etc/timezone:ro
       - /home/docker/duplicati:/config
-      - ${PATH_DATA}/backups:/backups
-      - ${PATH_DATA}/partage:/source
+      - nfs-backups:/backups
+      - nfs-partage:/source
     expose:
       - 8200
     networks:
       - webinternal
+
+volumes:
+  nfs-backups:
+    driver: local
+    driver_opts:
+      type: "nfs"
+      o: "addr=192.168.1.1,rw,nfsvers=4"
+      device: ":/mnt/raid/backups"
+  nfs-partage:
+    driver: local
+    driver_opts:
+      type: "nfs"
+      o: "addr=192.168.1.1,rw,nfsvers=4"
+      device: ":/mnt/raid/partage"
 
 networks:
   webinternal:
