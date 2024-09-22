@@ -237,6 +237,8 @@ services:
       - /home/docker/home-docker/timezone:/etc/timezone:ro
       - /home/docker/authentik/media:/media
       - /home/docker/authentik/custom-templates:/templates
+    ports:
+      - ${PERSONAL_LDAP_PORT}:389
     expose:
       - 9000
       - 9443
