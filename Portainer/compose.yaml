@@ -29,5 +29,5 @@ services:
     - portainer
 
 networks:
-  portainer:
-    name: portainer
+  webinternal:
+    name: webinternal
