@@ -7,12 +7,20 @@ services:
     labels:
       diun.enable: true
       diun.watch_repos: true
+      traefik.enable: true
+      traefik.http.routers.portainer.tls: true
+      traefik.http.routers.portainer.tls.certresolver: production
+      traefik.http.routers.portainer.middlewares: authentik@docker
+      traefik.http.routers.portainer.entrypoints: web, websecure
+      traefik.http.routers.portainer.rule: Host(`management.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.portainer.service: portainer
+      traefik.http.services.portainer.loadBalancer.server.port: 80
     environment:
       PUID: 1000
       PGID: 1000
       TZ: Europe/Paris
-    ports:
-      - ${PERSONAL_PORT_PORTAINER}:9000
+    expose:
+      - 9000
     volumes:
       - /home/docker/portainer:/data
       - /var/run/docker.sock:/var/run/docker.sock:ro
