@@ -1,0 +1,56 @@
+services:
+  portainer:
+    restart: always
+    image: docker.io/portainer/portainer-ee:${PERSONAL_PORTAINER_VERSION}
+    container_name: portainer-ee
+    hostname: portainer-ee
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+      traefik.enable: true
+      traefik.http.routers.portainer.tls: true
+      traefik.http.routers.portainer.tls.certresolver: production
+      traefik.http.routers.portainer.middlewares: authentik@docker
+      traefik.http.routers.portainer.entrypoints: web, websecure
+      traefik.http.routers.portainer.rule: Host(`management.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.portainer.service: portainer
+      traefik.http.services.portainer.loadBalancer.server.port: 9000
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Paris
+    ports:
+      - ${PERSONAL_PORT_PORTAINER}:9000
+    expose:
+      - 9000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /home/docker/home-docker/timezone:/etc/timezone:ro
+      - /home/docker/portainer:/data
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /home/docker/home-docker/timezone:/etc/timezone:ro
+    networks:
+    - webinternal
+
+  portainer_agent:
+    restart: always
+    image: docker.io/portainer/agent:${PERSONAL_PORTAINER_VERSION}
+    container_name: portainer_agent
+    hostname: portainer_agent
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+    environment:
+      TZ: Europe/Paris
+    expose:
+      - 9001
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /home/docker/home-docker/timezone:/etc/timezone:ro
+      - /var/lib/docker/volumes:/var/lib/docker/volumes
+    networks:
+    - webinternal
+
+networks:
+  webinternal:
+    name: webinternal
