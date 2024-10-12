@@ -32,8 +32,8 @@ services:
       # Optionally enable auto-login (bypasses Grafana login screen)
       GF_AUTH_OAUTH_AUTO_LOGIN: ${GF_AUTH_OAUTH_AUTO_LOGIN}
     volumes:
-      - /home/docker/home-docker/timezone:/etc/timezone:ro
-      - /home/docker/grafana:/var/lib/grafana
+      - /${DOCKER_DATA_DIRECTORY}/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/grafana:/var/lib/grafana
     expose:
       - 3000
     networks:
@@ -51,7 +51,7 @@ services:
   #   environment:
   #     TZ: Europe/Paris
   #   volumes:
-  #     - /home/docker/home-docker/timezone:/etc/timezone:ro
+  #     - /${DOCKER_DATA_DIRECTORY}/home-docker/timezone:/etc/timezone:ro
   #     - /:/rootfs:ro
   #     - /run:/run:ro
   #     - /sys:/sys:ro
@@ -76,8 +76,8 @@ services:
   #   environment:
   #     TZ: Europe/Paris
   #   volumes:
-  #     - /home/docker/home-docker/timezone:/etc/timezone:ro
-  #     - /home/docker/home-docker/grafana/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
+  #     - /${DOCKER_DATA_DIRECTORY}/home-docker/timezone:/etc/timezone:ro
+  #     - /${DOCKER_DATA_DIRECTORY}/home-docker/grafana/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
   #     - prometheus-data:/prometheus
   #   ports:
   #     - 9090:9090
@@ -115,7 +115,7 @@ services:
   #   ports:
   #     - 8086:8086
   #   volumes:
-  #     - /home/docker/home-docker/timezone:/etc/timezone:ro
+  #     - /${DOCKER_DATA_DIRECTORY}/home-docker/timezone:/etc/timezone:ro
   #     - influxdb-data:/var/lib/influxdb2
   #     - /etc/influxdb2:/etc/influxdb2
   #   networks:

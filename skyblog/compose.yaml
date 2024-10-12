@@ -16,8 +16,8 @@ services:
       traefik.http.routers.skyblog1.service: skyblog1
       traefik.http.services.skyblog1.loadBalancer.server.port: 80
     volumes:
-      - /home/docker/home-docker/timezone:/etc/timezone:ro
-      - /home/docker/skyblog/${SKYBLOG1}.skyrock.com:/usr/share/nginx/html:ro
+      - /${DOCKER_DATA_DIRECTORY}/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/skyblog/${SKYBLOG1}.skyrock.com:/usr/share/nginx/html:ro
     environment:
       PUID: 1000
       PGID: 1000
@@ -43,8 +43,8 @@ services:
       traefik.http.routers.skyblog2.service: skyblog2
       traefik.http.services.skyblog2.loadBalancer.server.port: 80
     volumes:
-      - /home/docker/home-docker/timezone:/etc/timezone:ro
-      - /home/docker/skyblog/${SKYBLOG2}.skyrock.com:/usr/share/nginx/html:ro
+      - /${DOCKER_DATA_DIRECTORY}/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/skyblog/${SKYBLOG2}.skyrock.com:/usr/share/nginx/html:ro
     environment:
       PUID: 1000
       PGID: 1000

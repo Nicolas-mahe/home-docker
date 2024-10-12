@@ -7,7 +7,7 @@ services:
       diun.enable: true
       diun.watch_repos: true
     volumes:
-      - /home/docker/traefik/certs:/certs/
+      - /${DOCKER_DATA_DIRECTORY}/traefik/certs:/certs/
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
@@ -62,7 +62,7 @@ services:
       - TZ=Europe/Paris
     command: sh -c "wget https://raw.githubusercontent.com/Nicolas-mahe/Ansible-perso/Treafik/traefik/dynamic.yml -O /certs/dynamic.yml"
     volumes:
-      - /home/docker/traefik/certs:/certs/
+      - /${DOCKER_DATA_DIRECTORY}/traefik/certs:/certs/
     networks:
       - web
 

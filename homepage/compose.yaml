@@ -21,11 +21,11 @@ services:
       TZ: Europe/Paris
       LOG_TARGETS: stdout
     volumes:
-      - /home/docker/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/home-docker/timezone:/etc/timezone:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /home/docker/homepage/config:/app/config
-      - /home/docker/homepage/images:/app/public/images
-      - /home/docker/homepage/icons:/app/public/icons
+      - /${DOCKER_DATA_DIRECTORY}/homepage/config:/app/config
+      - /${DOCKER_DATA_DIRECTORY}/homepage/images:/app/public/images
+      - /${DOCKER_DATA_DIRECTORY}/homepage/icons:/app/public/icons
     networks:
       - crowdsec
       - webinternal

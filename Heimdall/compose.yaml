@@ -12,8 +12,8 @@ services:
       PGID: 1000
       TZ: Europe/Paris
     volumes:
-      - /home/docker/home-docker/timezone:/etc/timezone:ro
-      - /home/docker/heimdall:/config
+      - /${DOCKER_DATA_DIRECTORY}/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/heimdall:/config
     networks:
     - web
 

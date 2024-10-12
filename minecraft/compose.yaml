@@ -56,9 +56,9 @@ services:
       VERSION: "1.20.1"
       VIEW_DISTANCE: 10
     volumes:
-      - /home/docker/home-docker/timezone:/etc/timezone:ro
-      - /home/docker/mc-perso/:/data
-      - /home/docker/mc-s4/RaBByT-S4.jpg:/RaBByT-S4.jpg:ro
+      - /${DOCKER_DATA_DIRECTORY}/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/mc-perso/:/data
+      - /${DOCKER_DATA_DIRECTORY}/mc-s4/RaBByT-S4.jpg:/RaBByT-S4.jpg:ro
     ports:
       - ${PERSONAL_PORT_MINECRAFT}:25565
     networks:
