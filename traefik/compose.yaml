@@ -20,7 +20,7 @@ services:
       PGID: 1000
       TZ: Europe/Paris
     volumes:
-      - /${DOCKER_DATA_DIRECTORY}/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
     expose:
       - 80
     networks:
@@ -52,10 +52,10 @@ services:
       CF_DNS_API_TOKEN: ${PERSONAL_CF_DNS_API}
     volumes:
       - /run/docker.sock:/run/docker.sock:ro
-      - /${DOCKER_DATA_DIRECTORY}/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/traefik/conf/:/etc/traefik/conf/
-      - /${DOCKER_DATA_DIRECTORY}/traefik/certs/:/etc/traefik/certs/
-      - /${DOCKER_DATA_DIRECTORY}/traefik/logs/:/var/log/traefik
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/traefik/conf/:/etc/traefik/conf/
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/traefik/certs/:/etc/traefik/certs/
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/traefik/logs/:/var/log/traefik
     ports:
       - 80:80
       - 443:443
@@ -123,7 +123,7 @@ services:
       GUID: 1000      
       TZ: Europe/Paris
     volumes:
-      - /${DOCKER_DATA_DIRECTORY}/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
       - redis-bouncer:/data
     networks:
       - crowdsec
@@ -180,11 +180,11 @@ services:
         Dominic-Wagner/vaultwarden
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro #Can read logs from socket!
-      - /${DOCKER_DATA_DIRECTORY}/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/traefik/crowdsec/config:/etc/crowdsec #Config Crowdsec
-      - /${DOCKER_DATA_DIRECTORY}/traefik/crowdsec/data:/var/lib/crowdsec/data/ #Config Crowdsec
-      - /${DOCKER_DATA_DIRECTORY}/traefik/logs/:/var/log/traefik:ro #Logs Traefik
-      - /${DOCKER_DATA_DIRECTORY}/nextcloud/config/log/:/var/log/nextcloud/:ro #Logs nginx + php Nextcloud
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/traefik/crowdsec/config:/etc/crowdsec #Config Crowdsec
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/traefik/crowdsec/data:/var/lib/crowdsec/data/ #Config Crowdsec
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/traefik/logs/:/var/log/traefik:ro #Logs Traefik
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/nextcloud/config/log/:/var/log/nextcloud/:ro #Logs nginx + php Nextcloud
     expose:
       - 8080
     networks:
@@ -234,9 +234,9 @@ services:
       AUTHENTIK_EMAIL__TIMEOUT: 10
       AUTHENTIK_EMAIL__FROM: ${PERSONAL_EMAIL_SMTP}
     volumes:
-      - /${DOCKER_DATA_DIRECTORY}/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/authentik/media:/media
-      - /${DOCKER_DATA_DIRECTORY}/authentik/custom-templates:/templates
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/authentik/media:/media
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/authentik/custom-templates:/templates
     expose:
       - 9000
       - 9443
@@ -277,10 +277,10 @@ services:
       AUTHENTIK_EMAIL__FROM: ${PERSONAL_EMAIL_SMTP}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /${DOCKER_DATA_DIRECTORY}/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/authentik/media:/media
-      - /${DOCKER_DATA_DIRECTORY}/authentik/certs:/certs
-      - /${DOCKER_DATA_DIRECTORY}/authentik/custom-templates:/templates
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/authentik/media:/media
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/authentik/certs:/certs
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/authentik/custom-templates:/templates
     depends_on:
       postgresql:
         condition: service_healthy
@@ -311,7 +311,7 @@ services:
       POSTGRES_USER: ${POSTGRES_AUTHENTIK_USER:?database user required}
       POSTGRES_DB: ${POSTGRES_AUTHENTIK_DB:?database name required}
     volumes:
-      - /${DOCKER_DATA_DIRECTORY}/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
       - database:/var/lib/postgresql/data
     networks:
       - authentik
@@ -336,7 +336,7 @@ services:
       GUID: 1000      
       TZ: Europe/Paris
     volumes:
-      - /${DOCKER_DATA_DIRECTORY}/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
       - redis-auth:/data
     networks:
       - authentik

@@ -20,8 +20,8 @@ services:
       PGID: 1000
       TZ: Europe/Paris
     volumes:
-      - /${DOCKER_DATA_DIRECTORY}/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/vaultwarden/:/data/
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/vaultwarden/:/data/
     networks:
       - webinternal
 

@@ -21,9 +21,9 @@ services:
       TZ: Europe/Paris
       NEXTCLOUD_TRUSTED_DOMAINS: cloud.${PERSONAL_DOMAINE_NAME}
     volumes:
-      - /${DOCKER_DATA_DIRECTORY}/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/nextcloud/config:/config
-      - /${DOCKER_DATA_DIRECTORY}/nextcloud/data:/data
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/nextcloud/config:/config
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/nextcloud/data:/data
     depends_on:
       - mariadb
     # ports:
@@ -49,8 +49,8 @@ services:
       TZ: Europe/Paris
       MYSQL_ROOT_PASSWORD: ${ROOT_PWD}
     volumes:
-      - /${DOCKER_DATA_DIRECTORY}/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/nextcloud/mariadb:/config
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/nextcloud/mariadb:/config
     networks:
       - cloud-db
 
