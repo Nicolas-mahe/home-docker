@@ -1,0 +1,21 @@
+services:
+  adguardhome:
+    restart: always
+    image: docker.io/adguard/adguardhome
+    container_name: adguardhome
+    hostname: adguardhome
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+      traefik.enable: true
+      traefik.http.routers.adguard.tls: true
+      traefik.http.routers.adguard.tls.certresolver: production
+      traefik.http.routers.adguard.middlewares: authentik@docker
+      traefik.http.routers.adguard.entrypoints: web, websecure
+      traefik.http.routers.adguard.rule: Host(`dns.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.adguard.service: adguard
+      traefik.http.services.adguard.loadBalancer.server.port: 80
+    volumes:
+      - /home/docker/adguard/data:/opt/adguardhome/work
+      - /home/docker/adguard/conf:/opt/adguardhome/conf
+    network_mode: "host"

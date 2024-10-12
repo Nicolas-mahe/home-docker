@@ -40,11 +40,11 @@ services:
         lscr.io/linuxserver/mods:swag-dbip
         lscr.io/linuxserver/mods:swag-f2bdiscord
     volumes:
-      - /home/docker/home-docker/timezone:/etc/timezone:ro
-      - /home/docker/swag:/config #Config Swag
-      - /home/docker/authelia/config/authelia.log:/authelia/authelia.log:ro #Logs Authelia
-      - /home/docker/nextcloud/config/nextcloud.log:/nextcloud/nextcloud.log:ro #Logs Nextcloud
-      - /home/docker/vaultwarden/vaultwarden.log:/vaultwarden/vaultwarden.log:ro #Logs Vaultwarden
+      - /${DOCKER_DATA_DIRECTORY}/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/swag:/config #Config Swag
+      - /${DOCKER_DATA_DIRECTORY}/authelia/config/authelia.log:/authelia/authelia.log:ro #Logs Authelia
+      - /${DOCKER_DATA_DIRECTORY}/nextcloud/config/nextcloud.log:/nextcloud/nextcloud.log:ro #Logs Nextcloud
+      - /${DOCKER_DATA_DIRECTORY}/vaultwarden/vaultwarden.log:/vaultwarden/vaultwarden.log:ro #Logs Vaultwarden
     ports:
       - 443:443
     expose:
@@ -73,13 +73,13 @@ services:
       BOUNCER_KEY_SWAG: ${CROWDSEC_API_KEY}
       COLLECTIONS: crowdsecurity/http-cve crowdsecurity/whitelist-good-actors crowdsecurity/nginx crowdsecurity/nextcloud LePresidente/authelia Dominic-Wagner/vaultwarden
     volumes:
-      - /home/docker/home-docker/timezone:/etc/timezone:ro
-      - /home/docker/crowdsec/config:/etc/crowdsec #Config Crowdsec
-      - /home/docker/crowdsec/data:/var/lib/crowdsec/data/ #Config Crowdsec
-      - /home/docker/swag/log/nginx:/var/log/nginx:ro #Logs Swag
-      - /home/docker/authelia/config/authelia.log:/var/log/authelia.log:ro #Logs Authelia
-      - /home/docker/nextcloud/config/nextcloud.log:/var/log/nextcloud.log:ro #Logs Nextcloud
-      - /home/docker/vaultwarden/vaultwarden.log:/var/log/vaultwarden.log:ro #Logs Vaultwarden
+      - /${DOCKER_DATA_DIRECTORY}/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/crowdsec/config:/etc/crowdsec #Config Crowdsec
+      - /${DOCKER_DATA_DIRECTORY}/crowdsec/data:/var/lib/crowdsec/data/ #Config Crowdsec
+      - /${DOCKER_DATA_DIRECTORY}/swag/log/nginx:/var/log/nginx:ro #Logs Swag
+      - /${DOCKER_DATA_DIRECTORY}/authelia/config/authelia.log:/var/log/authelia.log:ro #Logs Authelia
+      - /${DOCKER_DATA_DIRECTORY}/nextcloud/config/nextcloud.log:/var/log/nextcloud.log:ro #Logs Nextcloud
+      - /${DOCKER_DATA_DIRECTORY}/vaultwarden/vaultwarden.log:/var/log/vaultwarden.log:ro #Logs Vaultwarden
     expose:
       - 8080
     networks:
@@ -100,8 +100,8 @@ services:
       PGID: 1000
       TZ: Europe/Paris
     volumes:
-      - /home/docker/home-docker/timezone:/etc/timezone:ro
-      - /home/docker/authelia/config:/config
+      - /${DOCKER_DATA_DIRECTORY}/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/authelia/config:/config
     expose:
       - 9091
     networks:

@@ -28,7 +28,7 @@ services:
     ports:
       - ${PERSONAL_PORT_WIREGUARD}:51820/udp
     volumes:
-      - /home/docker/wireguard:/config
+      - /${DOCKER_DATA_DIRECTORY}/wireguard:/config
       - /lib/modules:/lib/modules
     networks:
     - vpn
