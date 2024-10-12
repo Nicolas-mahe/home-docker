@@ -16,6 +16,7 @@ services:
       traefik.http.routers.adguard.service: adguard
       traefik.http.services.adguard.loadBalancer.server.port: 80
     volumes:
-      - /home/docker/adguard/data:/opt/adguardhome/work
-      - /home/docker/adguard/conf:/opt/adguardhome/conf
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/adguard/data:/opt/adguardhome/work
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/adguard/conf:/opt/adguardhome/conf
     network_mode: "host"

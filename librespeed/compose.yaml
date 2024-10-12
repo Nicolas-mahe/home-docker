@@ -21,8 +21,8 @@ services:
       TZ: Europe/Paris
       PASSWORD: ${PERSONAL_LIBRESPEED_PWD}
     volumes:
-      - /${DOCKER_DATA_DIRECTORY}/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/librespeed:/config
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/librespeed:/config
     expose:
       - 80
     networks:

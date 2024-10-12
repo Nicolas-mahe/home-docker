@@ -28,7 +28,8 @@ services:
     ports:
       - ${PERSONAL_PORT_WIREGUARD}:51820/udp
     volumes:
-      - /${DOCKER_DATA_DIRECTORY}/wireguard:/config
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/wireguard:/config
       - /lib/modules:/lib/modules
     networks:
     - vpn

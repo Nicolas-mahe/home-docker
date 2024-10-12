@@ -14,7 +14,7 @@ services:
       TZ: Europe/Paris
       DELETE_ON_STOP: true
     volumes:
-      - /${DOCKER_DATA_DIRECTORY}/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
     networks:
       - cloudflare-ddns
 
