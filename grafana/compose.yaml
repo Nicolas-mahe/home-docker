@@ -3,7 +3,7 @@ services:
     image: docker.io/grafana/grafana-oss
     container_name: grafana
     hostname: grafana
-    user: "1000"
+    user: "1000:100"
     labels:
       diun.enable: true
       diun.watch_repos: true
@@ -17,7 +17,7 @@ services:
       traefik.http.services.gafana.loadBalancer.server.port: 3000
     environment:
       PUID: 1000
-      PGID: 1000
+      PGID: 100
       TZ: Europe/Paris
       GF_SERVER_ROOT_URL: "https://monitoring.${PERSONAL_DOMAINE_NAME}"
       GF_AUTH_GENERIC_OAUTH_ENABLED: "true"
@@ -33,11 +33,10 @@ services:
       GF_AUTH_OAUTH_AUTO_LOGIN: ${GF_AUTH_OAUTH_AUTO_LOGIN}
     volumes:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/grafana:/var/lib/grafana
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/grafana/data:/var/lib/grafana
     expose:
       - 3000
     networks:
-      - grafana
       - webinternal
 
   cadvisor:
@@ -63,29 +62,32 @@ services:
     expose:
       - 8080
     networks:
-      - grafana
+      - webinternal
 
   prometheus:
     restart: unless-stopped
     image: docker.io/prom/prometheus
     container_name: prometheus
     hostname: prometheus
+    user: "1000:100"
     labels:
       diun.enable: true
       diun.watch_repos: true
     environment:
       TZ: Europe/Paris
+      PUID: 1000
+      PGID: 100
     volumes:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/grafana/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
-      - prometheus-data:/prometheus
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/grafana/prometheus/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/grafana/prometheus:/prometheus
     ports:
       - 9090:9090
     expose:
       - 9090
     command: --config.file=/etc/prometheus/prometheus.yaml
     networks:
-      - grafana
+      - webinternal
 
   node_exporter:
     restart: unless-stopped
@@ -104,7 +106,7 @@ services:
     expose:
       - 9100
     networks:
-      - grafana
+      - webinternal
 
 # Not used
   # influxdb:
@@ -142,13 +144,10 @@ services:
   #   networks:
   #     - grafana
 
-volumes:
+# volumes:
   # influxdb-data: 
-  prometheus-data:
 
 networks:
-  grafana:
-    name: grafana
   webinternal:
     name: webinternal
   
