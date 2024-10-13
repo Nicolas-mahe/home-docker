@@ -23,7 +23,8 @@ services:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/duplicati:/config
       - /${RAID_DATA_DIRECTORY}/backups:/backups
-      - /${RAID_DATA_DIRECTORY}/partage:/source
+      - /${DOCKER_DATA_DIRECTORY}/docker:/source/docker
+      - /${RAID_DATA_DIRECTORY}/partage:/source/partage
     expose:
       - 8200
     networks:
