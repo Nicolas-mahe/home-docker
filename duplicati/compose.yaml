@@ -22,26 +22,12 @@ services:
     volumes:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/duplicati:/config
-      - nfs-backups:/backups
-      - nfs-partage:/source
+      - /${RAID_DATA_DIRECTORY}/backups:/backups
+      - /${RAID_DATA_DIRECTORY}/partage:/source
     expose:
       - 8200
     networks:
       - webinternal
-
-volumes:
-  nfs-backups:
-    driver: local
-    driver_opts:
-      type: "nfs"
-      o: "addr=192.168.1.1,rw,nfsvers=4"
-      device: ":/mnt/raid/backups"
-  nfs-partage:
-    driver: local
-    driver_opts:
-      type: "nfs"
-      o: "addr=192.168.1.1,rw,nfsvers=4"
-      device: ":/mnt/raid/partage"
 
 networks:
   webinternal:
