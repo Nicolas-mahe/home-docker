@@ -37,55 +37,76 @@ services:
     expose:
       - 3000
     networks:
+      - grafana
       - webinternal
 
-  # cadvisor:
-  #   restart: unless-stopped
-  #   image: gcr.io/cadvisor/cadvisor
-  #   container_name: cadvisor
-  #   hostname: cadvisor
-  #   privileged: true
-  #   labels:
-  #     diun.enable: true
-  #     diun.watch_repos: true
-  #   environment:
-  #     TZ: Europe/Paris
-  #   volumes:
-  #     - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-  #     - /:/rootfs:ro
-  #     - /run:/run:ro
-  #     - /sys:/sys:ro
-  #     - /var/lib/docker/:/var/lib/docker:ro
-  #     - /dev/disk/:/dev/disk:ro
-  #   devices:
-  #     - /dev/kmsg
-  #   expose:
-  #     - 8080
-  #   networks:
-  #     - grafana
+  cadvisor:
+    restart: unless-stopped
+    image: gcr.io/cadvisor/cadvisor
+    container_name: cadvisor
+    hostname: cadvisor
+    privileged: true
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+    environment:
+      TZ: Europe/Paris
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+      - /:/rootfs:ro
+      - /run:/run:ro
+      - /sys:/sys:ro
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-config:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    devices:
+      - /dev/kmsg
+    expose:
+      - 8080
+    networks:
+      - grafana
 
-# Works but I run it on TrueNAS-Scale 
-  # prometheus:
-  #   restart: unless-stopped
-  #   image: docker.io/prom/prometheus
-  #   container_name: prometheus
-  #   hostname: prometheus
-  #   labels:
-  #     diun.enable: true
-  #     diun.watch_repos: true
-  #   environment:
-  #     TZ: Europe/Paris
-  #   volumes:
-  #     - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-  #     - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/grafana/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
-  #     - prometheus-data:/prometheus
-  #   ports:
-  #     - 9090:9090
-  #   command: --config.file=/etc/prometheus/prometheus.yaml
-  #   networks:
-  #     - grafana
+  prometheus:
+    restart: unless-stopped
+    image: docker.io/prom/prometheus
+    container_name: prometheus
+    hostname: prometheus
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+    environment:
+      TZ: Europe/Paris
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/grafana/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - 9090:9090
+    expose:
+      - 9090
+    command: --config.file=/etc/prometheus/prometheus.yaml
+    networks:
+      - grafana
 
-# Run on truenas but works 
+  node_exporter:
+    restart: unless-stopped
+    image: quay.io/prometheus/node-exporter
+    container_name: node_exporter
+    hostname: node_exporter
+    pid: host
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+    environment:
+      TZ: Europe/Paris
+    volumes:
+      - /:/host:ro,rslave
+    command: --path.rootfs=/host
+    expose:
+      - 9100
+    networks:
+      - grafana
+
+# Not used
   # influxdb:
   #   restart: unless-stopped
   #   image: docker.io/library/influxdb:2.7.10-alpine
@@ -121,30 +142,13 @@ services:
   #   networks:
   #     - grafana
 
-
-# Not used but works  
-  # node_exporter:
-  #   restart: unless-stopped
-  #   image: quay.io/prometheus/node-exporter
-  #   container_name: node_exporter
-  #   hostname: node_exporter
-  #   pid: host
-  #   labels:
-  #     diun.enable: true
-  #     diun.watch_repos: true
-  #   environment:
-  #     TZ: Europe/Paris
-  #   volumes:
-  #     - /:/host:ro,rslave
-  #   command: --path.rootfs=/host
-  #   networks:
-  #     - grafana
-
-# volumes:
-#   influxdb-data: 
-#   prometheus-data:
+volumes:
+  # influxdb-data: 
+  prometheus-data:
 
 networks:
+  grafana:
+    name: grafana
   webinternal:
     name: webinternal
   
