@@ -1,4 +1,25 @@
 services:
+  cloudflare-ddns:
+    restart: always
+    image: oznu/cloudflare-ddns
+    container_name: cloudflare-ddns
+    hostname: cloudflare-ddns
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+    environment:
+      API_KEY: ${DNS_API_KEY}
+      ZONE: ${PERSONAL_DOMAINE_NAME}
+      PROXIED: true
+      TZ: Europe/Paris
+      DELETE_ON_STOP: true
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+    networks:
+      - webexpose
+
+  ################# Traefik #################
+
   whoami:
     restart: unless-stopped
     image: docker.io/traefik/whoami
@@ -29,7 +50,6 @@ services:
       traefik:
         condition: service_started
 
-  ################# Traefik #################
   traefik:
     restart: unless-stopped
     image: docker.io/library/traefik:${TRAEFIK_TAG:-v3.2.1}
@@ -104,7 +124,8 @@ services:
       - --providers.file.watch=true
       - --experimental.plugins.bouncer.moduleName=github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
       - --experimental.plugins.bouncer.version=${CROWDSEC_PLUGIN_VERSION:?bouncer version required}
- 
+
+  ################# Crowdsec #################
   redis-bouncer:
     image: docker.io/library/redis:alpine
     command: --save 60 1 --loglevel warning
@@ -130,7 +151,6 @@ services:
     networks:
       - crowdsec
 
-  ################# Crowdsec #################
   crowdsec:
     restart: unless-stopped
     image: ghcr.io/crowdsecurity/crowdsec
