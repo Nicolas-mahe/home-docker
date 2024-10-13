@@ -68,7 +68,9 @@ services:
       redis-bouncer:
         condition: service_healthy
       server:
-        condition: service_started
+        condition: service_healthy
+      worker:
+        condition: service_healthy
     networks:
       - crowdsec
       - webexpose
