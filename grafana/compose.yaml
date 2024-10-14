@@ -62,7 +62,7 @@ services:
       PGID: 100
     volumes:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/grafana/prometheus/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/grafana/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/grafana/prometheus:/prometheus
     ports:
       - 9090:9090
