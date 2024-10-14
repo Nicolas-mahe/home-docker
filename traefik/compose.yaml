@@ -102,6 +102,8 @@ services:
       - --accesslog=true
       - --api.dashboard=true
       - --api.insecure=true
+      - --metrics.addinternals
+      - --metrics.prometheus=true
       - --entrypoints.web.address=:80
       - --entrypoints.web.http.redirections.entryPoint.to=websecure
       - --entrypoints.web.http.redirections.entryPoint.scheme=https
