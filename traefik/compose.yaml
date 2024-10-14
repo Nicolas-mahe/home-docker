@@ -45,7 +45,6 @@ services:
     expose:
       - 80
     networks:
-      - prometheus
       - webinternal
     depends_on: 
       traefik:
@@ -94,6 +93,7 @@ services:
         condition: service_healthy
     networks:
       - crowdsec
+      - prometheus
       - webexpose
       - webinternal
     command:
