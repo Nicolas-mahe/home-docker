@@ -17,7 +17,7 @@ services:
     environment:
       DOMAIN: https://vaultwarden.${PERSONAL_DOMAINE_NAME}
       PUID: 1000
-      PGID: 1000
+      PGID: 100
       TZ: Europe/Paris
     volumes:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro

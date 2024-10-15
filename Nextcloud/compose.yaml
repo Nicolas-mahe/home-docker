@@ -17,7 +17,7 @@ services:
       traefik.http.services.nextcloud.loadBalancer.server.port: 80
     environment:
       PUID: 1000
-      PGID: 1000
+      PGID: 100
       TZ: Europe/Paris
       NEXTCLOUD_TRUSTED_DOMAINS: cloud.${PERSONAL_DOMAINE_NAME}
     volumes:
@@ -45,7 +45,7 @@ services:
       diun.watch_repos: true
     environment:
       PUID: 1000
-      PGID: 1000
+      PGID: 100
       TZ: Europe/Paris
       MYSQL_ROOT_PASSWORD: ${ROOT_PWD}
     volumes:

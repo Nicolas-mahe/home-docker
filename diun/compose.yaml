@@ -11,7 +11,7 @@ services:
     environment:
       TZ: Europe/Paris
       PUID: 1000
-      GUID: 1000
+      GUID: 100
       LOG_LEVEL: info
       LOG_JSON: false
       DIUN_WATCH_WORKERS: 20
