@@ -15,7 +15,7 @@ services:
       diun.watch_repos: true
     environment:
       PGID: 1000
-      PUID: 1000
+      PUID: 100
       TZ: Europe/Paris
       ALLOW_FLIGHT: TRUE
       BROADCAST_CONSOLE_TO_OPS: TRUE

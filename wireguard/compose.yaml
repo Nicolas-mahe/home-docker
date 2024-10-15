@@ -14,7 +14,7 @@ services:
       diun.watch_repos: true
     environment:
       PUID: 1000
-      PGID: 1000
+      PGID: 100
       TZ: Europe/Paris
       ALLOWEDIPS: 0.0.0.0/0
       INTERFACE: eth0

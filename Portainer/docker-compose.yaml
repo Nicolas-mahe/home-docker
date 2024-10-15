@@ -17,7 +17,7 @@ services:
       traefik.http.services.portainer.loadBalancer.server.port: 9000
     environment:
       PUID: 1000
-      PGID: 1000
+      PGID: 100
       TZ: Europe/Paris
     expose:
       - 9000

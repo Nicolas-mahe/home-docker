@@ -9,7 +9,7 @@ services:
       diun.watch_repos: true
     environment:
       PUID: 1000
-      PGID: 1000
+      PGID: 100
       TZ: Europe/Paris
     volumes:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro

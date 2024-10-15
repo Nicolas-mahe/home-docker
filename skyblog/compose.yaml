@@ -20,7 +20,7 @@ services:
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/skyblog/${SKYBLOG1}.skyrock.com:/usr/share/nginx/html:ro
     environment:
       PUID: 1000
-      PGID: 1000
+      PGID: 100
       TZ: Europe/Paris
       NGINX_HOST: ${SKYBLOG1}.${PERSONAL_DOMAINE_NAME}
     expose:
@@ -47,7 +47,7 @@ services:
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/skyblog/${SKYBLOG2}.skyrock.com:/usr/share/nginx/html:ro
     environment:
       PUID: 1000
-      PGID: 1000
+      PGID: 100
       TZ: Europe/Paris
       NGINX_HOST: ${SKYBLOG2}.${PERSONAL_DOMAINE_NAME}
     expose:
