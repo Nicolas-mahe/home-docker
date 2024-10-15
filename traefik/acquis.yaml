@@ -1,6 +1,12 @@
 ---
 source: docker
 container_name:
+ - adguardhome
+labels:
+  type: adguardhome
+---
+source: docker
+container_name:
  - authentik-server
 labels:
   type: authentik
@@ -20,6 +26,11 @@ filenames:
   - /var/log/nextcloud/nginx/*.log
 labels:
   type: nginx
+---
+filenames:
+  - /var/log/openmediavault/*.*
+labels:
+  type: nextcloud
 ---
 source: docker
 container_name:

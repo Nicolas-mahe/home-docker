@@ -1,74 +1,36 @@
 http:
   routers:
-    adguard:
+    dns:
       rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`)"
-      service: adguard
+      service: dns
       tls:
         certResolver: production
       middlewares:
         - authentik@docker
-    gc-ups:
+    nas:
       rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`)"
-      service: gc-ups
+      service: nas
       tls:
         certResolver: production
       middlewares:
         - authentik@docker
-    mailcow:
-      rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`)"
-      service: mailcow
-      tls:
-        certResolver: production
-      middlewares:
-        - authentik@docker
-    truenas:
-      rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`)"
-      service: truenas
-      tls:
-        certResolver: staging
-      middlewares:
-        - authentik@docker
-    portainer:
-      rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`)"
-      service: portainer
-      tls:
-        certResolver: staging
-      middlewares:
-        - authentik@docker
-    proxmox:
-      rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`)"
-      service: proxmox
-      tls:
-        certResolver: staging
-      middlewares:
-        - authentik@docker
+    # mailcow:
+    #   rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`)"
+    #   service: mailcow
+    #   tls:
+    #     certResolver: production
+    #   middlewares:
+    #     - authentik@docker
 
   services:
-    adguard:
+    dns:
       loadBalancer:
         servers:
-          - url: "http://${PERSONAL_NETWORK}.4:${PERSONAL_DNS_PORT}"
-    gc-ups:
+          - url: "http://${PERSONAL_NETWORK}.2:{PERSONAL_DNS_PORT}"
+    nas:
       loadBalancer:
         servers:
-          - url: "http://${PERSONAL_NETWORK}.4:${PERSONAL_UPS_PORT}"
-    mailcow:
-      loadBalancer:
-        servers:
-          - url: "http://${PERSONAL_NETWORK}.6:${PERSONAL_DNS_PORT}"
-    truenas:
-      loadBalancer:
-        servers:
-          - url: "https://${PERSONAL_NETWORK}.1:443"
-    portainer-test:
-      loadBalancer:
-        servers:
-          - url: "http://${PERSONAL_NETWORK}.15:${PERSONAL_PORTAINER_PORT}"
-    proxmox:
-      loadBalancer:
-        servers:
-          - url: "https://${PERSONAL_NETWORK}.2:8006"
-    
+          - url: "http://${PERSONAL_NETWORK}:{PERSONAL_NAS_PORT}"
 
   #  minecraft:
   #     loadBalancer:
