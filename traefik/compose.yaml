@@ -199,6 +199,7 @@ services:
         crowdsecurity/linux-lpe
         firix/authentik
         LePresidente/grafana
+        LePresidente/adguardhome
         crowdsecurity/nginx
         crowdsecurity/nextcloud
         crowdsecurity/traefik
@@ -210,6 +211,7 @@ services:
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/traefik/crowdsec/data:/var/lib/crowdsec/data/ #Config Crowdsec
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/traefik/logs/:/var/log/traefik:ro #Logs Traefik
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/nextcloud/config/log/:/var/log/nextcloud/:ro #Logs nginx + php Nextcloud
+      - /var/log/nginx://var/log/nginx/:/var/log/openmediavault/:ro #Logs nginx OpenMediaVault
     expose:
       - 6060 #monitoring
       - 8080
