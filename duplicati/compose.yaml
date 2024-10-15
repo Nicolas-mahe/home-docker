@@ -25,6 +25,7 @@ services:
       - /${RAID_DATA_DIRECTORY}/backups:/backups
       - /${DOCKER_DATA_DIRECTORY}/docker:/source/docker
       - /${RAID_DATA_DIRECTORY}/partage:/source/partage
+      - /${RAID_DATA_DIRECTORY}/users:/source/
     expose:
       - 8200
     networks:
