@@ -1,7 +1,7 @@
 services:
   homepage:
     restart: unless-stopped
-    image: ghcr.io/gethomepage/homepage:${HOMEPAGE_TAG}
+    image: ghcr.io/gethomepage/homepage${HOMEPAGE_TAG}
     container_name: homepage
     hostname: homepage
     labels:
@@ -16,8 +16,6 @@ services:
       traefik.http.routers.homepage.service: homepage
       traefik.http.services.homepage.loadBalancer.server.port: 3000
     environment:
-      PUID: 1000
-      PGID: 100
       TZ: Europe/Paris
       LOG_TARGETS: stdout
     volumes:
