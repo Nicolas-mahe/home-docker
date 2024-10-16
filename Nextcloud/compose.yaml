@@ -10,7 +10,6 @@ services:
       traefik.enable: true
       traefik.http.routers.nextcloud.tls: true
       traefik.http.routers.nextcloud.tls.certresolver: production
-      traefik.http.routers.nextcloud.middlewares: authentik@docker
       traefik.http.routers.nextcloud.entrypoints: web, websecure
       traefik.http.routers.nextcloud.rule: Host(`cloud.${PERSONAL_DOMAINE_NAME}`)
       traefik.http.routers.nextcloud.service: nextcloud
@@ -24,10 +23,12 @@ services:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/nextcloud/config:/config
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/nextcloud/data:/data
+      - /${RAID_DATA_DIRECTORY}/partage/:/mnt/partage
+      - /${RAID_DATA_DIRECTORY}/backups/:/mnt/backups
     depends_on:
       - mariadb
-    # ports:
-    #   - 450:443
+    ports:
+      - ${PERSONAL_NEXTCLOUD_PORT?:port mandatory}:443
     expose:
       - 80
       - 443
