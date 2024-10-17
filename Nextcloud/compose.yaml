@@ -22,7 +22,7 @@ services:
     volumes:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/nextcloud/config:/config
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/nextcloud/data:/data
+      - /${RAID_DATA_DIRECTORY}/utilisateurs:/data
       - /${RAID_DATA_DIRECTORY}/partage/:/mnt/partage
       - /${RAID_DATA_DIRECTORY}/backups/:/mnt/backups
     depends_on:
