@@ -373,10 +373,13 @@ services:
 volumes:  
   database:
     driver: local
+    name: traefik-authentik_database
   redis-auth:
     driver: local
+    name: traefik-authentik_redis-auth
   redis-bouncer:
     driver: local
+    name: traefik-authentik_redis-bouncer
 
 networks:
   authentik:
