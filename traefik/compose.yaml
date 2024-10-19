@@ -99,7 +99,7 @@ services:
     command:
       - --global.sendAnonymousUsage
       - --log.level=INFO
-      - --log.nocolor=true
+      - --log.nocolor=false
       - --accesslog=true
       - --api.dashboard=true
       - --api.insecure=true
@@ -189,7 +189,7 @@ services:
       PUID: 1000
       PGID: 100
       TZ: Europe/Paris
-      CUSTOM_HOSTNAME: crowdsec-docker
+      CUSTOM_HOSTNAME: crowdsec
       BOUNCER_KEY_TRAEFIK: ${CROWDSEC_API_TRAEFIK:?crowdsec api required}
       COLLECTIONS: |
         crowdsecurity/appsec-generic-rules
