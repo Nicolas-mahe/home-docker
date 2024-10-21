@@ -1,0 +1,29 @@
+services:
+  satisfactory-server:
+    restart: unless-stopped
+    image: wolveix/satisfactory-server:latest
+    container_name: satisfactory-server
+    hostname: satisfactory-server
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+    ports:
+      - 7777:7777/udp
+      - 7777:7777/tcp
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/satisfactory:/config
+    environment:
+      name: value
+      MAXPLAYERS: 4
+      PGID: 100
+      PUID: 1000
+      TZ: Europe/Paris
+      ROOTLESS: false
+      STEAMBETA: false
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+        reservations:
+          memory: 4G
