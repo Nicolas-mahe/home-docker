@@ -5,8 +5,6 @@ services:
     container_name: skyblog1
     hostname: skyblog1
     labels:
-      diun.enable: true
-      diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.skyblog1.tls: true
       traefik.http.routers.skyblog1.tls.certresolver: production
