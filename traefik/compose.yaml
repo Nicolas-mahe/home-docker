@@ -108,9 +108,9 @@ services:
       - --entrypoints.web.address=:80
       - --entrypoints.web.http.redirections.entryPoint.to=websecure
       - --entrypoints.web.http.redirections.entryPoint.scheme=https
-      - --entrypoints.web.http.middlewares=crowdsec@docker
+      - --entrypoints.web.http.middlewares=crowdsec@docker,nginx-errors@docker
       - --entrypoints.websecure.address=:443
-      - --entrypoints.websecure.http.middlewares=crowdsec@docker
+      - --entrypoints.websecure.http.middlewares=crowdsec@docker,nginx-errors@docker
       # - --entrypoints.minecraft.address=:25565/udp # test for minecraft in udp
       - --certificatesresolvers.staging.acme.email=${PERSONAL_CF_MAIL}
       - --certificatesresolvers.staging.acme.storage=/etc/traefik/certs/acme.json
@@ -127,6 +127,39 @@ services:
       - --providers.file.watch=true
       - --experimental.plugins.bouncer.moduleName=github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
       - --experimental.plugins.bouncer.version=${CROWDSEC_PLUGIN_VERSION:?bouncer version required}
+
+  nginx-errors:
+    restart: unless-stopped
+    image: docker.io/nginx:alpine
+    container_name: nginx-errors
+    hostname: nginx-errors
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+      traefik.enable: true
+      traefik.http.routers.nginx-errors.tls: true
+      traefik.http.routers.nginx-errors.tls.certresolver: production
+      traefik.http.routers.nginx-errors.entrypoints: web, websecure
+      traefik.http.routers.nginx-errors.rule: Host(`errors.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.nginx-errors.middlewares: authentik@docker
+      traefik.http.routers.nginx-errors.service: nginx-errors
+      traefik.http.services.nginx-errors.loadBalancer.server.port: 80
+      traefik.http.middlewares.nginx-errors.errors.status: 404,500,501,503,505-599
+      traefik.http.middlewares.nginx-errors.errors.service: nginx-errors
+      traefik.http.middlewares.nginx-errors.errors.query: /{status}
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/traefik/conf/nginx.conf:/etc/nginx/nginx.conf:ro
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/traefik/conf:/usr/share/nginx/html:ro
+    environment:
+      PUID: 1000
+      PGID: 100
+      TZ: Europe/Paris
+      NGINX_HOST: test.${PERSONAL_DOMAINE_NAME}
+    expose:
+      - 80
+    networks:
+      - webinternal
 
   ################# Crowdsec #################
   redis-bouncer:
