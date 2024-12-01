@@ -144,9 +144,9 @@ services:
       traefik.http.routers.nginx-errors.middlewares: authentik@docker
       traefik.http.routers.nginx-errors.service: nginx-errors
       traefik.http.services.nginx-errors.loadBalancer.server.port: 80
-      traefik.http.middlewares.nginx-errors.errors.status: 404,500,501,503,505-599
+      traefik.http.middlewares.nginx-errors.errors.status: 404 #,500,501,503,505-599
       traefik.http.middlewares.nginx-errors.errors.service: nginx-errors
-      traefik.http.middlewares.nginx-errors.errors.query: /{status}
+      traefik.http.middlewares.nginx-errors.errors.query: /{status}.html
     volumes:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/traefik/conf/nginx.conf:/etc/nginx/nginx.conf:ro
