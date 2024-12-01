@@ -149,7 +149,7 @@ services:
       traefik.http.middlewares.nginx-errors.errors.query: /{status}.html
     volumes:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/traefik/conf/nginx.conf:/etc/nginx/nginx.conf:ro
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/traefik/nginx.conf:/etc/nginx/nginx.conf:ro
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/traefik/conf:/usr/share/nginx/html:ro
     environment:
       PUID: 1000
