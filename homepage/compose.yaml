@@ -8,22 +8,23 @@ services:
       diun.enable: true
       diun.watch_repos: true
       traefik.enable: true
+      # Redirection Root Domain
+      traefik.http.routers.redirect.tls: true
+      traefik.http.routers.redirect.tls.certresolver: production
+      traefik.http.routers.redirect.middlewares: authentik@docker,redirect-to-www
+      traefik.http.routers.redirect.entrypoints: web, websecure
+      traefik.http.routers.redirect.rule: Host(`${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.middlewares.redirect-to-www.redirectregex.regex:  "^https?:\\/\\/(${PERSONAL_DOMAINE_NAME//./\\.})" #"^https?:\\/\\/XXXXXXXX\\.com(.*)"
+      traefik.http.middlewares.redirect-to-www.redirectregex.replacement: "https://www.${PERSONAL_DOMAINE_NAME}/$${1}"
+      traefik.http.middlewares.redirect-to-www.redirectregex.permanent: true
+      # homepage
       traefik.http.routers.homepage.tls: true
       traefik.http.routers.homepage.tls.certresolver: production
       traefik.http.routers.homepage.middlewares: authentik@docker
       traefik.http.routers.homepage.entrypoints: web, websecure
-      traefik.http.routers.homepage.rule: Host(`www.${PERSONAL_DOMAINE_NAME}`) || Host(`${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.homepage.rule: Host(`www.${PERSONAL_DOMAINE_NAME}`) # || Host(`${PERSONAL_DOMAINE_NAME}`)
       traefik.http.routers.homepage.service: homepage
       traefik.http.services.homepage.loadBalancer.server.port: 3000
-      # Middleware de redirection avec la variable DOMAIN
-      traefik.http.middlewares.redirect-to-www.redirectregex.regex: "^https?://({PERSONAL_DOMAINE_NAME//./\\.})(.*)"
-      traefik.http.middlewares.redirect-to-www.redirectregex.replacement: "http://www.{PERSONAL_DOMAINE_NAME}$${2}"
-      traefik.http.middlewares.redirect-to-www.redirectregex.permanent: "true"
-
-      # Router pour la redirection
-      traefik.http.routers.redirect.rule: Host(`{PERSONAL_DOMAINE_NAME}`)
-      traefik.http.routers.redirect.middlewares: redirect-to-www
-      traefik.http.routers.redirect.entrypoints: web, websecure
     environment:
       TZ: Europe/Paris
       LOG_TARGETS: stdout
