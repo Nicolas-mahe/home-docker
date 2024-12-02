@@ -9,7 +9,6 @@ services:
       diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.duplicati.tls: true
-      traefik.http.routers.duplicati.tls.certresolver: production
       traefik.http.routers.duplicati.middlewares: authentik@docker
       traefik.http.routers.duplicati.entrypoints: web, websecure
       traefik.http.routers.duplicati.rule: Host(`duplicati.${PERSONAL_DOMAINE_NAME}`)

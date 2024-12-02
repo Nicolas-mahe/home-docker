@@ -30,7 +30,6 @@ services:
       diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.whoami.tls: true
-      traefik.http.routers.whoami.tls.certresolver: production
       traefik.http.routers.whoami.middlewares: authentik@docker
       traefik.http.routers.whoami.entrypoints: web, websecure
       traefik.http.routers.whoami.rule: Host(`whoami.${PERSONAL_DOMAINE_NAME}`)
@@ -60,7 +59,6 @@ services:
       diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.dashboard.tls: true
-      traefik.http.routers.dashboard.tls.certresolver: production
       traefik.http.routers.dashboard.middlewares: authentik@docker
       traefik.http.routers.dashboard.entrypoints: web, websecure
       traefik.http.routers.dashboard.rule: Host(`traefik.${PERSONAL_DOMAINE_NAME}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
@@ -69,7 +67,8 @@ services:
       PUID: 1000
       PGID: 100
       TZ: Europe/Paris
-      CF_DNS_API_TOKEN: ${PERSONAL_CF_DNS_API}
+      CF_DNS_API_TOKEN: ${PERSONAL_CF_TRAEFIK_API}
+      CF_API_EMAIL: ${PERSONAL_CF_MAIL}
     volumes:
       - /run/docker.sock:/run/docker.sock:ro
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
@@ -105,26 +104,44 @@ services:
       - --api.insecure=true
       - --metrics.addinternals
       - --metrics.prometheus=true
+
+# Certificates management
+      # - --certificatesresolvers.staging.acme.email=${PERSONAL_CF_MAIL}
+      # - --certificatesresolvers.staging.acme.storage=/etc/traefik/certs/acme.json
+      # - --certificatesresolvers.staging.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory
+      # - --certificatesresolvers.staging.acme.httpChallenge.entryPoint=web
+      # - --certificatesresolvers.production.acme.email=${PERSONAL_CF_MAIL}
+      # - --certificatesresolvers.production.acme.storage=/etc/traefik/certs/acme.json
+      # - --certificatesresolvers.production.acme.caServer=https://acme-v02.api.letsencrypt.org/directory
+      # - --certificatesresolvers.production.acme.httpChallenge.entryPoint=web
+      - --certificatesresolvers.letsencrypt-cloudflare.acme.dnschallenge=true
+      - --certificatesresolvers.letsencrypt-cloudflare.acme.dnschallenge.provider=cloudflare
+      - --certificatesResolvers.letsencrypt-cloudflare.acme.dnschallenge.resolvers=1.1.1.1:53,1.0.0.1:53
+      - --certificatesResolvers.letsencrypt-cloudflare.acme.dnschallenge.delayBeforeCheck=20
+      - --certificatesresolvers.letsencrypt-cloudflare.acme.email=${PERSONAL_CF_MAIL}
+      - --certificatesresolvers.letsencrypt-cloudflare.acme.storage=/etc/traefik/certs/acme-wildcard.json
+      - --entrypoints.websecure.http.tls.domains[0].main=${PERSONAL_DOMAINE_NAME}
+      - --entrypoints.websecure.http.tls.domains[0].sans=*.${PERSONAL_DOMAINE_NAME}
+
+# Entrypoint management
       - --entrypoints.web.address=:80
       - --entrypoints.web.http.redirections.entryPoint.to=websecure
       - --entrypoints.web.http.redirections.entryPoint.scheme=https
       - --entrypoints.web.http.middlewares=crowdsec@docker,nginx-errors@docker
       - --entrypoints.websecure.address=:443
       - --entrypoints.websecure.http.middlewares=crowdsec@docker,nginx-errors@docker
+      - --entrypoints.websecure.http.tls.certResolver=letsencrypt-cloudflare
       # - --entrypoints.minecraft.address=:25565/udp # test for minecraft in udp
-      - --certificatesresolvers.staging.acme.email=${PERSONAL_CF_MAIL}
-      - --certificatesresolvers.staging.acme.storage=/etc/traefik/certs/acme.json
-      - --certificatesresolvers.staging.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory
-      - --certificatesresolvers.staging.acme.httpChallenge.entryPoint=web
-      - --certificatesresolvers.production.acme.email=${PERSONAL_CF_MAIL}
-      - --certificatesresolvers.production.acme.storage=/etc/traefik/certs/acme.json
-      - --certificatesresolvers.production.acme.caServer=https://acme-v02.api.letsencrypt.org/directory
-      - --certificatesresolvers.production.acme.httpChallenge.entryPoint=web
+
       - --serversTransport.insecureSkipVerify=true  # need to put a validate cert everywhere for delete it
+
+# Provider definition
       - --providers.docker.exposedbydefault=false
       - --providers.docker.network=webinternal
       - --providers.file.directory=/etc/traefik/conf
       - --providers.file.watch=true
+
+# Crowdsec definition
       - --experimental.plugins.bouncer.moduleName=github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
       - --experimental.plugins.bouncer.version=${CROWDSEC_PLUGIN_VERSION:?bouncer version required}
 
@@ -138,7 +155,7 @@ services:
       diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.nginx-errors.tls: true
-      traefik.http.routers.nginx-errors.tls.certresolver: production
+      # traefik.http.routers.nginx-errors.tls.certresolver: letsencrypt
       traefik.http.routers.nginx-errors.entrypoints: web, websecure
       traefik.http.routers.nginx-errors.rule: Host(`errors.${PERSONAL_DOMAINE_NAME}`)
       traefik.http.routers.nginx-errors.middlewares: authentik@docker
@@ -265,7 +282,6 @@ services:
       diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.authentik-server.tls: true
-      traefik.http.routers.authentik-server.tls.certresolver: production
       traefik.http.routers.authentik-server.entrypoints: web, websecure
       traefik.http.routers.authentik-server.rule: Host(`auth.${PERSONAL_DOMAINE_NAME}`)
       traefik.http.routers.authentik-server.service: authentik-server  
