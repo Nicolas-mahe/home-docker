@@ -8,7 +8,6 @@ services:
       diun.enable: true
       diun.watch_repos: true
       traefik.http.routers.gafana.tls: true
-      traefik.http.routers.gafana.tls.certresolver: production
       traefik.http.routers.gafana.middlewares: authentik@docker
       traefik.http.routers.gafana.entrypoints: web, websecure
       traefik.http.routers.gafana.rule: Host(`monitoring.${PERSONAL_DOMAINE_NAME}`)

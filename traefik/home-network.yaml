@@ -3,22 +3,16 @@ http:
     dns:
       rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`)"
       service: dns
-      tls:
-        certResolver: production
       middlewares:
         - authentik@docker
     nas:
       rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`)"
       service: nas
-      tls:
-        certResolver: production
       middlewares:
         - authentik@docker
     # mailcow:
     #   rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`)"
     #   service: mailcow
-    #   tls:
-    #     certResolver: production
     #   middlewares:
     #     - authentik@docker
 

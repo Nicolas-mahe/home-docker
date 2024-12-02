@@ -9,7 +9,6 @@ services:
       diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.gafana.tls: true
-      traefik.http.routers.gafana.tls.certresolver: production
       traefik.http.routers.gafana.middlewares: authentik@docker
       traefik.http.routers.gafana.entrypoints: web, websecure
       traefik.http.routers.gafana.rule: Host(`monitoring.${PERSONAL_DOMAINE_NAME}`)
@@ -50,7 +49,6 @@ services:
       diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.prometheus.tls: true
-      traefik.http.routers.prometheus.tls.certresolver: production
       traefik.http.routers.prometheus.middlewares: authentik@docker
       traefik.http.routers.prometheus.entrypoints: web, websecure
       traefik.http.routers.prometheus.rule: Host(`prometheus.${PERSONAL_DOMAINE_NAME}`)

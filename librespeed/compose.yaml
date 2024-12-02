@@ -9,7 +9,6 @@ services:
       diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.librespeed.tls: true
-      traefik.http.routers.librespeed.tls.certresolver: production
       traefik.http.routers.librespeed.middlewares: authentik@docker
       traefik.http.routers.librespeed.entrypoints: web, websecure
       traefik.http.routers.librespeed.rule: Host(`librespeed.${PERSONAL_DOMAINE_NAME}`)

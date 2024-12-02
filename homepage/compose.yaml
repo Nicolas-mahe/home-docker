@@ -10,7 +10,6 @@ services:
       traefik.enable: true
       # Redirection Root Domain
       traefik.http.routers.redirect.tls: true
-      traefik.http.routers.redirect.tls.certresolver: production
       traefik.http.routers.redirect.middlewares: authentik@docker,redirect-to-www
       traefik.http.routers.redirect.entrypoints: web, websecure
       traefik.http.routers.redirect.rule: Host(`${PERSONAL_DOMAINE_NAME}`)
@@ -19,7 +18,6 @@ services:
       traefik.http.middlewares.redirect-to-www.redirectregex.permanent: true
       # homepage
       traefik.http.routers.homepage.tls: true
-      traefik.http.routers.homepage.tls.certresolver: production
       traefik.http.routers.homepage.middlewares: authentik@docker
       traefik.http.routers.homepage.entrypoints: web, websecure
       traefik.http.routers.homepage.rule: Host(`www.${PERSONAL_DOMAINE_NAME}`)
