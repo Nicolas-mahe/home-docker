@@ -1,7 +1,7 @@
 services:
   duplicati:
     restart: unless-stopped
-    image: lscr.io/linuxserver/duplicati
+    image: docker.io/duplicati/duplicati:canary
     container_name: duplicati
     hostname: duplicati
     labels:
@@ -18,17 +18,26 @@ services:
       PUID: 1000
       PGID: 100
       TZ: Europe/Paris
+      SETTINGS_ENCRYPTION_KEY: /run/secrets/SETTINGS_ENCRYPTION_KEY
+      DUPLICATI__DISABLE_DB_ENCRYPTION: false
+      DUPLICATI__WEBSERVICE_ALLOWED_HOSTNAMES: duplicati.${PERSONAL_DOMAINE_NAME}
+      DUPLICATI__WEBSERVICE_PASSWORD: ${DUPLICATI_WEB_PWD}
     volumes:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/duplicati:/config
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/duplicati:/data
       - /${RAID_DATA_DIRECTORY}/backups:/backups
       - /${DOCKER_DATA_DIRECTORY}/docker:/source/docker
       - /${RAID_DATA_DIRECTORY}/partage:/source/partage
-      - /${RAID_DATA_DIRECTORY}/users:/source/
     expose:
       - 8200
     networks:
       - webinternal
+    secrets:
+      - SETTINGS_ENCRYPTION_KEY
+
+secrets:
+  SETTINGS_ENCRYPTION_KEY:
+    file: /${DOCKER_DATA_DIRECTORY}/docker/docker-secret/duplicati/SETTINGS_ENCRYPTION_KEY.txt
 
 networks:
   webinternal:
