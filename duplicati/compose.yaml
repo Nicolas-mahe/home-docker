@@ -1,7 +1,7 @@
 services:
   duplicati:
     restart: unless-stopped
-    image: docker.io/duplicati/duplicati:canary
+    image: docker.io/duplicati/duplicati:${TAG_DUPLICATI}
     container_name: duplicati
     hostname: duplicati
     labels:
