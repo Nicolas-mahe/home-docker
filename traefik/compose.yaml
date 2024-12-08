@@ -200,7 +200,7 @@ services:
       TZ: Europe/Paris
     volumes:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - redis-bouncer:/data
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/traefik/crowdsec/redis-bouncer:/data
     networks:
       - crowdsec
 
@@ -313,8 +313,8 @@ services:
       AUTHENTIK_EMAIL__FROM: ${PERSONAL_EMAIL_SMTP}
     volumes:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/authentik/media:/media
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/authentik/custom-templates:/templates
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/traefik/authentik/media:/media
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/traefik/authentik/custom-templates:/templates
     expose:
       - 9000
       - 9443
@@ -356,9 +356,9 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/authentik/media:/media
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/authentik/certs:/certs
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/authentik/custom-templates:/templates
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/traefik/authentik/media:/media
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/traefik/authentik/certs:/certs
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/traefik/authentik/custom-templates:/templates
     depends_on:
       postgresql:
         condition: service_healthy
@@ -379,7 +379,6 @@ services:
       interval: 30s
       retries: 5
       timeout: 5s
-    user: root
     labels:
       diun.enable: true
       diun.watch_repos: true
@@ -390,7 +389,7 @@ services:
       POSTGRES_DB: ${POSTGRES_AUTHENTIK_DB:?database name required}
     volumes:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - database:/var/lib/postgresql/data
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/traefik/authentik/postgres-db:/var/lib/postgresql/data
     networks:
       - authentik
 
@@ -415,20 +414,9 @@ services:
       TZ: Europe/Paris
     volumes:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - redis-auth:/data
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/traefik/authentik/redis-auth:/data
     networks:
       - authentik
-
-volumes:  
-  database:
-    driver: local
-    name: traefik-authentik_database
-  redis-auth:
-    driver: local
-    name: traefik-authentik_redis-auth
-  redis-bouncer:
-    driver: local
-    name: traefik-authentik_redis-bouncer
 
 networks:
   authentik:
