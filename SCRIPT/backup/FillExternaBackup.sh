@@ -68,6 +68,7 @@ delete_old_files() {
 # Set Path
 read -r PathRaid < ../docker/docker-secret/global/RAID_DATA_DIRECTORY.txt
 BackupsPath="/$PathRaid/backups/ExternalBackup/Server-Backups"
+read -r EncryptionKey < ../docker/docker-secret/portainer/PortainerEncryption.txt
 
 # # Déclaration du tableau associatif
 # declare -A backups
@@ -92,21 +93,21 @@ if [ "$TimeToExec" ]; then
     # Portainer
     read -r PortainerApiKey < ../docker/docker-secret/portainer/APIKEY.txt
     read -r PortainerLocalPort < ../docker/docker-secret/portainer/PERSONNAL_PORTAINER_PORT.txt
-    read -r PortainerEncryption < ../docker/docker-secret/portainer/PortainerEncryption.txt
     curl -X POST "http://localhost:$PortainerLocalPort/api/backup" \
     -H "X-API-Key: $PortainerApiKey" \
     -H "Content-Type: application/json" \
-    -d "{\"password\": \"$PortainerEncryption\"}" \
+    -d "{\"password\": \"$EncryptionKey\"}" \
     --output "$BackupsPath/Portainer/portainer_config_encrypted_backup_$exec_date.tar.gz"
 
     # OpenMediaVault config
     echo "Export OpenMediaVault config"
     tar -czf  "$BackupsPath/OpenMediaVault/openmediavault_config_backup_$exec_date.tar.gz" -C /etc/openmediavault/ config.xml
-    gpg --batch --yes --passphrase "$PortainerEncryption" --symmetric \
+    gpg --batch --yes --passphrase "$EncryptionKey" --symmetric \
         --cipher-algo AES256 "$BackupsPath/OpenMediaVault/openmediavault_config_backup_$exec_date.tar.gz"
     rm $BackupsPath/OpenMediaVault/openmediavault_config_backup_$exec_date.tar.gz
 
     # Important docker config files
+    echo "Export container configs"
     docker_path="../docker/docker-data"
     docker_config=(
         "adguard/conf"
@@ -114,14 +115,16 @@ if [ "$TimeToExec" ]; then
         "traefik/conf"
         "vaultwarden/config.json"
         "nextcloud/config/www/nextcloud/config"
+        "duplicati/"
         )
     tar -czf  "docker_apps_config_backup_$exec_date.tar.gz" -C "$docker_path" "${docker_config[@]}"
-    gpg --batch --yes --passphrase "$PortainerEncryption" --symmetric --cipher-algo AES256 -o "$BackupsPath/DockerAppConfig/docker_apps_config_backup_$exec_date.tar.gz.gpg" "docker_apps_config_backup_$exec_date.tar.gz"
+    gpg --batch --yes --passphrase "$EncryptionKey" --symmetric --cipher-algo AES256 -o "$BackupsPath/DockerAppConfig/docker_apps_config_backup_$exec_date.tar.gz.gpg" "docker_apps_config_backup_$exec_date.tar.gz"
     rm docker_apps_config_backup_$exec_date.tar.gz
 
     # Traefik stack data
-    tar -czf  "traefik_stack_backup_$exec_date.tar.gz" -C "./docker/docker-data/" "traefik"
-    gpg --batch --yes --passphrase "$PortainerEncryption" --symmetric --cipher-algo AES256 -o "$BackupsPath/DockerAppConfig/traefik_stack_backup_$exec_date.tar.gz.gpg" "traefik_stack_backup_$exec_date.tar.gz"
+    echo "Export traefik stack volumes"
+    tar -czf  "traefik_stack_backup_$exec_date.tar.gz" -C "../docker/docker-data/" "traefik"
+    gpg --batch --yes --passphrase "$EncryptionKey" --symmetric --cipher-algo AES256 -o "$BackupsPath/DockerAppConfig/traefik_stack_backup_$exec_date.tar.gz.gpg" "traefik_stack_backup_$exec_date.tar.gz"
     rm traefik_stack_backup_$exec_date.tar.gz
 
 fi
@@ -135,5 +138,3 @@ delete_old_files "$BackupsPath/DockerAppConfig" "traefik_stack_backup_"
 echo "Apply owner to backups files"
 chown -R docker:maison $BackupsPath
 chmod -R 771 $BackupsPath
-
-omv-onedrive --sync
