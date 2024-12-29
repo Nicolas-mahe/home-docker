@@ -22,6 +22,8 @@ services:
       DOCKER_MODS: |
         lscr.io/linuxserver/mods:nextcloud-mediadc
         lscr.io/linuxserver/mods:nextcloud-memories
+      #   lscr.io/linuxserver/mods:universal-package-install
+      # INSTALL_PACKAGES: "git|cmake|g++|dlib|libx11" # Facerecognition's requirement: PDlib
     volumes:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/nextcloud/config:/config
