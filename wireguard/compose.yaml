@@ -1,9 +1,7 @@
-version: '3'
-
 services:
   wireguard:
     restart: unless-stopped
-    image: ghcr.io/linuxserver/wireguard
+    image: lscr.io/linuxserver/wireguard
     container_name: wireguard
     hostname: wireguard
     cap_add:
@@ -16,23 +14,26 @@ services:
       diun.watch_repos: true
     environment:
       PUID: 1000
-      PGID: 1000
+      PGID: 100
       TZ: Europe/Paris
+      ALLOWEDIPS: 0.0.0.0/0
+      INTERFACE: eth0
+      INTERNAL_SUBNET: ${PERSONAL_VPN_MASK}
+      LOG_CONFS: true
+      PEERS: ${PERSONAL_PEER_LIST}
+      PEERDNS: ${PERSONAL_DNS}
+      PERSISTENTKEEPALIVE_PEERS: all
       SERVERURL: auto
       SERVERPORT: ${PERSONAL_PORT_WIREGUARD}
-      PEERS: ${PERSONAL_PEER_LIST}
-      PEERDNS: auto
-      INTERNAL_SUBNET: ${PERSONAL_VPN_MASK}
-      ALLOWEDIPS: 0.0.0.0/0
-      LOG_CONFS: true
     ports:
       - ${PERSONAL_PORT_WIREGUARD}:51820/udp
     volumes:
-      - /home/docker/wireguard:/config
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/wireguard:/config
       - /lib/modules:/lib/modules
     networks:
     - vpn
 
 networks:
   vpn:
-    external: true
+    name: vpn

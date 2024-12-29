@@ -1,0 +1,32 @@
+services:
+  librespeed:
+    restart: unless-stopped
+    image: lscr.io/linuxserver/librespeed
+    container_name: librespeed
+    hostname: librespeed
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+      traefik.enable: true
+      traefik.http.routers.librespeed.tls: true
+      traefik.http.routers.librespeed.middlewares: authentik@docker
+      traefik.http.routers.librespeed.entrypoints: web, websecure
+      traefik.http.routers.librespeed.rule: Host(`librespeed.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.librespeed.service: librespeed
+      traefik.http.services.librespeed.loadBalancer.server.port: 80
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Paris
+      PASSWORD: ${PERSONAL_LIBRESPEED_PWD}
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/librespeed:/config
+    expose:
+      - 80
+    networks:
+    - webinternal
+
+networks:
+  webinternal:
+    name: webinternal

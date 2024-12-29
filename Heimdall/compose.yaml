@@ -1,9 +1,7 @@
-version: '2.1'
-
 services:
   heimdall:
     restart: unless-stopped
-    image: ghcr.io/linuxserver/heimdall
+    image: lscr.io/linuxserver/heimdall
     container_name: heimdall
     hostname: heimdall
     labels:
@@ -11,10 +9,11 @@ services:
       diun.watch_repos: true
     environment:
       PUID: 1000
-      PGID: 1000
+      PGID: 100
       TZ: Europe/Paris
     volumes:
-      - /home/docker/heimdall:/config
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/heimdall:/config
     networks:
     - web
 

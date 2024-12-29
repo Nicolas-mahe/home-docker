@@ -1,9 +1,7 @@
-version: '3.8'
-
 services:
   nextcloud:
     restart: unless-stopped
-    image: ghcr.io/linuxserver/nextcloud
+    image: lscr.io/linuxserver/nextcloud
     hostname: nextcloud
     container_name: nextcloud
     labels:
@@ -14,21 +12,21 @@ services:
       PGID: 1000
       TZ: Europe/Paris
       NEXTCLOUD_TRUSTED_DOMAINS: ${HOST}
-      DOCKER_MODS: ghcr.io/linuxserver/mods:nextcloud-mediadc|ghcr.io/linuxserver/mods:nextcloud-memories
     volumes:
       - /home/docker/nextcloud/config:/config
       - /home/docker/nextcloud/data:/data
+      - nfs-films:/mnt/nfs-films
     depends_on:
       - mariadb
-    # ports:
-    #   - 450:443
+    ports:
+      - 450:443
     networks:
       - cloud
-      - cloud_db
+      - cloud-db
 
   mariadb:
     restart: unless-stopped
-    image: ghcr.io/linuxserver/mariadb
+    image: lscr.io/linuxserver/mariadb
     container_name: nextcloud_db
     hostname: nextcloud_db
     labels:
@@ -42,10 +40,20 @@ services:
     volumes:
       - /home/docker/nextcloud/mariadb:/config
     networks:
-      - cloud_db
+      - cloud-db
+
+volumes:
+  nfs-films:
+    name:
+      nextcloud-nfs-films
+    driver: local
+    driver_opts:
+      type: "nfs"
+      o: "addr=omv-vm,rw,nfsvers=3"
+      device: ":/export/films"
 
 networks:
   cloud:
     name: cloud
-  cloud_db:
-    name: cloud_db
+  cloud-db:
+    name: cloud-db

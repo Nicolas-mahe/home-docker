@@ -1,0 +1,3 @@
+# [greencell]
+127.0.0.1 gcups.greencell.global
+127.0.0.1 gcups-static.greencell.global

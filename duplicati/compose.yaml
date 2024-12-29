@@ -1,0 +1,44 @@
+services:
+  duplicati:
+    restart: unless-stopped
+    image: docker.io/duplicati/duplicati:${TAG_DUPLICATI}
+    container_name: duplicati
+    hostname: duplicati
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+      traefik.enable: true
+      traefik.http.routers.duplicati.tls: true
+      traefik.http.routers.duplicati.middlewares: authentik@docker
+      traefik.http.routers.duplicati.entrypoints: web, websecure
+      traefik.http.routers.duplicati.rule: Host(`duplicati.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.duplicati.service: duplicati
+      traefik.http.services.duplicati.loadBalancer.server.port: 8200
+    environment:
+      PUID: 1000
+      PGID: 100
+      TZ: Europe/Paris
+      SETTINGS_ENCRYPTION_KEY: /run/secrets/SETTINGS_ENCRYPTION_KEY
+      DUPLICATI__DISABLE_DB_ENCRYPTION: false
+      DUPLICATI__WEBSERVICE_ALLOWED_HOSTNAMES: duplicati.${PERSONAL_DOMAINE_NAME}
+      DUPLICATI__WEBSERVICE_PASSWORD: ${DUPLICATI_WEB_PWD}
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/duplicati:/data
+      - /${RAID_DATA_DIRECTORY}/backups:/backups
+      - /${DOCKER_DATA_DIRECTORY}/docker:/source/docker
+      - /${RAID_DATA_DIRECTORY}/partage:/source/partage
+    expose:
+      - 8200
+    networks:
+      - webinternal
+    secrets:
+      - SETTINGS_ENCRYPTION_KEY
+
+secrets:
+  SETTINGS_ENCRYPTION_KEY:
+    file: /${DOCKER_DATA_DIRECTORY}/docker/docker-secret/duplicati/SETTINGS_ENCRYPTION_KEY.txt
+
+networks:
+  webinternal:
+    name: webinternal
