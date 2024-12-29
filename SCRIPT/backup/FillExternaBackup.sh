@@ -115,6 +115,7 @@ if [ "$TimeToExec" ]; then
         "traefik/conf"
         "vaultwarden/config.json"
         "nextcloud/config/www/nextcloud/config"
+        "nextcloud/config/php"
         "duplicati/"
         )
     tar -czf  "docker_apps_config_backup_$exec_date.tar.gz" -C "$docker_path" "${docker_config[@]}"
