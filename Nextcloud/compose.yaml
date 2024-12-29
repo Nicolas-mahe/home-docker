@@ -51,13 +51,12 @@ services:
       PGID: 100
       TZ: Europe/Paris
       MYSQL_ROOT_PASSWORD: ${ROOT_PWD}
+      MARIADB_EXTRA_FLAGS: "--log_bin_trust_function_creators=1"
     volumes:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/nextcloud/mariadb:/config
     networks:
       - cloud-db
-    command:
-      "--log_bin_trust_function_creators=true"
 
 networks:
   cloud-db:
