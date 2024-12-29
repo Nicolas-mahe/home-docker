@@ -48,12 +48,12 @@ services:
       diun.enable: true
       diun.watch_repos: true
       traefik.enable: true
-      traefik.http.routers.prometheus.tls: true
-      traefik.http.routers.prometheus.middlewares: authentik@docker
-      traefik.http.routers.prometheus.entrypoints: websecure
-      traefik.http.routers.prometheus.rule: Host(`prometheus.${PERSONAL_DOMAINE_NAME}`)
-      traefik.http.routers.prometheus.service: prometheus
-      traefik.http.services.prometheus.loadBalancer.server.port: 9090
+      traefik.http.routers.prometheusdb.tls: true
+      traefik.http.routers.prometheusdb.middlewares: authentik@docker
+      traefik.http.routers.prometheusdb.entrypoints: websecure
+      traefik.http.routers.prometheusdb.rule: Host(`prometheus.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.prometheusdb.service: prometheusdb
+      traefik.http.services.prometheusdb.loadBalancer.server.port: 9090
     environment:
       TZ: Europe/Paris
       PUID: 1000
