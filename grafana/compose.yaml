@@ -73,7 +73,7 @@ services:
 
   cadvisor:
     restart: unless-stopped
-    image: ghcr.io/cadvisor/cadvisor
+    image: gcr.io/cadvisor/cadvisor
     container_name: cadvisor
     hostname: cadvisor
     privileged: true
