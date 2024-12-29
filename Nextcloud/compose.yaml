@@ -56,6 +56,8 @@ services:
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/nextcloud/mariadb:/config
     networks:
       - cloud-db
+    command:
+      "--log_bin_trust_function_creators=true"
 
 networks:
   cloud-db:
