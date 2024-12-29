@@ -64,6 +64,28 @@ services:
     networks:
       - webexpose
 
+  # router:
+  #   image: docker.io/itzg/mc-router
+  #   restart: unless-stopped
+  #   container_name: minecraft-router
+  #   hostname: minecraft-router
+  #   labels:
+  #     diun.enable: true
+  #     diun.watch_repos: true
+  #     traefik.enable: true
+  #     traefik.http.routers.mc-router.tls: true
+  #     traefik.http.routers.mc-router.entrypoints: web, websecure
+  #     traefik.http.routers.mc-router.rule: Host(`minecraft.${PERSONAL_DOMAINE_NAME}`)
+  #     traefik.http.routers.mc-router.service: mc-router
+  #     traefik.http.services.mc-router.loadBalancer.server.port: 25565
+  #   depends_on:
+  #     - server
+  #   environment:
+  #     MAPPING: |
+  #       minecraft.${PERSONAL_DOMAINE_NAME}:25565
+  #   networks:
+  #     - webexpose
+
 networks:
   webexpose:
     name: webexpose
