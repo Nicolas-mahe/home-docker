@@ -84,8 +84,6 @@ services:
     depends_on:
       crowdsec:
         condition: service_started
-      redis-bouncer:
-        condition: service_healthy
       server:
         condition: service_healthy
       worker:
@@ -175,6 +173,9 @@ services:
       NGINX_HOST: test.${PERSONAL_DOMAINE_NAME}
     expose:
       - 80
+    depends_on:
+      traefik:
+        condition: service_started
     networks:
       - webinternal
 
@@ -269,6 +270,9 @@ services:
       - crowdsec
       - prometheus
       - webexpose
+    depends_on: 
+      redis-bouncer:
+        condition: service_started
 
   ################# Authentik #################
   server:
