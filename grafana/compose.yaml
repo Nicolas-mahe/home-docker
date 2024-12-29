@@ -73,7 +73,7 @@ services:
 
   cadvisor:
     restart: unless-stopped
-    image: gcr.io/cadvisor/cadvisor
+    image: gcr.io/cadvisor/cadvisor # google registry
     container_name: cadvisor
     hostname: cadvisor
     privileged: true
