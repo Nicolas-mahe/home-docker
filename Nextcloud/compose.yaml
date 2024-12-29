@@ -9,7 +9,7 @@ services:
       diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.nextcloud.tls: true
-      traefik.http.routers.nextcloud.entrypoints: web, websecure
+      traefik.http.routers.nextcloud.entrypoints: websecure
       traefik.http.routers.nextcloud.rule: Host(`cloud.${PERSONAL_DOMAINE_NAME}`)
       traefik.http.routers.nextcloud.service: nextcloud
       traefik.http.services.nextcloud.loadBalancer.server.port: 80

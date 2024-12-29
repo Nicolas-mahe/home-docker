@@ -74,7 +74,7 @@ services:
   #     diun.watch_repos: true
   #     traefik.enable: true
   #     traefik.http.routers.mc-router.tls: true
-  #     traefik.http.routers.mc-router.entrypoints: web, websecure
+  #     traefik.http.routers.mc-router.entrypoints: websecure
   #     traefik.http.routers.mc-router.rule: Host(`minecraft.${PERSONAL_DOMAINE_NAME}`)
   #     traefik.http.routers.mc-router.service: mc-router
   #     traefik.http.services.mc-router.loadBalancer.server.port: 25565

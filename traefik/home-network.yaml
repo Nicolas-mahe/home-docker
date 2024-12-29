@@ -1,22 +1,43 @@
 http:
   routers:
+    box:
+      rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`)"
+      service: box
+      tls: true
+      entrypoints:
+        - websecure
+      middlewares:
+        - authentik@docker
     dns:
       rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`)"
       service: dns
+      tls: true
+      entrypoints:
+        - websecure
       middlewares:
         - authentik@docker
     nas:
       rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`)"
       service: nas
+      tls: true
+      entrypoints:
+        - websecure
       middlewares:
-        - authentik@docker
+        - authentik@docker   
     # mailcow:
     #   rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`)"
     #   service: mailcow
+      # tls: true
+      # entrypoints:
+      #   - websecure
     #   middlewares:
     #     - authentik@docker
 
   services:
+    box:
+      loadBalancer:
+        servers:
+          - url: "http://${PERSONAL_NETWORK}.254:{PERSONAL_BOX_PORT}"
     dns:
       loadBalancer:
         servers:
@@ -34,7 +55,6 @@ http:
 # udp:
 #   routers:
 #     minecraft:
-#       rule: "Host(`play.${PERSONAL_DOMAINE_NAME}`)"
+#       rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`)"
 #       service: minecraft
-#       tls:
-#         certResolver: staging
+
