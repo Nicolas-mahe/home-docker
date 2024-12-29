@@ -18,6 +18,9 @@ services:
       PGID: 100
       TZ: Europe/Paris
       NEXTCLOUD_TRUSTED_DOMAINS: cloud.${PERSONAL_DOMAINE_NAME}
+      DOCKER_MODS: |
+        lscr.io/linuxserver/mods:nextcloud-mediadc
+        lscr.io/linuxserver/mods:nextcloud-memories
     volumes:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/nextcloud/config:/config
