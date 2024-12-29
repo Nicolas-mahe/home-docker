@@ -31,7 +31,7 @@ services:
       traefik.enable: true
       traefik.http.routers.whoami.tls: true
       traefik.http.routers.whoami.middlewares: authentik@docker
-      traefik.http.routers.whoami.entrypoints: web, websecure
+      traefik.http.routers.whoami.entrypoints: websecure
       traefik.http.routers.whoami.rule: Host(`whoami.${PERSONAL_DOMAINE_NAME}`)
       traefik.http.routers.whoami.service: whoami
       traefik.http.services.whoami.loadBalancer.server.port: 80
@@ -60,7 +60,7 @@ services:
       traefik.enable: true
       traefik.http.routers.dashboard.tls: true
       traefik.http.routers.dashboard.middlewares: authentik@docker
-      traefik.http.routers.dashboard.entrypoints: web, websecure
+      traefik.http.routers.dashboard.entrypoints: websecure
       traefik.http.routers.dashboard.rule: Host(`traefik.${PERSONAL_DOMAINE_NAME}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
       traefik.http.routers.dashboard.service: api@internal
     environment:
@@ -154,7 +154,7 @@ services:
       traefik.enable: true
       traefik.http.routers.nginx-errors.tls: true
       # traefik.http.routers.nginx-errors.tls.certresolver: letsencrypt
-      traefik.http.routers.nginx-errors.entrypoints: web, websecure
+      traefik.http.routers.nginx-errors.entrypoints: websecure
       traefik.http.routers.nginx-errors.rule: Host(`errors.${PERSONAL_DOMAINE_NAME}`)
       traefik.http.routers.nginx-errors.middlewares: authentik@docker
       traefik.http.routers.nginx-errors.service: nginx-errors
@@ -286,7 +286,7 @@ services:
       diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.authentik-server.tls: true
-      traefik.http.routers.authentik-server.entrypoints: web, websecure
+      traefik.http.routers.authentik-server.entrypoints: websecure
       traefik.http.routers.authentik-server.rule: Host(`auth.${PERSONAL_DOMAINE_NAME}`)
       traefik.http.routers.authentik-server.service: authentik-server  
       traefik.http.services.authentik-server.loadBalancer.server.port: 9000

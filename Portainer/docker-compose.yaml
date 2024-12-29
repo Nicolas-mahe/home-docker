@@ -10,7 +10,7 @@ services:
       traefik.enable: true
       traefik.http.routers.portainer.tls: true
       traefik.http.routers.portainer.middlewares: authentik@docker
-      traefik.http.routers.portainer.entrypoints: web, websecure
+      traefik.http.routers.portainer.entrypoints: websecure
       traefik.http.routers.portainer.rule: Host(`management.${PERSONAL_DOMAINE_NAME}`)
       traefik.http.routers.portainer.service: portainer
       traefik.http.services.portainer.loadBalancer.server.port: 9000

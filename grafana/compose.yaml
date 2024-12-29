@@ -10,7 +10,7 @@ services:
       traefik.enable: true
       traefik.http.routers.gafana.tls: true
       traefik.http.routers.gafana.middlewares: authentik@docker
-      traefik.http.routers.gafana.entrypoints: web, websecure
+      traefik.http.routers.gafana.entrypoints: websecure
       traefik.http.routers.gafana.rule: Host(`monitoring.${PERSONAL_DOMAINE_NAME}`)
       traefik.http.routers.gafana.service: gafana
       traefik.http.services.gafana.loadBalancer.server.port: 3000
@@ -50,7 +50,7 @@ services:
       traefik.enable: true
       traefik.http.routers.prometheus.tls: true
       traefik.http.routers.prometheus.middlewares: authentik@docker
-      traefik.http.routers.prometheus.entrypoints: web, websecure
+      traefik.http.routers.prometheus.entrypoints: websecure
       traefik.http.routers.prometheus.rule: Host(`prometheus.${PERSONAL_DOMAINE_NAME}`)
       traefik.http.routers.prometheus.service: prometheus
       traefik.http.services.prometheus.loadBalancer.server.port: 9090
