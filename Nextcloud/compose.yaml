@@ -18,6 +18,7 @@ services:
       PGID: 100
       TZ: Europe/Paris
       NEXTCLOUD_TRUSTED_DOMAINS: cloud.${PERSONAL_DOMAINE_NAME}
+      DOCKER_MODS_DEBUG: ${DOCKER_MODS_DEBUG}
       DOCKER_MODS: |
         lscr.io/linuxserver/mods:nextcloud-mediadc
         lscr.io/linuxserver/mods:nextcloud-memories
