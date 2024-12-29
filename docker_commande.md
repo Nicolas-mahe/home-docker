@@ -33,5 +33,9 @@ to generate a new password:
 `docker run authelia/authelia:latest authelia crypto hash generate argon2 --password 'CHANGEME'`
 
 ## Fail2Ban
-fail2ban-client status
-fail2ban-client set [nom du jail] unbanip [IP concerné]
+`fail2ban-client status`
+`fail2ban-client set [nom du jail] unbanip [IP concerné]`
+
+## Docker config
+Add in `[Service]` section: TimeoutStopSec=120 and run this to apply:
+`sudo systemctl daemon-reload && sudo systemctl restart docker`

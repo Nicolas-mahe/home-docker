@@ -1,0 +1,40 @@
+http:
+  routers:
+    dns:
+      rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`)"
+      service: dns
+      middlewares:
+        - authentik@docker
+    nas:
+      rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`)"
+      service: nas
+      middlewares:
+        - authentik@docker
+    # mailcow:
+    #   rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`)"
+    #   service: mailcow
+    #   middlewares:
+    #     - authentik@docker
+
+  services:
+    dns:
+      loadBalancer:
+        servers:
+          - url: "http://${PERSONAL_NETWORK}.2:{PERSONAL_DNS_PORT}"
+    nas:
+      loadBalancer:
+        servers:
+          - url: "http://${PERSONAL_NETWORK}:{PERSONAL_NAS_PORT}"
+
+  #  minecraft:
+  #     loadBalancer:
+  #       servers:
+  #         - url: "udp://${PERSONAL_NETWORK}.6:25565"
+
+# udp:
+#   routers:
+#     minecraft:
+#       rule: "Host(`play.${PERSONAL_DOMAINE_NAME}`)"
+#       service: minecraft
+#       tls:
+#         certResolver: staging

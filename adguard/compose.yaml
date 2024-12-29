@@ -1,0 +1,14 @@
+services:
+  adguardhome:
+    restart: always
+    image: docker.io/adguard/adguardhome
+    container_name: adguardhome
+    hostname: adguardhome
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/adguard/data:/opt/adguardhome/work
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/adguard/conf:/opt/adguardhome/conf
+    network_mode: "host"

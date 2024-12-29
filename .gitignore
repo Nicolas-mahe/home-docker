@@ -5,7 +5,9 @@ inventory.yml
 vars_rabbyt.yml
 vars_zaula.yml
 vars_test.yml
-*.env*
+.env
 *.zip
 /minecraft/data
 /minecraft/modpacks
+.vscode
+secret.json

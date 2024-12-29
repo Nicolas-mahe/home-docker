@@ -1,0 +1,56 @@
+services:
+  skyblog1:
+    restart: unless-stopped
+    image: docker.io/nginx:alpine
+    container_name: skyblog1
+    hostname: skyblog1
+    labels:
+      traefik.enable: true
+      traefik.http.routers.skyblog1.tls: true
+      traefik.http.routers.skyblog1.middlewares: authentik@docker
+      traefik.http.routers.skyblog1.entrypoints: web, websecure
+      traefik.http.routers.skyblog1.rule: Host(`${SKYBLOG1}.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.skyblog1.service: skyblog1
+      traefik.http.services.skyblog1.loadBalancer.server.port: 80
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/skyblog/${SKYBLOG1}.skyrock.com:/usr/share/nginx/html:ro
+    environment:
+      PUID: 1000
+      PGID: 100
+      TZ: Europe/Paris
+      NGINX_HOST: ${SKYBLOG1}.${PERSONAL_DOMAINE_NAME}
+    expose:
+      - 80
+    networks:
+      - webinternal
+
+  skyblog2:
+    restart: unless-stopped
+    image: docker.io/nginx:alpine
+    container_name: skyblog2
+    hostname: skyblog2
+    labels:
+      traefik.enable: true
+      traefik.http.routers.skyblog2.tls: true
+      traefik.http.routers.skyblog2.middlewares: authentik@docker
+      traefik.http.routers.skyblog2.entrypoints: web, websecure
+      traefik.http.routers.skyblog2.rule: Host(`${SKYBLOG2}.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.skyblog2.service: skyblog2
+      traefik.http.services.skyblog2.loadBalancer.server.port: 80
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/skyblog/${SKYBLOG2}.skyrock.com:/usr/share/nginx/html:ro
+    environment:
+      PUID: 1000
+      PGID: 100
+      TZ: Europe/Paris
+      NGINX_HOST: ${SKYBLOG2}.${PERSONAL_DOMAINE_NAME}
+    expose:
+      - 80
+    networks:
+      - webinternal
+
+networks:
+  webinternal:
+    name: webinternal

@@ -1,6 +1,4 @@
 #docker run -d -p $PERSONAL_AGENT_PORT:9001 --name portainer_agent --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/docker/volumes:/var/lib/docker/volumes portainer/agent:2.18.4
-version: '3'
-
 services:
   portainer_agent:
     restart: always
@@ -10,9 +8,12 @@ services:
     labels:
       diun.enable: true
       diun.watch_repos: true
+    environment:
+      TZ: Europe/Paris
     ports:
       - ${PERSONAL_AGENT_PORT}:9001
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /var/lib/docker/volumes:/var/lib/docker/volumes
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/volumes:/var/lib/docker/volumes
     network_mode: bridge
