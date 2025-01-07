@@ -27,8 +27,8 @@ services:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/diun:/data
     networks:
-      - diun
+      - webinternal
 
 networks:
-  diun:
-    name: diun
+  webinternal:
+    name: webinternal
