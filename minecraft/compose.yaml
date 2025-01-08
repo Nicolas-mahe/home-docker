@@ -22,6 +22,8 @@ services:
       BROADCAST_RCON_TO_OPS: TRUE
       CF_API_KEY: ${CF_API_KEY}
       CF_BASE_DIR: "/data"
+      CF_FILE_ID: 5353015 #Ragnamod-VII-7.1.7
+      CF_SLUG: ragnamod-vii
       DIFFICULTY: normal
       EULA: TRUE
       ENABLE_STATUS: TRUE
@@ -34,30 +36,28 @@ services:
       MAX_BUILD_HEIGHT: 320 # only under 320
       MAX_PLAYERS: 5
       MAX_WORLD_SIZE: 10000000
-      MEMORY: "8G"
-      MODE: creative # 0=survival, 1=creative, 2=adventure, 3=spectator
-      MOTD: "§b§l§oRaBByT Season Perso\n§f§kMinecraft docker Server"
+      MEMORY: "16G"
+      MODE: survival # 0=survival, 1=creative, 2=adventure, 3=spectator
+      MOTD: "§b§l§oRaBByT Season 5\n§f§kRagnamod-VII-7.1.7"
       ONLINE_MODE: TRUE
       OVERRIDE_ICON: TRUE
-      PERSONAL_PORT_MINECRAFT_RCON: ${PERSONAL_PORT_MINECRAFT_RCON}
-      PERSONAL_RCON_PWD: ${PERSONAL_RCON_PWD}
       PVP: TRUE
-      QUERY_PORT: ${PERSONAL_PORT_MINECRAFT}
+      QUERY_PORT: 25565
       RCON_CMDS_STARTUP: |-
         gamerule playersSleepingPercentage 1
       RCON_PASSWORD: ${PERSONAL_RCON_PWD}
       RCON_PORT: ${PERSONAL_PORT_MINECRAFT_RCON}
-      SERVER_NAME: RaBByT_S4
+      SERVER_NAME: RaBByT_S5
       SIMULATION_DISTANCE: 7
       SNOOPER_ENABLED: FALSE
       SPAWN_PROTECTION: 0
       STOP_DURATION: 180
-      TYPE: FORGE
-      VERSION: "1.20.1"
+      TYPE: AUTO_CURSEFORGE
+      VERSION: "1.18.2"
       VIEW_DISTANCE: 10
     volumes:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/mc-perso/:/data
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/mc-s5/:/data
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/RaBByT.jpg:/icon.jpg:ro
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/banned-ips.json:/data/banned-ips.json
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/banned-players.json:/data/banned-players.json
