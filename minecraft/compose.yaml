@@ -35,12 +35,9 @@ services:
       MAX_PLAYERS: 5
       MAX_WORLD_SIZE: 10000000
       MEMORY: "8G"
-      MODE: survival # 0=survival, 1=creative, 2=adventure, 3=spectator
+      MODE: creative # 0=survival, 1=creative, 2=adventure, 3=spectator
       MOTD: "§b§l§oRaBByT Season Perso\n§f§kMinecraft docker Server"
       ONLINE_MODE: TRUE
-      OPS: |
-        RaBByt_Tv
-        TBMPQF
       OVERRIDE_ICON: TRUE
       PERSONAL_PORT_MINECRAFT_RCON: ${PERSONAL_PORT_MINECRAFT_RCON}
       PERSONAL_RCON_PWD: ${PERSONAL_RCON_PWD}
@@ -58,39 +55,33 @@ services:
       TYPE: FORGE
       VERSION: "1.20.1"
       VIEW_DISTANCE: 10
-      WHITELIST: |
-        FodVodZ
     volumes:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/mc-perso/:/data
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/RaBByT.jpg:/icon.jpg:ro
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/banned-ips.json:/data/banned-ips.json
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/banned-players.json:/data/banned-players.json
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/ops.json:/data/ops.json
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/whitelist.json:/data/whitelist.json
     ports:
       - ${PERSONAL_PORT_MINECRAFT}:25565
     networks:
-      - webexpose
+      - minecraft
 
-  # router:
-  #   image: docker.io/itzg/mc-router
-  #   restart: unless-stopped
-  #   container_name: minecraft-router
-  #   hostname: minecraft-router
-  #   labels:
-  #     diun.enable: true
-  #     diun.watch_repos: true
-  #     traefik.enable: true
-  #     traefik.http.routers.mc-router.tls: true
-  #     traefik.http.routers.mc-router.entrypoints: websecure
-  #     traefik.http.routers.mc-router.rule: Host(`minecraft.${PERSONAL_DOMAINE_NAME}`)
-  #     traefik.http.routers.mc-router.service: mc-router
-  #     traefik.http.services.mc-router.loadBalancer.server.port: 25565
-  #   depends_on:
-  #     - server
-  #   environment:
-  #     MAPPING: |
-  #       minecraft.${PERSONAL_DOMAINE_NAME}:25565
-  #   networks:
-  #     - webexpose
+  ### Public VPN ###
+  playit: #https://playit.gg
+    restart: no
+    image: ghcr.io/playit-cloud/playit-agent:0.15
+    container_name: minecraft-playit
+    hostname: minecraft-playit
+    environment:
+      SECRET_KEY: ${PLAYIT_SECRET_KEY}
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+    networks:
+      - minecraft
+
 
 networks:
-  webexpose:
-    name: webexpose
+  minecraft:
+    name: minecraft
