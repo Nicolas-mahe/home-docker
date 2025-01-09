@@ -8,8 +8,6 @@ services:
     image: docker.io/itzg/minecraft-server:java17-jdk
     container_name: minecraft-server
     hostname: minecraft-server
-    tty: true
-    stdin_open: true
     labels:
       diun.enable: true
       diun.watch_repos: true
@@ -57,7 +55,7 @@ services:
       VIEW_DISTANCE: 10
     volumes:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/mc-s5/:/data
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/mc-s5:/data
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/RaBByT.jpg:/icon.jpg:ro
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/banned-ips.json:/data/banned-ips.json
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/banned-players.json:/data/banned-players.json
@@ -66,7 +64,37 @@ services:
     ports:
       - ${PERSONAL_PORT_MINECRAFT}:25565
     networks:
-      - minecraft
+      - games
+
+  backups:
+    restart: unless-stopped
+    image: itzg/mc-backup
+    container_name: minecraft-backups
+    hostname: minecraft-backups
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+    environment:
+      PGID: 1000
+      PUID: 100
+      TZ: Europe/Paris
+      INITIAL_DELAY: 15m
+      BACKUP_INTERVAL: 24h
+      PRUNE_BACKUPS_DAYS: 7
+      PRUNE_RESTIC_RETENTION: --keep-within 7d
+      RCON_HOST: server
+      RCON_PORT: ${PERSONAL_PORT_MINECRAFT_RCON}
+      RCON_PASSWORD: ${PERSONAL_RCON_PWD}
+      DEST_DIR: /backups
+      LINK_LATEST: FALSE
+      TAR_COMPRESS_METHOD: gzip
+      ZSTD_PARAMETERS: -3 --long=25 --single-thread
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/mc-s5:/data
+      - /${RAID_DATA_DIRECTORY}/backups/Minecraft/s5:/backups
+    networks:
+      - games
 
   ### Public VPN ###
   playit: #https://playit.gg
@@ -74,14 +102,17 @@ services:
     image: ghcr.io/playit-cloud/playit-agent:0.15
     container_name: minecraft-playit
     hostname: minecraft-playit
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
     environment:
       SECRET_KEY: ${PLAYIT_SECRET_KEY}
     volumes:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
     networks:
-      - minecraft
+      - games
 
 
 networks:
-  minecraft:
-    name: minecraft
+  games:
+    name: games
