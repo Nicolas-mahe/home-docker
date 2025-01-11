@@ -78,21 +78,28 @@ services:
       PGID: 1000
       PUID: 100
       TZ: Europe/Paris
-      INITIAL_DELAY: ${PERSONAL_INTERVAL_SAVE}
+      INITIAL_DELAY: 0 # since this service waits for mc to be healthy, no initial delay is needed
       BACKUP_INTERVAL: ${PERSONAL_INTERVAL_SAVE}
+      BACKUP_NAME: RaBByT-S5
       PRUNE_BACKUPS_DAYS: 7
       PRUNE_RESTIC_RETENTION: --keep-within 7d
-      RCON_HOST: server
+      RCON_HOST: minecraft-server
       RCON_PORT: ${PERSONAL_PORT_MINECRAFT_RCON}
       RCON_PASSWORD: ${PERSONAL_RCON_PWD}
+      PAUSE_IF_NO_PLAYERS: TRUE
       DEST_DIR: /backups
+      SRC_DIR: /data
       LINK_LATEST: FALSE
+      BACKUP_METHOD: tar
       TAR_COMPRESS_METHOD: gzip
       ZSTD_PARAMETERS: -3 --long=25 --single-thread
     volumes:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/mc-s5:/data
       - /${RAID_DATA_DIRECTORY}/backups/Minecraft/s5:/backups
+    depends_on:
+      server:
+        condition: service_healthy
     networks:
       - games
 
@@ -100,8 +107,8 @@ services:
   playit: #https://playit.gg
     restart: no
     image: ghcr.io/playit-cloud/playit-agent:0.15
-    container_name: minecraft-playit
-    hostname: minecraft-playit
+    container_name: minecraft-tunnel
+    hostname: minecraft-tunnel
     labels:
       diun.enable: true
       diun.watch_repos: true
