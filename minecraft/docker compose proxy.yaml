@@ -1,0 +1,94 @@
+#https://github.com/itzg/docker-minecraft-server
+#https://github.com/itzg/docker-mc-backup
+#https://www.youtube.com/watch?v=PHJE60COs5g&ab_channel=OuiHeberg DNS
+
+services:
+  proxy:
+    restart: unless-stopped
+    image: docker.io/itzg/mc-proxy
+    container_name: minecraft-proxy
+    hostname: minecraft-proxy
+    environment:
+      BUNGEE_JAR_REVISION: 1
+      CFG_MOTD: RaBByT Season 5
+      REPLACE_ENV_VARIABLES: TRUE
+      TYPE: BUNGEECORD
+      OVERRIDE_ICON: TRUE
+      ICON: /icon.jpg
+    ports:
+      - "${PERSONAL_PORT_MINECRAFT}:25577"
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/RaBByT.jpg:/icon.jpg:ro
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/proxy-config.yaml:/config/config.yml
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/proxy:/server
+    networks:
+      - minecraft
+
+  mc-prod-server:
+    restart: unless-stopped
+    image: docker.io/itzg/minecraft-server
+    container_name: mc-prod-server
+    hostname: mc-prod-server
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+    environment:
+      TZ: Europe/Paris
+      EULA: TRUE
+      ONLINE_MODE: FALSE
+      MODE: survival
+      MOTD: "§b§l§oRaBByT docker Prod Server\n§f§kzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
+      VERSION: "1.18.2"
+      PGID: 1000
+      PUID: 100
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/s5/prod/:/data
+    ports:
+      - 25564:25565
+    networks:
+      - minecraft
+
+  # mc-spare-server:
+  #   restart: unless-stopped
+  #   image: docker.io/itzg/minecraft-server
+  #   container_name: mc-spare-server
+  #   hostname: mc-spare-server
+  #   environment:
+  #     TZ: Europe/Paris
+  #     EULA: TRUE
+  #     ONLINE_MODE: FALSE
+  #     MODE: creative
+  #     MOTD: "§b§l§oRaBByT docker Spare Server\n§f§kzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
+  #     VERSION: "1.18.2"
+  #     PGID: 1000
+  #     PUID: 100
+  #   volumes:
+  #     - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+  #     - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/s5/spare/:/data
+  #   networks:
+  #     - minecraft
+  #   ports:
+  #     - 25566:25565
+  #   depends_on:
+  #     mc-prod-server:
+  #       condition: service_healthy
+
+  ### Public VPN ###
+  playit: #https://playit.gg
+    restart: no
+    image: ghcr.io/playit-cloud/playit-agent:0.15
+    container_name: minecraft-playit
+    hostname: minecraft-playit
+    environment:
+      SECRET_KEY: ${PLAYIT_SECRET_KEY}
+      TZ: Europe/Paris
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+    networks:
+      - minecraft
+
+networks:
+  minecraft:
+    name: minecraft
