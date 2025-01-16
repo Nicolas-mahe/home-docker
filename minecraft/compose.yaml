@@ -11,9 +11,11 @@ services:
     labels:
       diun.enable: true
       diun.watch_repos: true
+    tty: true
+    stdin_open: true
     environment:
-      PGID: 1000
-      PUID: 100
+      PGID: 100
+      PUID: 1000
       TZ: Europe/Paris
       ALLOW_FLIGHT: TRUE
       BROADCAST_CONSOLE_TO_OPS: TRUE
@@ -29,23 +31,19 @@ services:
       ENABLE_RCON: TRUE
       ENABLE_WHITELIST: TRUE
       FORCE_GAMEMODE: TRUE
-      FORGE_VERSION: "47.2.32"
+      FORGEVERSION: "40.2.21"
       ICON: /icon.jpg
-      MAX_BUILD_HEIGHT: 320 # only under 320
       MAX_PLAYERS: 5
-      MAX_WORLD_SIZE: 10000000
       MEMORY: "16G"
       MODE: survival # 0=survival, 1=creative, 2=adventure, 3=spectator
       MOTD: "§b§l§oRaBByT Season 5\n§f§kRagnamod-VII-7.1.7"
       ONLINE_MODE: TRUE
       OVERRIDE_ICON: TRUE
       PVP: TRUE
-      QUERY_PORT: 25565
       RCON_CMDS_STARTUP: |-
         gamerule playersSleepingPercentage 1
       RCON_PASSWORD: ${PERSONAL_RCON_PWD}
       RCON_PORT: ${PERSONAL_PORT_MINECRAFT_RCON}
-      SERVER_NAME: RaBByT_S5
       SIMULATION_DISTANCE: 7
       SNOOPER_ENABLED: FALSE
       SPAWN_PROTECTION: 0
@@ -55,7 +53,7 @@ services:
       VIEW_DISTANCE: 10
     volumes:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/mc-s5:/data
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/mc-s5-tmp:/data
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/RaBByT.jpg:/icon.jpg:ro
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/banned-ips.json:/data/banned-ips.json
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/banned-players.json:/data/banned-players.json
@@ -66,42 +64,106 @@ services:
     networks:
       - games
 
-  backups:
-    restart: unless-stopped
-    image: itzg/mc-backup
-    container_name: minecraft-backups
-    hostname: minecraft-backups
-    labels:
-      diun.enable: true
-      diun.watch_repos: true
+  server-creative:
+    restart: no
+    image: docker.io/itzg/minecraft-server:java17-jdk
+    container_name: minecraft-server-creative
+    hostname: minecraft-server-creative
+    tty: true
+    stdin_open: true
+    cap_add:
+      - NET_RAW # Auto pause
     environment:
-      PGID: 1000
-      PUID: 100
+      PGID: 100
+      PUID: 1000
       TZ: Europe/Paris
-      INITIAL_DELAY: 0 # since this service waits for mc to be healthy, no initial delay is needed
-      BACKUP_INTERVAL: ${PERSONAL_INTERVAL_SAVE}
-      BACKUP_NAME: RaBByT-S5
-      PRUNE_BACKUPS_DAYS: 7
-      PRUNE_RESTIC_RETENTION: --keep-within 7d
-      RCON_HOST: minecraft-server
-      RCON_PORT: ${PERSONAL_PORT_MINECRAFT_RCON}
+      AUTOPAUSE_TIMEOUT_EST: "1200"
+      ENABLE_AUTOPAUSE: TRUE
+      ALLOW_FLIGHT: TRUE
+      BROADCAST_CONSOLE_TO_OPS: TRUE
+      BROADCAST_RCON_TO_OPS: TRUE
+      CF_API_KEY: ${CF_API_KEY}
+      CF_BASE_DIR: "/data"
+      CF_FILE_ID: 5353015 #Ragnamod-VII-7.1.7
+      CF_SLUG: ragnamod-vii
+      DIFFICULTY: normal
+      EULA: TRUE
+      ENABLE_STATUS: TRUE
+      ENABLE_QUERY: TRUE
+      ENABLE_RCON: TRUE
+      ENABLE_WHITELIST: TRUE
+      FORCE_GAMEMODE: TRUE
+      FORGEVERSION: "40.2.21"
+      ICON: /icon.jpg
+      MAX_PLAYERS: 5
+      MAX_TICK_TIME: "-1"
+      MEMORY: "12G"
+      MODE: creative # 0=survival, 1=creative, 2=adventure, 3=spectator
+      MOTD: "§b§l§oCREATIVE Season 5\n§f§kRagnamod-VII-7.1.7"
+      ONLINE_MODE: TRUE
+      OVERRIDE_ICON: TRUE
+      PVP: TRUE
+      RCON_CMDS_STARTUP: |-
+        gamerule playersSleepingPercentage 1
+        time set day
+        gamerule doDaylightCycle false
       RCON_PASSWORD: ${PERSONAL_RCON_PWD}
-      PAUSE_IF_NO_PLAYERS: TRUE
-      DEST_DIR: /backups
-      SRC_DIR: /data
-      LINK_LATEST: FALSE
-      BACKUP_METHOD: tar
-      TAR_COMPRESS_METHOD: gzip
-      ZSTD_PARAMETERS: -3 --long=25 --single-thread
+      RCON_PORT: ${PERSONAL_PORT_MINECRAFT_RCON}
+      SIMULATION_DISTANCE: 7
+      SKIP_SUDO: TRUE # Auto pause
+      SNOOPER_ENABLED: FALSE
+      SPAWN_PROTECTION: 0
+      TYPE: AUTO_CURSEFORGE
+      VERSION: "1.18.2"
+      VIEW_DISTANCE: 5
     volumes:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/mc-s5:/data
-      - /${RAID_DATA_DIRECTORY}/backups/Minecraft/s5:/backups
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/mc-s5-creative:/data
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/RaBByT-Creative.jpg:/icon.jpg:ro
+    ports:
+      - ${PERSONAL_PORT_MINECRAFT2}:25565
+    networks:
+      - games
     depends_on:
       server:
         condition: service_healthy
-    networks:
-      - games
+
+  # backups: # Not needed to due a backup mod in stack
+  #   restart: unless-stopped
+  #   image: docker.io/itzg/mc-backup
+  #   container_name: minecraft-backups
+  #   hostname: minecraft-backups
+  #   labels:
+  #     diun.enable: true
+  #     diun.watch_repos: true
+  #   environment:
+  #     PGID: 1000
+  #     PUID: 100
+  #     TZ: Europe/Paris
+  #     INITIAL_DELAY: 0 # since this service waits for mc to be healthy, no initial delay is needed
+  #     BACKUP_INTERVAL: ${PERSONAL_INTERVAL_SAVE}
+  #     BACKUP_NAME: RaBByT-S5
+  #     PRUNE_BACKUPS_DAYS: 7
+  #     PRUNE_RESTIC_RETENTION: --keep-within 7d
+  #     RCON_HOST: minecraft-server
+  #     RCON_PORT: ${PERSONAL_PORT_MINECRAFT_RCON}
+  #     RCON_PASSWORD: ${PERSONAL_RCON_PWD}
+  #     PAUSE_IF_NO_PLAYERS: TRUE
+  #     DEST_DIR: /backups
+  #     SRC_DIR: /data
+  #     LINK_LATEST: FALSE
+  #     BACKUP_METHOD: tar
+  #     TAR_COMPRESS_METHOD: gzip
+  #     ZSTD_PARAMETERS: -3 --long=25 --single-thread
+  #   volumes:
+  #     - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+  #     - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/mc-s5:/data
+  #     - /${RAID_DATA_DIRECTORY}/backups/Minecraft/s5:/backups
+  #   depends_on:
+  #     server:
+  #       condition: service_healthy
+  #   networks:
+  #     - games
 
   ### Public VPN ###
   playit: #https://playit.gg
@@ -118,7 +180,6 @@ services:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
     networks:
       - games
-
 
 networks:
   games:
