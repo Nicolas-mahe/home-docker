@@ -1,4 +1,4 @@
-#https://github.com/itzg/docker-minecraft-server
+#https://github.com/itzg/docker-minecraft-server & https://docker-minecraft-server.readthedocs.io/en/latest/
 #https://github.com/itzg/docker-mc-backup
 #https://www.youtube.com/watch?v=PHJE60COs5g&ab_channel=OuiHeberg DNS
 
@@ -20,10 +20,10 @@ services:
       ALLOW_FLIGHT: TRUE
       BROADCAST_CONSOLE_TO_OPS: TRUE
       BROADCAST_RCON_TO_OPS: TRUE
-      CF_API_KEY: ${CF_API_KEY}
-      CF_BASE_DIR: "/data"
-      CF_FILE_ID: 5353015 #Ragnamod-VII-7.1.7
-      CF_SLUG: ragnamod-vii
+      # CF_API_KEY: ${CF_API_KEY}
+      # CF_BASE_DIR: "/data"
+      # CF_FILE_ID: 5353015 #Ragnamod-VII-7.1.7
+      # CF_SLUG: ragnamod-vii
       DIFFICULTY: normal
       EULA: TRUE
       ENABLE_STATUS: TRUE
@@ -36,7 +36,7 @@ services:
       MAX_PLAYERS: 5
       MEMORY: "16G"
       MODE: survival # 0=survival, 1=creative, 2=adventure, 3=spectator
-      MOTD: "§b§l§oRaBByT Season 5\n§f§kRagnamod-VII-7.1.7"
+      MOTD: "§b§l§oRaBByT Season 5:§r§r§r§l§o §r§r§r§2§l§o Ragnamod-VII-7.1.7\n§6§kC'est rigolo cette ligne qui bouge tout le temps"
       ONLINE_MODE: TRUE
       OVERRIDE_ICON: TRUE
       PVP: TRUE
@@ -48,17 +48,13 @@ services:
       SNOOPER_ENABLED: FALSE
       SPAWN_PROTECTION: 0
       STOP_DURATION: 180
-      TYPE: AUTO_CURSEFORGE
+      TYPE: FORGE
       VERSION: "1.18.2"
       VIEW_DISTANCE: 10
     volumes:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/mc-s5-tmp:/data
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/s5/prod:/data
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/RaBByT.jpg:/icon.jpg:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/banned-ips.json:/data/banned-ips.json
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/banned-players.json:/data/banned-players.json
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/ops.json:/data/ops.json
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/whitelist.json:/data/whitelist.json
     ports:
       - ${PERSONAL_PORT_MINECRAFT}:25565
     networks:
@@ -99,7 +95,7 @@ services:
       MAX_TICK_TIME: "-1"
       MEMORY: "12G"
       MODE: creative # 0=survival, 1=creative, 2=adventure, 3=spectator
-      MOTD: "§b§l§oCREATIVE Season 5\n§f§kRagnamod-VII-7.1.7"
+      MOTD: "§b§l§oRaBByT Season 5:§r§r§r§l§o §r§r§r§4§l§oCREATIVE Ragnamod-VII§r§r§r\n§6§kC'est rigolo cette ligne qui bouge tout le temps"
       ONLINE_MODE: TRUE
       OVERRIDE_ICON: TRUE
       PVP: TRUE
@@ -109,16 +105,16 @@ services:
         gamerule doDaylightCycle false
       RCON_PASSWORD: ${PERSONAL_RCON_PWD}
       RCON_PORT: ${PERSONAL_PORT_MINECRAFT_RCON}
-      SIMULATION_DISTANCE: 7
+      SIMULATION_DISTANCE: 3
       SKIP_SUDO: TRUE # Auto pause
       SNOOPER_ENABLED: FALSE
       SPAWN_PROTECTION: 0
       TYPE: AUTO_CURSEFORGE
       VERSION: "1.18.2"
-      VIEW_DISTANCE: 5
+      VIEW_DISTANCE: 7
     volumes:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/mc-s5-creative:/data
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/s5/creative:/data
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/RaBByT-Creative.jpg:/icon.jpg:ro
     ports:
       - ${PERSONAL_PORT_MINECRAFT2}:25565
