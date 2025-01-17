@@ -1,110 +1,46 @@
-#https://github.com/itzg/docker-minecraft-server
-#https://github.com/itzg/docker-mc-backup
-#https://www.youtube.com/watch?v=PHJE60COs5g&ab_channel=OuiHeberg DNS
-
 services:
-  proxy:
+  mc:
     restart: unless-stopped
-    image: docker.io/itzg/mc-proxy
-    container_name: minecraft-proxy
-    hostname: minecraft-proxy
-    environment:
-      BUNGEE_JAR_REVISION: 1
-      CFG_MOTD: RaBByT Season 5
-      REPLACE_ENV_VARIABLES: TRUE
-      TYPE: BUNGEECORD
-      OVERRIDE_ICON: TRUE
-      ICON: /icon.jpg
-    ports:
-      - "${PERSONAL_PORT_MINECRAFT}:25577"
-    volumes:
-      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/RaBByT.jpg:/icon.jpg:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/proxy-config.yaml:/config/config.yml
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/proxy:/server
-    networks:
-      - minecraft
-
-  mc-prod-server:
-    restart: unless-stopped
-    image: docker.io/itzg/minecraft-server
-    container_name: mc-prod-server
-    hostname: mc-prod-server
-    labels:
-      diun.enable: true
-      diun.watch_repos: true
+    image: itzg/minecraft-server:java17-jdk
+    container_name: minecraft
+    hostname: minecraft
+    tty: true
+    stdin_open: true
     environment:
       TZ: Europe/Paris
+      ALLOW_FLIGHT: "true"
       EULA: TRUE
-      ONLINE_MODE: FALSE
-      MODE: survival
-      MOTD: "§b§l§oRaBByT docker Prod Server\n§f§kzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
-      OP: |
-        RaBByt_Tv
+      ENFORCE_WHITELIST: TRUE
+      DEBUG: "false"
+      FORGEVERSION: "40.2.21"
+      TYPE: FORGE
       VERSION: "1.18.2"
-      PGID: 1000
-      PUID: 100
-      CF_API_KEY: ${CF_API_KEY}
-      CF_BASE_DIR: "/data"
-      CF_FILE_ID: 5353015 #Ragnamod-VII-7.1.7
-      CF_SLUG: ragnamod-vii
-      TYPE: AUTO_CURSEFORGE
+      MEMORY: "6G"
+      MOTD: "§b§l§oRaBByT Season 5:§r§l§o§2 Ragnamod-VII-7.1.7\n§6§kC'est rigolo cette lingne qui bouge tout le temps"
     volumes:
-      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/s5/prod/:/data
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/temp:/data
     ports:
-      - 25564:25565
+      - 25566:25565
     networks:
-      - minecraft
-
-  # mc-spare-server:
-  #   restart: unless-stopped
-  #   image: docker.io/itzg/minecraft-server
-  #   container_name: mc-spare-server
-  #   hostname: mc-spare-server
-  #   environment:
-  #     TZ: Europe/Paris
-  #     EULA: TRUE
-  #     ONLINE_MODE: FALSE
-  #     MODE: creative
-  #     MOTD: "§b§l§oRaBByT docker Spare Server\n§f§kzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
-  #     VERSION: "1.18.2"
-  #     PGID: 1000
-  #     PUID: 100
-  #     CF_API_KEY: ${CF_API_KEY}
-  #     CF_BASE_DIR: "/data"
-  #     CF_FILE_ID: 5353015 #Ragnamod-VII-7.1.7
-  #     CF_SLUG: ragnamod-vii
-  #     TYPE: AUTO_CURSEFORGE
-  #   volumes:
-  #     - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-  #     - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/s5/spare/:/data
-  #     - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/banned-ips.json:/data/banned-ips.json
-  #     - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/banned-players.json:/data/banned-players.json
-  #     - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/ops.json:/data/ops.json
-  #     - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/whitelist.json:/data/whitelist.json
-  #   networks:
-  #     - minecraft
-  #   ports:
-  #     - 25566:25565
-  #   depends_on:
-  #     mc-prod-server:
-  #       condition: service_healthy
+      - games
 
   ### Public VPN ###
-  playit: #https://playit.gg
-    restart: no
-    image: ghcr.io/playit-cloud/playit-agent:0.15
-    container_name: minecraft-playit
-    hostname: minecraft-playit
-    environment:
-      SECRET_KEY: ${PLAYIT_SECRET_KEY}
-      TZ: Europe/Paris
-    volumes:
-      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-    networks:
-      - minecraft
+  # playit: #https://playit.gg
+  #   restart: no
+  #   image: ghcr.io/playit-cloud/playit-agent:0.15
+  #   container_name: minecraft-tunnel
+  #   hostname: minecraft-tunnel
+  #   labels:
+  #     diun.enable: true
+  #     diun.watch_repos: true
+  #   environment:
+  #     SECRET_KEY: ${PLAYIT_SECRET_KEY}
+  #     TZ: Europe/Paris
+  #   volumes:
+  #     - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+  #   networks:
+  #     - games
 
 networks:
-  minecraft:
-    name: minecraft
+  games:
+    name: games
