@@ -2,8 +2,8 @@ services:
   skyblog1:
     restart: unless-stopped
     image: docker.io/nginx:alpine
-    container_name: skyblog1
-    hostname: skyblog1
+    container_name: web-skyblog1
+    hostname: web-skyblog1
     labels:
       traefik.enable: true
       traefik.http.routers.skyblog1.tls: true
@@ -14,7 +14,7 @@ services:
       traefik.http.services.skyblog1.loadBalancer.server.port: 80
     volumes:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/skyblog/${SKYBLOG1}.skyrock.com:/usr/share/nginx/html:ro
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/websites/${SKYBLOG1}.skyrock.com:/usr/share/nginx/html:ro
     environment:
       PUID: 1000
       PGID: 100
@@ -28,8 +28,8 @@ services:
   skyblog2:
     restart: unless-stopped
     image: docker.io/nginx:alpine
-    container_name: skyblog2
-    hostname: skyblog2
+    container_name: web-skyblog2
+    hostname: web-skyblog2
     labels:
       traefik.enable: true
       traefik.http.routers.skyblog2.tls: true
@@ -40,12 +40,37 @@ services:
       traefik.http.services.skyblog2.loadBalancer.server.port: 80
     volumes:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/skyblog/${SKYBLOG2}.skyrock.com:/usr/share/nginx/html:ro
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/websites/${SKYBLOG2}.skyrock.com:/usr/share/nginx/html:ro
     environment:
       PUID: 1000
       PGID: 100
       TZ: Europe/Paris
       NGINX_HOST: ${SKYBLOG2}.${PERSONAL_DOMAINE_NAME}
+    expose:
+      - 80
+    networks:
+      - webinternal
+
+  candle:
+    restart: unless-stopped
+    image: docker.io/nginx:alpine
+    container_name: web-candle
+    hostname: web-candle
+    labels:
+      traefik.enable: true
+      traefik.http.routers.candle.tls: true
+      traefik.http.routers.candle.entrypoints: websecure
+      traefik.http.routers.candle.rule: Host(`candle.${PERSONAL_DOMAINE_NAME}`) || Host(`brule-un-cierge.${PERSONAL_DOMAINE_NAME}`) || Host(`bruleuncierge.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.candle.service: candle
+      traefik.http.services.candle.loadBalancer.server.port: 80
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/websites/candle:/usr/share/nginx/html:ro
+    environment:
+      UID: 1000
+      GID: 100
+      TZ: Europe/Paris
+      NGINX_HOST: candle.${PERSONAL_DOMAINE_NAME}
     expose:
       - 80
     networks:
