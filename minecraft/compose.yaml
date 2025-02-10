@@ -54,6 +54,7 @@ services:
     volumes:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/s5/prod:/data
+      - /${RAID_DATA_DIRECTORY}/backups/Minecraft/s5:/backups
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/RaBByT.jpg:/icon.jpg:ro
     ports:
       - ${PERSONAL_PORT_MINECRAFT}:25565
