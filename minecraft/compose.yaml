@@ -93,7 +93,7 @@ services:
       ICON: /icon.jpg
       MAX_PLAYERS: 5
       MAX_TICK_TIME: "-1"
-      MEMORY: "12G"
+      MEMORY: "14G"
       MODE: creative # 0=survival, 1=creative, 2=adventure, 3=spectator
       MOTD: "§b§l§oRaBByT Season 5:§r§r§r§l§o §r§r§r§4§l§oCREATIVE Ragnamod-VII§r§r§r\n§6§kC'est rigolo cette ligne qui bouge tout le temps"
       ONLINE_MODE: TRUE
