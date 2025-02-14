@@ -60,9 +60,17 @@ services:
       - ${PERSONAL_PORT_MINECRAFT}:25565
     networks:
       - games
+    deploy:
+      resources:
+        limits:
+          cpus: "6.0" 
+          memory: 20000M
+        reservations:
+          cpus: "2.0"
+          memory: 8000M
 
   server-creative:
-    restart: no
+    restart: unless-stopped
     image: docker.io/itzg/minecraft-server:java17-jdk
     container_name: minecraft-server-creative
     hostname: minecraft-server-creative
@@ -96,7 +104,7 @@ services:
       MAX_TICK_TIME: "-1"
       MEMORY: "14G"
       MODE: creative # 0=survival, 1=creative, 2=adventure, 3=spectator
-      MOTD: "§b§l§oRaBByT Season 5:§r§r§r§l§o §r§r§r§4§l§oCREATIVE Ragnamod-VII§r§r§r\n§6§kC'est rigolo cette ligne qui bouge tout le temps"
+      MOTD: "§b§l§oRaBByT Season 5:§r§r§r§l§o §r§r§r§4§l§oCREATIVE Ragnamod-7.1.7§r§r§r\n§6§kC'est rigolo cette ligne qui bouge tout le temps"
       ONLINE_MODE: TRUE
       OVERRIDE_ICON: TRUE
       PVP: TRUE
@@ -164,7 +172,7 @@ services:
 
   ### Public VPN ###
   playit: #https://playit.gg
-    restart: no
+    restart: unless-stopped
     image: ghcr.io/playit-cloud/playit-agent:0.15
     container_name: minecraft-tunnel
     hostname: minecraft-tunnel
