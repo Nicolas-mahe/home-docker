@@ -1,0 +1,72 @@
+services:
+  python-web:
+    restart: no
+    image: python:alpine3.21
+    container_name: python-mathieu
+    hostname: python-mathieu
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+      traefik.enable: true
+      traefik.http.routers.python-web.tls: true
+      traefik.http.routers.python-web.entrypoints: websecure
+      traefik.http.routers.python-web.rule: Host(`voiture.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.python-web.service: python-web
+      traefik.http.services.python-web.loadBalancer.server.port: 5000
+    environment:
+      PUID: 1000
+      PGID: 100    
+      TZ: Europe/Paris
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+      - python-mathieu:/data
+    env_file:
+      - stack.env
+    command:
+      - sh
+      - -c
+      - > 
+        cd /data &&
+        pip install -r requirements.txt && python3 /data/app.py
+    networks:
+    - webinternal
+
+    
+  python-web2:
+    restart: no
+    image: python:alpine3.21
+    container_name: python-luna
+    hostname: python-luna
+    labels:
+      traefik.enable: true
+      traefik.http.routers.python-luna.tls: true
+      traefik.http.routers.python-luna.entrypoints: websecure
+      traefik.http.routers.python-luna.rule: Host(`luna.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.python-luna.service: python-luna
+      traefik.http.services.python-luna.loadBalancer.server.port: 5000
+    environment:
+      PUID: 1000
+      PGID: 100    
+      TZ: Europe/Paris
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+      - python-luna:/data
+    env_file:
+      - stack.env
+    command:
+      - sh
+      - -c
+      - > 
+        cd /data &&
+        pip install flask && python3 /data/app.py
+    networks:
+    - webinternal
+
+volumes:
+  python-mathieu:
+    name: python-mathieu
+  python-luna:
+    name: python-luna
+networks:
+  webinternal:
+    name: webinternal
