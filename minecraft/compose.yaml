@@ -42,6 +42,7 @@ services:
       PVP: TRUE
       RCON_CMDS_STARTUP: |-
         gamerule playersSleepingPercentage 1
+        kill @e[type=item]
       RCON_PASSWORD: ${PERSONAL_RCON_PWD}
       RCON_PORT: ${PERSONAL_PORT_MINECRAFT_RCON}
       SIMULATION_DISTANCE: 7
@@ -112,6 +113,7 @@ services:
         gamerule playersSleepingPercentage 1
         time set day
         gamerule doDaylightCycle false
+        kill @e[type=item]
       RCON_PASSWORD: ${PERSONAL_RCON_PWD}
       RCON_PORT: ${PERSONAL_PORT_MINECRAFT_RCON}
       SIMULATION_DISTANCE: 3
