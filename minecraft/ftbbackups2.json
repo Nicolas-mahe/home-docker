@@ -4,7 +4,7 @@
 	// Permission level to use the /backup command
 	"command_permission_level": 3,
 	// Only send backup status to server ops
-	"notify_op_only": true,
+	"notify_op_only": false,
 	// Don't send backup status at all
 	"do_not_notify": false,
 	/* Backup retention mode. Valid Modes: MAX_BACKUPS, TIERED
@@ -48,7 +48,7 @@
 	// Display file size in backup message
 	"display_file_size": false,
 	// backup location
-	"backup_location": "/backups",
+	"backup_location": ".",
 	// Specify the backup format. Valid options are ZIP and DIRECTORY
 	"backup_format": "ZIP",
 	// Minimum free disk space in MB. If a backup's creation would leave less than this amount of disk space remaining, the backup will be aborted.
