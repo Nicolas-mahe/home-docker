@@ -6,18 +6,24 @@ echo "Execution time is: $exec_date"
 
 # Extract hour from $exec_date
 exec_hour=${exec_date:11:2}  # Les caractères 11 et 12 correspondent à l'heure dans le format YYYY-MM-DD_HH-MM-SS
-    TimeToExec=1
-# if [ "$exec_hour" -ge 6 ] && [ "$exec_hour" -lt 23 ]; then
-#     TimeToExec=0
-#     echo "Not First execution of the day, Don't make the all backups"
-# fi
+if [[ "$exec_hour" =~ ^[0-9]+$ ]]; then
+    if (( exec_hour < 6 || exec_hour > 23 )); then
+        echo "First execution of the day, Run all backups"
+        TimeToExec="1"
+    else
+        echo "Not First execution of the day, Don't make the all backups"
+        TimeToExec="0"
+    fi
+else
+    echo "Erreur : exec_hour n'est pas un nombre valide ($exec_hour)"
+fi
 
 # Fonction pour supprimer les fichiers les plus anciens si le nombre de fichiers dépasse $NbBackups
-NbBackups=10
 delete_old_files() {
     local directory="$1"  # work's directory
     local prefix="$2"     # Prefix of files
-    
+    local NbBackups="${3:-10}"  # Max Number of files to keep (10 by default)
+
     # Check if directory exists
     if [[ ! -d "$directory" ]]; then
         echo "Directory $directory not found."
@@ -64,52 +70,52 @@ delete_old_files() {
         echo "There is $file_count (=<$NbBackups) files match with prefix '$prefix', no purge needed"
     fi
 }
+#Recover Execution path
+Script_Dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+Data_Dir="/$(echo "$Script_Dir" | cut -d'/' -f2)"
+
+#Test is path is in root directory
+if [[ "$Data_Dir" == "//" ]]; then
+    Data_Dir="/"
+fi
+#echo "Folder container data is : $Data_Dir"
 
 # Set Path
-read -r PathRaid < ../docker/docker-secret/global/RAID_DATA_DIRECTORY.txt
-BackupsPath="/$PathRaid/backups/ExternalBackup/Server-Backups"
-read -r EncryptionKey < ../docker/docker-secret/portainer/PortainerEncryption.txt
+read -r PathRaid < $Data_Dir/docker/docker-secret/global/RAID_DATA_DIRECTORY.txt
+Backups_Path="/$PathRaid/backups"
+Backups_Apps_Path="$Backups_Path/Apps-conf"
+Docker_Path="$Data_Dir/docker/docker-data"
+Script_Path="$Data_Dir/repos/home-docker/SCRIPT"
 
-# # Déclaration du tableau associatif
-# declare -A backups
+read -r EncryptionKey < $Data_Dir/docker/docker-secret/portainer/PortainerEncryption.txt
 
-# # Ajout des données
-# backups["Duplicati"]="/$PathRaid/users/rabbyt/Documents/Config/Serveur/Duplicati"
-# backups["Portainer"]="/$PathRaid/users/rabbyt/Documents/Config/Serveur/Portainer"
 
-# # Copie des données
-# for key in "${!backups[@]}"; do
-#     echo "Copy backups $key's files" 
-#     cp -r "${backups[$key]}" $BackupsPath/$key
-# done
-
-if [ "$TimeToExec" ]; then
+if [ "$TimeToExec" -eq 1 ]; then
     
     # VaultWardenVaultExport
     echo "Export Vault from Vaultwarden"
     vaultwarden_filename="bitwarden_encrypted_export_$exec_date"
-    ./VaultwardenVaultExport.sh "$vaultwarden_filename" "$BackupsPath"
+    $Script_Path/backup/VaultwardenVaultExport.sh "$vaultwarden_filename" "$Backups_Apps_Path"
 
     # Portainer
-    read -r PortainerApiKey < ../docker/docker-secret/portainer/APIKEY.txt
-    read -r PortainerLocalPort < ../docker/docker-secret/portainer/PERSONNAL_PORTAINER_PORT.txt
+    read -r PortainerApiKey < $Data_Dir/docker/docker-secret/portainer/APIKEY.txt
+    read -r PortainerLocalPort < $Data_Dir/docker/docker-secret/portainer/PERSONNAL_PORTAINER_PORT.txt
     curl -X POST "http://localhost:$PortainerLocalPort/api/backup" \
     -H "X-API-Key: $PortainerApiKey" \
     -H "Content-Type: application/json" \
     -d "{\"password\": \"$EncryptionKey\"}" \
-    --output "$BackupsPath/Portainer/portainer_config_encrypted_backup_$exec_date.tar.gz"
+    --output "$Backups_Apps_Path/Portainer/portainer_config_encrypted_backup_$exec_date.tar.gz"
 
     # OpenMediaVault config
     echo "Export OpenMediaVault config"
-    tar -czf  "$BackupsPath/OpenMediaVault/openmediavault_config_backup_$exec_date.tar.gz" -C /etc/openmediavault/ config.xml
+    tar -czf  "$Backups_Apps_Path/OpenMediaVault/openmediavault_config_backup_$exec_date.tar.gz" -C /etc/openmediavault/ config.xml
     gpg --batch --yes --passphrase "$EncryptionKey" --symmetric \
-        --cipher-algo AES256 "$BackupsPath/OpenMediaVault/openmediavault_config_backup_$exec_date.tar.gz"
-    rm $BackupsPath/OpenMediaVault/openmediavault_config_backup_$exec_date.tar.gz
+        --cipher-algo AES256 "$Backups_Apps_Path/OpenMediaVault/openmediavault_config_backup_$exec_date.tar.gz"
+    rm $Backups_Apps_Path/OpenMediaVault/openmediavault_config_backup_$exec_date.tar.gz
 
     # Important docker config files
     echo "Export container configs"
-    docker_path="../docker/docker-data"
-    docker_config=(
+    Docker_Config=(
         "adguard/conf"
         "homepage/config"
         "traefik/conf"
@@ -118,24 +124,51 @@ if [ "$TimeToExec" ]; then
         "nextcloud/config/php"
         "duplicati/"
         )
-    tar -czf  "docker_apps_config_backup_$exec_date.tar.gz" -C "$docker_path" "${docker_config[@]}"
-    gpg --batch --yes --passphrase "$EncryptionKey" --symmetric --cipher-algo AES256 -o "$BackupsPath/DockerAppConfig/docker_apps_config_backup_$exec_date.tar.gz.gpg" "docker_apps_config_backup_$exec_date.tar.gz"
+    tar -czf  "docker_apps_config_backup_$exec_date.tar.gz" -C "$Docker_Path" "${Docker_Config[@]}"
+    gpg --batch --yes --passphrase "$EncryptionKey" --symmetric --cipher-algo AES256 -o "$Backups_Apps_Path/DockerAppConfig/docker_apps_config_backup_$exec_date.tar.gz.gpg" "docker_apps_config_backup_$exec_date.tar.gz"
     rm docker_apps_config_backup_$exec_date.tar.gz
 
     # Traefik stack data
     echo "Export traefik stack volumes"
-    tar -czf  "traefik_stack_backup_$exec_date.tar.gz" -C "../docker/docker-data/" "traefik"
-    gpg --batch --yes --passphrase "$EncryptionKey" --symmetric --cipher-algo AES256 -o "$BackupsPath/DockerAppConfig/traefik_stack_backup_$exec_date.tar.gz.gpg" "traefik_stack_backup_$exec_date.tar.gz"
+    tar -czf  "traefik_stack_backup_$exec_date.tar.gz" -C "$Data_Dir/docker/docker-data/" "traefik"
+    gpg --batch --yes --passphrase "$EncryptionKey" --symmetric --cipher-algo AES256 -o "$Backups_Apps_Path/DockerAppConfig/traefik_stack_backup_$exec_date.tar.gz.gpg" "traefik_stack_backup_$exec_date.tar.gz"
     rm traefik_stack_backup_$exec_date.tar.gz
 
 fi
-delete_old_files "$BackupsPath/Vaultwarden" "bitwarden_encrypted_export_"
-delete_old_files "$BackupsPath/Portainer" "portainer_config_encrypted_backup_"
-delete_old_files "$BackupsPath/OpenMediaVault" "openmediavault_config_backup_"
-delete_old_files "$BackupsPath/DockerAppConfig" "docker_apps_config_backup_"
-delete_old_files "$BackupsPath/DockerAppConfig" "traefik_stack_backup_"
+
+# Minecraft managment
+Minecraft_Path="$Docker_Path/minecraft/s5/prod/backups"
+Minecraft_Backups_Path="$Backups_Path/Minecraft/s5"
+if [[ ! -d "$Minecraft_Path" ]]; then
+    echo "Directory $Minecraft_Path not found."
+else 
+    # Find newer backups.zip
+    Minecraft_Recent_Backup=$(ls -t "$Minecraft_Path"/*.zip 2>/dev/null | head -n 1)
+    if [[ -z "$Minecraft_Recent_Backup" ]]; then
+        echo "No backups.zip files found in $Minecraft_Path."
+    fi
+
+    # Copy it in folder if not already exist
+    Minecraft_Newer_Backups=$(basename "$Minecraft_Recent_Backup")
+    Minecraft_Recent_Backup_Save=$(ls -t "$Minecraft_Backups_Path/$Minecraft_Newer_Backups" 2>/dev/null)
+    if [[ ! -z "$Minecraft_Recent_Backup_Save" ]]; then
+        echo "Minecraft backups $Minecraft_Newer_Backups already in $Minecraft_Backups_Path"
+    else
+        cp "$Minecraft_Recent_Backup" "$Minecraft_Backups_Path"
+        echo "Copied $Minecraft_Recent_Backup to $Minecraft_Backups_Path"
+    fi
+fi
+
+
+# Delete older files
+delete_old_files "$Backups_Apps_Path/Vaultwarden" "bitwarden_encrypted_export_"
+delete_old_files "$Backups_Apps_Path/Portainer" "portainer_config_encrypted_backup_"
+delete_old_files "$Backups_Apps_Path/OpenMediaVault" "openmediavault_config_backup_"
+delete_old_files "$Backups_Apps_Path/DockerAppConfig" "docker_apps_config_backup_"
+delete_old_files "$Backups_Apps_Path/DockerAppConfig" "traefik_stack_backup_"
+delete_old_files "$Minecraft_Backups_Path" "20" "5"
 
 # Apply owner to directory
 echo "Apply owner to backups files"
-chown -R docker:maison $BackupsPath
-chmod -R 771 $BackupsPath
+chown -R docker:maison $Backups_Path
+chmod -R 771 $Backups_Path
