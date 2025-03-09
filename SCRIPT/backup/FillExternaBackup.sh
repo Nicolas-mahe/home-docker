@@ -5,17 +5,23 @@ exec_date=$(date "+%Y-%m-%d_%H-%M-%S")
 echo "Execution time is: $exec_date"
 
 # Extract hour from $exec_date
-exec_hour=${exec_date:11:2}  # Les caractères 11 et 12 correspondent à l'heure dans le format YYYY-MM-DD_HH-MM-SS
-if [[ "$exec_hour" =~ ^[0-9]+$ ]]; then
+exec_hour=${exec_date:11:2}  # Extraction de l'heure à partir du format YYYY-MM-DD_HH-MM-SS
+exec_day_of_week=$(date -d "${exec_date:0:10}" +%u)  # Extraction du jour de la semaine (1 = lundi, ..., 7 = dimanche)
+if [[ "$exec_hour" =~ ^[0-9]+$ && "$exec_day_of_week" =~ ^[0-9]+$ ]]; then
     if (( exec_hour < 6 || exec_hour > 23 )); then
-        echo "First execution of the day, Run all backups"
-        TimeToExec="1"
+        if (( exec_day_of_week == 1 )); then
+            echo "It's Monday, Run all backups"
+            TimeToExec="1"
+        else
+            echo "It's not Monday, Run minimal backups"
+            TimeToExec="2"
+        fi
     else
         echo "Not First execution of the day, Don't make the all backups"
         TimeToExec="0"
     fi
 else
-    echo "Erreur : exec_hour n'est pas un nombre valide ($exec_hour)"
+    echo "Erreur : exec_hour ($exec_hour) et/ou exec_day_of_week ($exec_day_of_week) n'est pas un nombre valide"
 fi
 
 # Fonction pour supprimer les fichiers les plus anciens si le nombre de fichiers dépasse $NbBackups
@@ -139,26 +145,27 @@ fi
 # Minecraft managment
 Minecraft_Path="$Docker_Path/minecraft/s5/prod/backups"
 Minecraft_Backups_Path="$Backups_Path/Minecraft/s5"
-if [[ ! -d "$Minecraft_Path" ]]; then
-    echo "Directory $Minecraft_Path not found."
-else 
-    # Find newer backups.zip
-    Minecraft_Recent_Backup=$(ls -t "$Minecraft_Path"/*.zip 2>/dev/null | head -n 1)
-    if [[ -z "$Minecraft_Recent_Backup" ]]; then
-        echo "No backups.zip files found in $Minecraft_Path."
-    fi
+if [ "$TimeToExec" -eq 2 ]; then
+    if [[ ! -d "$Minecraft_Path" ]]; then
+        echo "Directory $Minecraft_Path not found."
+    else 
+        # Find newer backups.zip
+        Minecraft_Recent_Backup=$(ls -t "$Minecraft_Path"/*.zip 2>/dev/null | head -n 1)
+        if [[ -z "$Minecraft_Recent_Backup" ]]; then
+            echo "No backups.zip files found in $Minecraft_Path."
+        fi
 
-    # Copy it in folder if not already exist
-    Minecraft_Newer_Backups=$(basename "$Minecraft_Recent_Backup")
-    Minecraft_Recent_Backup_Save=$(ls -t "$Minecraft_Backups_Path/$Minecraft_Newer_Backups" 2>/dev/null)
-    if [[ ! -z "$Minecraft_Recent_Backup_Save" ]]; then
-        echo "Minecraft backups $Minecraft_Newer_Backups already in $Minecraft_Backups_Path"
-    else
-        cp "$Minecraft_Recent_Backup" "$Minecraft_Backups_Path"
-        echo "Copied $Minecraft_Recent_Backup to $Minecraft_Backups_Path"
+        # Copy it in folder if not already exist
+        Minecraft_Newer_Backups=$(basename "$Minecraft_Recent_Backup")
+        Minecraft_Recent_Backup_Save=$(ls -t "$Minecraft_Backups_Path/$Minecraft_Newer_Backups" 2>/dev/null)
+        if [[ ! -z "$Minecraft_Recent_Backup_Save" ]]; then
+            echo "Minecraft backups $Minecraft_Newer_Backups already in $Minecraft_Backups_Path"
+        else
+            cp "$Minecraft_Recent_Backup" "$Minecraft_Backups_Path"
+            echo "Copied $Minecraft_Recent_Backup to $Minecraft_Backups_Path"
+        fi
     fi
 fi
-
 
 # Delete older files
 delete_old_files "$Backups_Apps_Path/Vaultwarden" "bitwarden_encrypted_export_"
