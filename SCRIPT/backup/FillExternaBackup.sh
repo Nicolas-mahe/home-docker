@@ -8,7 +8,7 @@ echo "Execution time is: $exec_date"
 exec_hour=${exec_date:11:2}  # Extraction de l'heure à partir du format YYYY-MM-DD_HH-MM-SS
 exec_day_of_week=$(date -d "${exec_date:0:10}" +%u)  # Extraction du jour de la semaine (1 = lundi, ..., 7 = dimanche)
 if [[ "$exec_hour" =~ ^[0-9]+$ && "$exec_day_of_week" =~ ^[0-9]+$ ]]; then
-    if (( exec_hour < 6 || exec_hour > 23 )); then
+    if (( exec_hour <= 6 || exec_hour >= 23 )); then
         if (( exec_day_of_week == 1 )); then
             echo "It's Monday, Run all backups"
             TimeToExec="1"
