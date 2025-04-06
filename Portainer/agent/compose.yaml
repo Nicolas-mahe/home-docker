@@ -2,7 +2,7 @@
 services:
   portainer_agent:
     restart: always
-    image: portainer/agent:${PERSONAL_PORTAINER_VERSION}
+    image: docker.io/portainer/agent:${PERSONAL_PORTAINER_VERSION:-lts}
     container_name: portainer_agent
     hostname: portainer_agent
     labels:
@@ -15,5 +15,10 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/volumes:/var/lib/docker/volumes
-    network_mode: bridge
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-config/volumes:/var/lib/docker/volumes
+    networks:
+    - webinternal
+
+networks:
+  webinternal:
+    name: webinternal
