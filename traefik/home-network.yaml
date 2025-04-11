@@ -32,6 +32,14 @@ http:
       #   - websecure
     #   middlewares:
     #     - authentik@docker
+    pve:
+      rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`)"
+      service: pve
+      tls: true
+      entrypoints:
+        - websecure
+      middlewares:
+        - authentik@docker 
 
   services:
     box:
@@ -46,6 +54,10 @@ http:
       loadBalancer:
         servers:
           - url: "http://${PERSONAL_NETWORK}:{PERSONAL_NAS_PORT}"
+    pve:
+      loadBalancer:
+        servers:
+          - url: "http://${PERSONAL_NETWORK}:{PERSONAL_PVE_PORT}"
 
   #  minecraft:
   #     loadBalancer:
