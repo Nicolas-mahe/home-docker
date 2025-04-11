@@ -180,7 +180,6 @@ services:
       # traefik.http.routers.nginx-errors.tls.certresolver: letsencrypt
       traefik.http.routers.nginx-errors.entrypoints: websecure
       traefik.http.routers.nginx-errors.rule: Host(`errors.${PERSONAL_DOMAINE_NAME}`)
-      traefik.http.routers.nginx-errors.middlewares: authentik@docker
       traefik.http.routers.nginx-errors.service: nginx-errors
       traefik.http.services.nginx-errors.loadBalancer.server.port: 80
       traefik.http.middlewares.nginx-errors.errors.status: 404 #,500,501,503,505-599
