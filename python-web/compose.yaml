@@ -6,9 +6,14 @@ services:
     hostname: python-pronostic
     labels:
       traefik.enable: true
+      traefik.http.routers.python-pronostic-liste.tls: true
+      traefik.http.routers.python-pronostic-liste.entrypoints: websecure
+      traefik.http.routers.python-pronostic-liste.rule: Host(`pronostic.${PERSONAL_DOMAINE_NAME}`) && PathPrefix(`/liste`)
+      traefik.http.routers.python-pronostic-liste.middlewares: authentik@docker
+      traefik.http.routers.python-pronostic-liste.service: python-pronostic
       traefik.http.routers.python-pronostic.tls: true
       traefik.http.routers.python-pronostic.entrypoints: websecure
-      traefik.http.routers.python-pronostic.rule: Host(`pronostic.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.python-pronostic.rule: Host(`pronostic.${PERSONAL_DOMAINE_NAME}`) && !PathPrefix(`/liste`)
       traefik.http.routers.python-pronostic.service: python-pronostic
       traefik.http.services.python-pronostic.loadBalancer.server.port: 5000
     environment:
