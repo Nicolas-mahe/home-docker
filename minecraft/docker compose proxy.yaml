@@ -4,19 +4,20 @@
 
 services:
   proxy:
-    restart: unless-stopped
+    user: "0:0"
+    restart: no
     image: docker.io/itzg/mc-proxy
     container_name: minecraft-proxy
     hostname: minecraft-proxy
     environment:
-      BUNGEE_JAR_REVISION: 1
-      CFG_MOTD: RaBByT Season 5
-      REPLACE_ENV_VARIABLES: TRUE
-      TYPE: BUNGEECORD
+      CFG_MOTD: "RaBByT Season 5"
       OVERRIDE_ICON: TRUE
       ICON: /icon.jpg
+      PGID: 1000
+      PUID: 100
+      TZ: Europe/Paris
     ports:
-      - "${PERSONAL_PORT_MINECRAFT}:25577"
+      - "25577:25577"
     volumes:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/RaBByT.jpg:/icon.jpg:ro
@@ -27,7 +28,7 @@ services:
 
   mc-prod-server:
     restart: unless-stopped
-    image: docker.io/itzg/minecraft-server
+    image: docker.io/itzg/minecraft-server:java17-jdk
     container_name: mc-prod-server
     hostname: mc-prod-server
     labels:
@@ -35,59 +36,67 @@ services:
       diun.watch_repos: true
     environment:
       TZ: Europe/Paris
-      EULA: TRUE
-      ONLINE_MODE: FALSE
-      MODE: survival
-      MOTD: "§b§l§oRaBByT docker Prod Server\n§f§kzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
-      VERSION: "1.18.2"
       PGID: 1000
       PUID: 100
+      EULA: TRUE
+      ALLOW_FLIGHT: TRUE
+      ONLINE_MODE: false
+      MEMORY: "6G"
+      MODE: survival
+      MOTD: "§b§l§oProxy:§r§r§r§l§o §r§r§r§2§l§o Ragnamod-VII-7.1.7\n§6§kC'est rigolo cette ligne qui bouge tout le temps"
+      VERSION: "1.18.2"
+      TYPE: FORGE
+      FORGEVERSION: "40.2.21"
     volumes:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/s5/prod/:/data
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/test/prod/:/data
     ports:
-      - 25564:25565
+      - 25566:25565
     networks:
       - minecraft
 
-  # mc-spare-server:
-  #   restart: unless-stopped
-  #   image: docker.io/itzg/minecraft-server
-  #   container_name: mc-spare-server
-  #   hostname: mc-spare-server
-  #   environment:
-  #     TZ: Europe/Paris
-  #     EULA: TRUE
-  #     ONLINE_MODE: FALSE
-  #     MODE: creative
-  #     MOTD: "§b§l§oRaBByT docker Spare Server\n§f§kzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
-  #     VERSION: "1.18.2"
-  #     PGID: 1000
-  #     PUID: 100
-  #   volumes:
-  #     - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-  #     - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/s5/spare/:/data
-  #   networks:
-  #     - minecraft
-  #   ports:
-  #     - 25566:25565
-  #   depends_on:
-  #     mc-prod-server:
-  #       condition: service_healthy
+  mc-spare-server:
+    restart: unless-stopped
+    image: docker.io/itzg/minecraft-server:java17-jdk
+    container_name: mc-spare-server
+    hostname: mc-spare-server
+    environment:
+      TZ: Europe/Paris
+      PGID: 1000
+      PUID: 100
+      ALLOW_FLIGHT: TRUE
+      EULA: TRUE
+      ONLINE_MODE: FALSE
+      MEMORY: "6G"
+      MODE: creative
+      MOTD: "§b§l§oProxy:§r§r§r§l§o §r§r§r§4§l§oCREATIVE Ragnamod-VII§r§r§r\n§6§kC'est rigolo cette ligne qui bouge tout le temps"
+      VERSION: "1.18.2"
+      TYPE: FORGE
+      FORGEVERSION: "40.2.21"
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/test/spare/:/data
+    networks:
+      - minecraft
+    ports:
+      - 25567:25565
+    depends_on:
+      mc-prod-server:
+        condition: service_healthy
 
   ### Public VPN ###
-  playit: #https://playit.gg
-    restart: no
-    image: ghcr.io/playit-cloud/playit-agent:0.15
-    container_name: minecraft-playit
-    hostname: minecraft-playit
-    environment:
-      SECRET_KEY: ${PLAYIT_SECRET_KEY}
-      TZ: Europe/Paris
-    volumes:
-      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-    networks:
-      - minecraft
+  # playit: #https://playit.gg
+  #   restart: no
+  #   image: ghcr.io/playit-cloud/playit-agent:0.15
+  #   container_name: minecraft-playit
+  #   hostname: minecraft-playit
+  #   environment:
+  #     SECRET_KEY: ${PLAYIT_SECRET_KEY}
+  #     TZ: Europe/Paris
+  #   volumes:
+  #     - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+  #   networks:
+  #     - minecraft
 
 networks:
   minecraft:
