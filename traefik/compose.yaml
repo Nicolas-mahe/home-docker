@@ -149,9 +149,9 @@ services:
       - --entrypoints.web.address=:80
       - --entrypoints.web.http.redirections.entryPoint.to=websecure
       - --entrypoints.web.http.redirections.entryPoint.scheme=https
-      - --entrypoints.web.http.middlewares=crowdsec@docker,nginx-errors@docker
+      - --entrypoints.web.http.middlewares=crowdsec@docker,error-pages@docker
       - --entrypoints.websecure.address=:443
-      - --entrypoints.websecure.http.middlewares=crowdsec@docker,nginx-errors@docker
+      - --entrypoints.websecure.http.middlewares=crowdsec@docker,error-pages@docker
       - --entrypoints.websecure.http.tls.certResolver=letsencrypt-cloudflare
       # - --entrypoints.minecraft.address=:25565/udp # test for minecraft in udp
       - --entrypoints.dot.address=:853
@@ -167,24 +167,24 @@ services:
       - --experimental.plugins.bouncer.moduleName=github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
       - --experimental.plugins.bouncer.version=${CROWDSEC_PLUGIN_VERSION:?bouncer version required}
 
-  nginx-errors:
+  error-pages:
     restart: unless-stopped
-    image: docker.io/nginx:alpine
-    container_name: nginx-errors
-    hostname: nginx-errors
+    image: ghcr.io/patbec/traefik-error-pages:latest
+    container_name: error-pages
+    hostname: error-pages
     labels:
       diun.enable: true
       diun.watch_repos: true
       traefik.enable: true
-      traefik.http.routers.nginx-errors.tls: true
-      # traefik.http.routers.nginx-errors.tls.certresolver: letsencrypt
-      traefik.http.routers.nginx-errors.entrypoints: websecure
-      traefik.http.routers.nginx-errors.rule: Host(`errors.${PERSONAL_DOMAINE_NAME}`)
-      traefik.http.routers.nginx-errors.service: nginx-errors
-      traefik.http.services.nginx-errors.loadBalancer.server.port: 80
-      traefik.http.middlewares.nginx-errors.errors.status: 404 #,500,501,503,505-599
-      traefik.http.middlewares.nginx-errors.errors.service: nginx-errors
-      traefik.http.middlewares.nginx-errors.errors.query: /{status}.html
+      traefik.http.routers.error-pages.tls: true
+      traefik.http.routers.error-pages.entrypoints: websecure
+      traefik.http.routers.error-pages.rule: HostRegexp(`{host:.+}`)
+      traefik.http.routers.error-pages.priority: 1
+      traefik.http.routers.error-pages.service: error-pages
+      traefik.http.services.error-pages.loadBalancer.server.port: 8090
+      traefik.http.middlewares.error-pages.errors.status: 400-599
+      traefik.http.middlewares.error-pages.errors.service: error-pages
+      traefik.http.middlewares.error-pages.errors.query: /{status}.html
     volumes:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/traefik/nginx.conf:/etc/nginx/nginx.conf:ro
@@ -193,9 +193,12 @@ services:
       PUID: 1000
       PGID: 100
       TZ: Europe/Paris
-      NGINX_HOST: test.${PERSONAL_DOMAINE_NAME}
+      PROXY_NAME: traefik
+      PROXY_LOCATION: ${PROXY_LOCATION:-France}
+      PROXY_SUPPORT_MESSAGE: ${PROXY_SUPPORT_MESSAGE:-Retry in few minutes or send mail at:}
+      PROXY_SUPPORT_MAIL: ${PROXY_SUPPORT_MAIL:-contact@${PERSONAL_DOMAINE_NAME}}
     expose:
-      - 80
+      - 8090
     depends_on:
       traefik:
         condition: service_started
