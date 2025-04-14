@@ -39,25 +39,73 @@ http:
       entrypoints:
         - websecure
       middlewares:
-        - authentik@docker 
+        - authentik@docker
+    pve-1:
+      rule: "Host(`domain-1.${PERSONAL_DOMAINE_NAME`)"
+      service: pve-1
+      tls: true
+      entrypoints:
+        - websecure
+      middlewares:
+        - authentik@docker
+    pve-2:
+      rule: "Host(`domain-2.${PERSONAL_DOMAINE_NAME`)"
+      service: pve-2
+      tls: true
+      entrypoints:
+        - websecure
+      middlewares:
+        - authentik@docker
+    wifi:
+      rule: "Host(`wifi.${PERSONAL_DOMAINE_NAME`)"
+      service: wifi
+      tls: true
+      entrypoints:
+        - websecure
+      middlewares:
+        - authentik@docker
 
   services:
     box:
       loadBalancer:
         servers:
-          - url: "http://${PERSONAL_NETWORK}.254:{PERSONAL_BOX_PORT}"
+          - url: "http://${PERSONAL_NETWORK}.254:${PERSONAL_BOX_PORT}"
     dns:
       loadBalancer:
         servers:
-          - url: "http://${PERSONAL_NETWORK}.2:{PERSONAL_DNS_PORT}"
+          - url: "http://${PERSONAL_NETWORK}.2:${PERSONAL_DNS_PORT}"
     nas:
       loadBalancer:
         servers:
-          - url: "http://${PERSONAL_NETWORK}:{PERSONAL_NAS_PORT}"
+          - url: "http://${PERSONAL_NETWORK}.2:${PERSONAL_NAS_PORT}"
     pve:
       loadBalancer:
         servers:
-          - url: "http://${PERSONAL_NETWORK}:{PERSONAL_PVE_PORT}"
+          - url: "http://${PERSONAL_NETWORK}.3:${PERSONAL_PVE_PORT}" # pve-1
+          - url: "http://${PERSONAL_NETWORK}.4:${PERSONAL_PVE_PORT}" # pve-2
+        sticky:
+          cookie:
+            name: pve-host
+            MaxAge: -1
+            secure: true
+        healthCheck:
+          path: /
+          port: ${PERSONAL_PVE_PORT}
+          scheme: https
+          interval: "10s"
+          timeout: "3s"
+    pve-1:
+      loadBalancer:
+        servers:
+          - url: "http://${PERSONAL_NETWORK}.3:${PERSONAL_PVE_PORT}"
+    pve-2:
+      loadBalancer:
+        servers:
+          - url: "http://${PERSONAL_NETWORK}.4:${PERSONAL_PVE_PORT}"
+    wifi:
+      loadBalancer:
+        servers:
+          - url: "https://${PERSONAL_NETWORK}.253:443"
 
   #  minecraft:
   #     loadBalancer:
