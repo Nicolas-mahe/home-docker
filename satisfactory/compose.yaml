@@ -21,15 +21,14 @@ services:
       TZ: Europe/Paris
       ROOTLESS: false
       STEAMBETA: false
-    deploy:
-      resources:
-        limits:
-          memory: 12G
-        reservations:
-          memory: 8G
+    # deploy:
+    #   resources:
+    #     limits:
+    #       memory: 12G
+    #     reservations:
+    #       memory: 8G
     networks:
       - games
-
 
 networks:
   games:
