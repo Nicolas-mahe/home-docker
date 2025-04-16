@@ -61,14 +61,14 @@ services:
       - ${PERSONAL_PORT_MINECRAFT}:25565
     networks:
       - games
-    deploy:
-      resources:
-        limits:
-          cpus: "6.0" 
-          memory: 20000M
-        reservations:
-          cpus: "2.0"
-          memory: 8000M
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: "6.0" 
+    #       memory: 20000M
+    #     reservations:
+    #       cpus: "2.0"
+    #       memory: 8000M
 
   server-creative:
     restart: unless-stopped
