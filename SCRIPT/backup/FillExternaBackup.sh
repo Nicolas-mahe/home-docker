@@ -178,4 +178,4 @@ delete_old_files "$Minecraft_Backups_Path" "20" "5"
 # Apply owner to directory
 echo "Apply owner to backups files"
 chown -R docker:maison $Backups_Path
-chmod -R 771 $Backups_Path
+chmod -R 775 $Backups_Path
