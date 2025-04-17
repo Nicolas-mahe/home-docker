@@ -11,6 +11,8 @@ services:
     labels:
       diun.enable: true
       diun.watch_repos: true
+      docker-monitor.enable: true
+      docker-monitor.group: minecraft
     tty: true
     stdin_open: true
     environment:
@@ -79,6 +81,9 @@ services:
     stdin_open: true
     cap_add:
       - NET_RAW # Auto pause
+    labels:
+      docker-monitor.enable: true
+      docker-monitor.group: minecraft
     environment:
       PGID: 100
       PUID: 1000
@@ -181,6 +186,8 @@ services:
     labels:
       diun.enable: true
       diun.watch_repos: true
+      docker-monitor.enable: true
+      docker-monitor.group: minecraft
     environment:
       SECRET_KEY: ${PLAYIT_SECRET_KEY}
     volumes:
