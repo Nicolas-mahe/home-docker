@@ -9,6 +9,8 @@ services:
       diun.watch_repos: true
       docker-monitor.enable: true
       docker-monitor.group: satisfactory
+      gamecontainermanager.enable: true
+      gamecontainermanager.group: satisfactory
     ports:
       - 7777:7777/udp
       - 7777:7777/tcp
