@@ -66,7 +66,10 @@ services:
       - 9090:9090
     expose:
       - 9090
-    command: --config.file=/etc/prometheus/prometheus.yaml
+    command: 
+      - "--config.file=/etc/prometheus/prometheus.yaml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=${PERSONAL_METRICS_RETENTION_TIME}"
     networks:
       - prometheus
       - webinternal
@@ -115,45 +118,36 @@ services:
     networks:
       - prometheus
 
-# Not used
-  # influxdb:
-  #   restart: unless-stopped
-  #   image: docker.io/library/influxdb:2.7.10-alpine
-  #   container_name: influxdb
-  #   hostname: influxdb
-  #   labels:
-  #     diun.enable: true
-  #     diun.watch_repos: true
-  #     # - traefik.enable=true
-  #     # - traefik.http.services.influxdb.loadbalancer.server.port=8086
-  #     # - traefik.http.services.influxdb.loadbalancer.server.scheme=https
-  #     # - traefik.http.routers.influxdb-https.entrypoints=websecure
-  #     # - traefik.http.routers.influxdb-https.rule=Host(`your-server-url`)
-  #     # - traefik.http.routers.influxdb-https.tls=true
-  #     # - traefik.http.routers.influxdb-https.tls.certresolver=your-certresolver
-  #   environment:
-  #     TZ: Europe/Paris
-  #     # DOCKER_INFLUXDB_INIT_MODE: setup #Only on first start
-  #     DOCKER_INFLUXDB_INIT_USERNAME: ${PERSONAL_INFLUXDB_USER}
-  #     DOCKER_INFLUXDB_INIT_PASSWORD: ${PERSONAL_INFLUXDB_PWD}
-  #     DOCKER_INFLUXDB_INIT_ORG: ${PERSONAL_INFLUXDB_ORG}
-  #     DOCKER_INFLUXDB_INIT_BUCKET: ${PERSONAL_INFLUXDB_BUCKET}
-  #   # (Optional) change retention time
-  #   #   - DOCKER_INFLUXDB_INIT_RETENTION=1w  # (optional) configure data retention 1 week
-  #   # (Optional) add admin token
-  #   #   - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-super-secret-auth-token  # (optional) set admin token
-  #   ports:
-  #     - 8086:8086
-  #   volumes:
-  #     - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-  #     - influxdb-data:/var/lib/influxdb2
-  #     - /etc/influxdb2:/etc/influxdb2
-  #   networks:
-  #     - prometheus
-  #     - webinternal
-
-# volumes:
-  # influxdb-data: 
+  influxdb:
+    restart: unless-stopped
+    image: docker.io/library/influxdb:2.7.10-alpine
+    container_name: influxdb2
+    hostname: influxdb2
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+      traefik.enable: true
+      traefik.http.routers.influxdb2.tls: true
+      traefik.http.routers.influxdb2.middlewares: authentik@docker
+      traefik.http.routers.influxdb2.entrypoints: websecure
+      traefik.http.routers.influxdb2.rule: Host(`influxdb2.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.influxdb2.service: influxdb2
+      traefik.http.services.influxdb2.loadbalancer.server.port: 8086
+    environment:
+      TZ: Europe/Paris
+    # (Optional) change retention time
+      DOCKER_INFLUXDB_INIT_RETENTION: ${PERSONAL_METRICS_RETENTION_TIME}  # (optional) configure data retention 1 week
+    # (Optional) add admin token
+      # DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${PERSONAL_INFLUXDB_ADMIN_TOKEN}  # (optional) set admin token
+    ports:
+      - 8086:8086
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/grafana/influxdb2/data:/var/lib/influxdb2
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/grafana/influxdb2/etc:/etc/influxdb2
+    networks:
+      - prometheus
+      - webinternal
 
 networks:
   prometheus:
