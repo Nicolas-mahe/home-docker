@@ -99,7 +99,7 @@ services:
       - 80:80
       - 443:443
       - 853:853
-      # - 25565:25565/udp # test for minecraft in udp
+      - 25565:25565
     expose:
       - 80
       - 443
@@ -153,7 +153,7 @@ services:
       - --entrypoints.websecure.address=:443
       - --entrypoints.websecure.http.middlewares=crowdsec@docker,error-pages@docker
       - --entrypoints.websecure.http.tls.certResolver=letsencrypt-cloudflare
-      # - --entrypoints.minecraft.address=:25565/udp # test for minecraft in udp
+      - --entrypoints.minecraft.address=:25565/udp # test for minecraft in udp
       - --entrypoints.dot.address=:853
       - --serversTransport.insecureSkipVerify=true  # need to put a validate cert everywhere for delete it
 
