@@ -1,0 +1,30 @@
+services:
+  steamcmd:
+    restart: unless-stopped
+    image: docker.io/cm2network/steamcmd
+    container_name: palworld
+    hostname: palworld
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+      gamecontainermanager.enable: true
+      gamecontainermanager.group: Palworld
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Paris
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/palworld/logs:/home/steam/Steam/logs
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/palworld/games:/home/steam/Steam/steamapps/
+    ports:
+      - 8211:8211/udp
+    networks:
+      - games
+    command: >
+      bash -c "/home/steam/steamcmd/steamcmd.sh +login anonymous +app_update 2394010 validate +quit &&
+               /home/steam/Steam/steamapps/common/PalServer/PalServer.sh"
+
+networks:
+  games:
+    name: games
