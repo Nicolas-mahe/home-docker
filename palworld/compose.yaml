@@ -2,8 +2,8 @@ services:
   steamcmd:
     restart: unless-stopped
     image: docker.io/cm2network/steamcmd
-    container_name: palworld
-    hostname: palworld
+    container_name: palworld-server
+    hostname: palworld-server
     labels:
       diun.enable: true
       diun.watch_repos: true
