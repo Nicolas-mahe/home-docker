@@ -1,12 +1,14 @@
 #!/bin/bash
 
+# Get script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DATA_DIR="/$(echo "$SCRIPT_DIR" | cut -d'/' -f2)"
+
 # Set VaultWarden VARS
-read -r VW_CLIENTID < ../docker/docker-secret/vaultwarden/VW_CLIENTID.txt
-export BW_CLIENTID="$VW_CLIENTID"
-read -r VW_CLIENTSECRET < ../docker/docker-secret/vaultwarden/VW_CLIENTSECRET.txt
-export BW_CLIENTSECRET="$VW_CLIENTSECRET"
-PASSWORD_FILE="../docker/docker-secret/vaultwarden/VW_PASSWORD.txt"
-BW="../script/bw"
+read -r BW_CLIENTID < "$DATA_DIR/docker/docker-secret/vaultwarden/VW_CLIENTID.txt"
+read -r BW_CLIENTSECRET < "$DATA_DIR/docker/docker-secret/vaultwarden/VW_CLIENTSECRET.txt"
+PASSWORD_FILE="$DATA_DIR/docker/docker-secret/vaultwarden/VW_PASSWORD.txt"
+BW="$DATA_DIR/script/bw"
 
 
 # # # 1st use (Config)
