@@ -26,6 +26,9 @@ services:
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/portainer:/data
     networks:
     - webinternal
+    depends_on:
+      portainer_agent:
+        condition: service_started
 
   portainer_agent:
     restart: always
