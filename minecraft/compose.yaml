@@ -12,6 +12,7 @@ services:
       diun.enable: true
       diun.watch_repos: true
       gamecontainermanager.enable: true
+      gamecontainermanager.customlabel0: "${PERSONAL_MINECRAFT_SERVER1_URL}"
     tty: true
     stdin_open: true
     environment:
@@ -82,6 +83,7 @@ services:
       - NET_RAW # Auto pause
     labels:
       gamecontainermanager.enable: true
+      gamecontainermanager.customlabel0: "${PERSONAL_MINECRAFT_SERVER2_URL}"
     environment:
       PGID: 100
       PUID: 1000
