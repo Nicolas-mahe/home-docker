@@ -11,7 +11,7 @@ services:
       diun.enable: true
       diun.watch_repos: true
     environment:
-      - TUNNEL_TOKEN=$CF_TUNNEL_TOKEN
+      - TUNNEL_TOKEN=${CF_TUNNEL_TOKEN}
     volumes:
       - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
     networks:
@@ -139,7 +139,7 @@ services:
       - --certificatesresolvers.letsencrypt-cloudflare.acme.dnschallenge=true
       - --certificatesresolvers.letsencrypt-cloudflare.acme.dnschallenge.provider=cloudflare
       - --certificatesResolvers.letsencrypt-cloudflare.acme.dnschallenge.resolvers=1.1.1.1:53,1.0.0.1:53
-      - --certificatesResolvers.letsencrypt-cloudflare.acme.dnschallenge.propagation.delaybeforechecks=20
+      - --certificatesResolvers.letsencrypt-cloudflare.acme.dnschallenge.propagation.delaybeforechecks=0
       - --certificatesresolvers.letsencrypt-cloudflare.acme.email=${PERSONAL_CF_MAIL}
       - --certificatesresolvers.letsencrypt-cloudflare.acme.storage=/etc/traefik/certs/acme-wildcard.json
       - --entrypoints.websecure.http.tls.domains[0].main=${PERSONAL_DOMAINE_NAME}
