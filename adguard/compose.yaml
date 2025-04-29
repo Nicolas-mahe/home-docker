@@ -11,7 +11,7 @@ services:
       ADGUARDHOME_INTERFACE: ${ADGUARDHOME_INTERFACE}
       TZ: Europe/Paris
     volumes:
-      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/adguard/data:/opt/adguardhome/work
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/adguard/conf:/opt/adguardhome/conf
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/adguard/data:/opt/adguardhome/work
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/adguard/conf:/opt/adguardhome/conf
     network_mode: "host"

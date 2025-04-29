@@ -28,8 +28,8 @@ services:
       TZ: Europe/Paris
       ADMIN_TOKEN: ${ADMIN_TOKEN}
     volumes:
-      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/vaultwarden/:/data/
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/vaultwarden/:/data/
     expose:
       - 80
     networks:

@@ -55,10 +55,10 @@ services:
       VERSION: "1.18.2"
       VIEW_DISTANCE: 10
     volumes:
-      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/s5/prod:/data
-      # - /${RAID_DATA_DIRECTORY}/backups/Minecraft/s5:/backups
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/RaBByT.jpg:/icon.jpg:ro
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/minecraft/s5/prod:/data
+      # - /${RAID_DATA_DIRECTORY:?raid path is required}/backups/Minecraft/s5:/backups
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/minecraft/RaBByT.jpg:/icon.jpg:ro
     ports:
       - ${PERSONAL_PORT_MINECRAFT}:25565
     networks:
@@ -129,9 +129,9 @@ services:
       VERSION: "1.18.2"
       VIEW_DISTANCE: 7
     volumes:
-      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/s5/creative:/data
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/RaBByT-Creative.jpg:/icon.jpg:ro
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/minecraft/s5/creative:/data
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/minecraft/RaBByT-Creative.jpg:/icon.jpg:ro
     ports:
       - ${PERSONAL_PORT_MINECRAFT2}:25565
     networks:
@@ -169,8 +169,8 @@ services:
   #     TAR_COMPRESS_METHOD: gzip
   #     ZSTD_PARAMETERS: -3 --long=25 --single-thread
   #   volumes:
-  #     - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-  #     - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/mc-s5:/data
+  #     - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
+  #     - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/mc-s5:/data
   #     - /${RAID_DATA_DIRECTORY}/backups/Minecraft/s5:/backups
   #   depends_on:
   #     server:
@@ -191,7 +191,7 @@ services:
     environment:
       SECRET_KEY: ${PLAYIT_SECRET_KEY}
     volumes:
-      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
     networks:
       - games
     depends_on:

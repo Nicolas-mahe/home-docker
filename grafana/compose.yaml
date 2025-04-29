@@ -32,8 +32,8 @@ services:
       # Optionally enable auto-login (bypasses Grafana login screen)
       GF_AUTH_OAUTH_AUTO_LOGIN: ${GF_AUTH_OAUTH_AUTO_LOGIN}
     volumes:
-      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/grafana/data:/var/lib/grafana
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/grafana/data:/var/lib/grafana
     expose:
       - 3000
     networks:
@@ -60,9 +60,9 @@ services:
       PUID: 1000
       PGID: 100
     volumes:
-      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/grafana/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/grafana/prometheus:/prometheus
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/grafana/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/grafana/prometheus:/prometheus
     ports:
       - 9090:9090
     expose:
@@ -87,11 +87,11 @@ services:
     environment:
       TZ: Europe/Paris
     volumes:
-      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
       - /:/rootfs:ro
       - /run:/run:ro
       - /sys:/sys:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-config:/var/lib/docker:ro
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-config:/var/lib/docker:ro
       - /dev/disk/:/dev/disk:ro
     devices:
       - /dev/kmsg
@@ -143,9 +143,9 @@ services:
     ports:
       - 8086:8086
     volumes:
-      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/grafana/influxdb2/data:/var/lib/influxdb2
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/grafana/influxdb2/etc:/etc/influxdb2
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/grafana/influxdb2/data:/var/lib/influxdb2
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/grafana/influxdb2/etc:/etc/influxdb2
     networks:
       - prometheus
       - webinternal

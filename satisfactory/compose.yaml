@@ -12,8 +12,8 @@ services:
       - 7777:7777/udp
       - 7777:7777/tcp
     volumes:
-      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/satisfactory:/config
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/satisfactory:/config
     environment:
       name: value
       MAXPLAYERS: 4

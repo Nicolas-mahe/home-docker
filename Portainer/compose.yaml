@@ -22,8 +22,8 @@ services:
       - 9000
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/portainer:/data
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/portainer:/data
     networks:
     - webinternal
     depends_on:
@@ -44,8 +44,8 @@ services:
       - 9001
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-config/volumes:/var/lib/docker/volumes
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-config/volumes:/var/lib/docker/volumes
     networks:
     - webinternal
 
