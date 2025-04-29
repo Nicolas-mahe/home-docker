@@ -112,11 +112,11 @@ services:
     user: "0:0"
     working_dir: "/photoprism" # do not change or remove
     volumes:
-      - /${RAID_DATA_DIRECTORY}/partage/photos:/photoprism/originals # Original media files (DO NOT REMOVE)
-      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${RAID_DATA_DIRECTORY:?raid path is required}/partage/photos:/photoprism/originals # Original media files (DO NOT REMOVE)
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
       # - "/example/family:/photoprism/originals/family" # *Additional* media folders can be mounted like this
       # - "~/Import:/photoprism/import"                  # *Optional* base folder from which files can be imported to originals
-      - "/${DOCKER_DATA_DIRECTORY}/docker/docker-data/photoprism/data:/photoprism/storage" # *Writable* storage folder for cache, database, and sidecar files (DO NOT REMOVE)
+      - "/${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/photoprism/data:/photoprism/storage" # *Writable* storage folder for cache, database, and sidecar files (DO NOT REMOVE)
     networks:
       - photoprism-db
       - webinternal
@@ -137,7 +137,7 @@ services:
     ## Never store database files on an unreliable device such as a USB flash drive, an SD card, or a shared network folder:
     volumes:
       - "/data/docker/docker-data/photoprism/database:/var/lib/mysql" # DO NOT REMOVE
-      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
     environment:
       TZ: Europe/Paris
       MARIADB_AUTO_UPGRADE: "1"

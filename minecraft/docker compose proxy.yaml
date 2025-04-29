@@ -19,10 +19,10 @@ services:
     ports:
       - "25577:25577"
     volumes:
-      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/RaBByT.jpg:/icon.jpg:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/proxy-config.yaml:/config/config.yml
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/proxy:/server
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/minecraft/RaBByT.jpg:/icon.jpg:ro
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/minecraft/proxy-config.yaml:/config/config.yml
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/minecraft/proxy:/server
     networks:
       - minecraft
 
@@ -48,8 +48,8 @@ services:
       TYPE: FORGE
       FORGEVERSION: "40.2.21"
     volumes:
-      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/test/prod/:/data
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/minecraft/test/prod/:/data
     ports:
       - 25566:25565
     networks:
@@ -74,8 +74,8 @@ services:
       TYPE: FORGE
       FORGEVERSION: "40.2.21"
     volumes:
-      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/test/spare/:/data
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/minecraft/test/spare/:/data
     networks:
       - minecraft
     ports:
@@ -94,7 +94,7 @@ services:
   #     SECRET_KEY: ${PLAYIT_SECRET_KEY}
   #     TZ: Europe/Paris
   #   volumes:
-  #     - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+  #     - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
   #   networks:
   #     - minecraft
 

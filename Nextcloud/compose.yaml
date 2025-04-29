@@ -25,11 +25,11 @@ services:
       #   lscr.io/linuxserver/mods:universal-package-install
       # INSTALL_PACKAGES: "git|cmake|g++|dlib|libx11" # Facerecognition's requirement: PDlib
     volumes:
-      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/nextcloud/config:/config
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/nextcloud/data:/data
-      - /${RAID_DATA_DIRECTORY}/partage/:/mnt/partage
-      - /${RAID_DATA_DIRECTORY}/backups/:/mnt/backups
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/nextcloud/config:/config
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/nextcloud/data:/data
+      - /${RAID_DATA_DIRECTORY:?raid path is required}/partage/:/mnt/partage
+      - /${RAID_DATA_DIRECTORY:?raid path is required}/backups/:/mnt/backups
     depends_on:
       - mariadb
     ports:
@@ -56,8 +56,8 @@ services:
       MYSQL_ROOT_PASSWORD: ${ROOT_PWD}
       MARIADB_EXTRA_FLAGS: "--log_bin_trust_function_creators=1"
     volumes:
-      - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/nextcloud/mariadb:/config
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/nextcloud/mariadb:/config
     networks:
       - cloud-db
 

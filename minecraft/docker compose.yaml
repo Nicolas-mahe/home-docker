@@ -18,7 +18,7 @@ services:
       MEMORY: "6G"
       MOTD: "§b§l§oRaBByT Season 5:§r§l§o§2 Ragnamod-VII-7.1.7\n§6§kC'est rigolo cette lingne qui bouge tout le temps"
     volumes:
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/minecraft/temp:/data
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/minecraft/temp:/data
     ports:
       - 25566:25565
     networks:
@@ -37,7 +37,7 @@ services:
   #     SECRET_KEY: ${PLAYIT_SECRET_KEY}
   #     TZ: Europe/Paris
   #   volumes:
-  #     - /${DOCKER_DATA_DIRECTORY}/repos/home-docker/timezone:/etc/timezone:ro
+  #     - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
   #   networks:
   #     - games
 
