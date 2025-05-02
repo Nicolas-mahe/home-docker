@@ -218,6 +218,7 @@ services:
       diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.web-utils.tls: true
+      traefik.http.routers.web-utils.middlewares: authelia@docker
       traefik.http.routers.web-utils.entrypoints: websecure
       traefik.http.routers.web-utils.rule: Host(`utils.${PERSONAL_DOMAINE_NAME}`)
       traefik.http.routers.web-utils.service: web-utils

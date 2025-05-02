@@ -14,6 +14,7 @@ services:
       traefik.http.routers.python-pronostic.tls: true
       traefik.http.routers.python-pronostic.entrypoints: websecure
       traefik.http.routers.python-pronostic.rule: Host(`pronostic.${PERSONAL_DOMAINE_NAME}`) && !PathPrefix(`/liste`)
+      traefik.http.routers.python-pronostic.middlewares: authelia@docker
       traefik.http.routers.python-pronostic.service: python-pronostic
       traefik.http.services.python-pronostic.loadBalancer.server.port: 5000
     environment:
