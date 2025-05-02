@@ -9,7 +9,7 @@ services:
       diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.librespeed.tls: true
-      traefik.http.routers.librespeed.middlewares: authentik@docker
+      traefik.http.routers.librespeed.middlewares: authelia@docker
       traefik.http.routers.librespeed.entrypoints: websecure
       traefik.http.routers.librespeed.rule: Host(`librespeed.${PERSONAL_DOMAINE_NAME}`)
       traefik.http.routers.librespeed.service: librespeed

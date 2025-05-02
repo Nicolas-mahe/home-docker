@@ -7,7 +7,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.skyblog1.tls: true
-      traefik.http.routers.skyblog1.middlewares: authentik@docker
+      traefik.http.routers.skyblog1.middlewares: authelia@docker
       traefik.http.routers.skyblog1.entrypoints: websecure
       traefik.http.routers.skyblog1.rule: Host(`${SKYBLOG1}.${PERSONAL_DOMAINE_NAME}`)
       traefik.http.routers.skyblog1.service: skyblog1
@@ -33,7 +33,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.skyblog2.tls: true
-      traefik.http.routers.skyblog2.middlewares: authentik@docker
+      traefik.http.routers.skyblog2.middlewares: authelia@docker
       traefik.http.routers.skyblog2.entrypoints: websecure
       traefik.http.routers.skyblog2.rule: Host(`${SKYBLOG2}.${PERSONAL_DOMAINE_NAME}`)
       traefik.http.routers.skyblog2.service: skyblog2

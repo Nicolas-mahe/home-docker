@@ -9,7 +9,6 @@ services:
       diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.gafana.tls: true
-      traefik.http.routers.gafana.middlewares: authentik@docker
       traefik.http.routers.gafana.entrypoints: websecure
       traefik.http.routers.gafana.rule: Host(`monitoring.${PERSONAL_DOMAINE_NAME}`)
       traefik.http.routers.gafana.service: gafana
@@ -19,18 +18,26 @@ services:
       PGID: 100
       TZ: Europe/Paris
       GF_SERVER_ROOT_URL: "https://monitoring.${PERSONAL_DOMAINE_NAME}"
-      GF_AUTH_GENERIC_OAUTH_ENABLED: "true"
-      GF_AUTH_GENERIC_OAUTH_NAME: "Authentik - ${PERSONAL_DOMAINE_NAME}"
+      GF_AUTH_BASIC_ENABLED: true
+      GF_AUTH_GENERIC_OAUTH_ENABLED: true
+      traefik.http.routers.prometheusdb.middlewares: authelia@docker
+      GF_AUTH_GENERIC_OAUTH_NAME: "Authelia - ${PERSONAL_DOMAINE_NAME}"
       GF_AUTH_GENERIC_OAUTH_CLIENT_ID: "${GF_AUTH_GENERIC_OAUTH_CLIENT_ID}"
       GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: "${GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET}"
-      GF_AUTH_GENERIC_OAUTH_SCOPES: "openid profile email"
-      GF_AUTH_GENERIC_OAUTH_AUTH_URL: "https://auth.${PERSONAL_DOMAINE_NAME}/application/o/authorize/"
-      GF_AUTH_GENERIC_OAUTH_TOKEN_URL: "https://auth.${PERSONAL_DOMAINE_NAME}/application/o/token/"
-      GF_AUTH_GENERIC_OAUTH_API_URL: "https://auth.${PERSONAL_DOMAINE_NAME}/application/o/userinfo/"
-      GF_AUTH_SIGNOUT_REDIRECT_URL: "https://auth.${PERSONAL_DOMAINE_NAME}/application/o/grafana/end-session/"
-      GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH: "contains(groups, 'admin') && 'Admin' || 'Viewer'"
+      GF_AUTH_GENERIC_OAUTH_SCOPES: "openid profile email groups"
+      GF_AUTH_GENERIC_OAUTH_LOGIN_ATTRIBUTE_PATH: preferred_username
+      GF_AUTH_GENERIC_OAUTH_GROUPS_ATTRIBUTE_PATH: groups
+      GF_AUTH_GENERIC_OAUTH_NAME_ATTRIBUTE_PATH: name
+      GF_AUTH_GENERIC_OAUTH_USE_PKCE: true
+      GF_AUTH_GENERIC_OAUTH_AUTH_URL: "https://auth.${PERSONAL_DOMAINE_NAME}/api/oidc/authorization"
+      GF_AUTH_GENERIC_OAUTH_TOKEN_URL: "https://auth.${PERSONAL_DOMAINE_NAME}/api/oidc/token"
+      GF_AUTH_GENERIC_OAUTH_API_URL: "https://auth.${PERSONAL_DOMAINE_NAME}/api/oidc/userinfo"
+      GF_AUTH_SIGNOUT_REDIRECT_URL: "https://auth.${PERSONAL_DOMAINE_NAME}/logout"
+      GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH: "contains(groups, 'admin') && 'Admin' || contains(groups, 'Maison') && 'Editor' || 'Viewer'"
       # Optionally enable auto-login (bypasses Grafana login screen)
-      GF_AUTH_OAUTH_AUTO_LOGIN: ${GF_AUTH_OAUTH_AUTO_LOGIN}
+      GF_AUTH_GENERIC_OAUTH_AUTO_LOGIN: false
+      GF_AUTH_GOOGLE_AUTO_LOGIN: false
+      GF_AUTH_GITHUB_AUTO_LOGIN: false
     volumes:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/grafana/data:/var/lib/grafana
@@ -38,6 +45,7 @@ services:
       - 3000
     networks:
       - webinternal
+      - prometheus
 
   prometheus:
     restart: unless-stopped
@@ -50,7 +58,7 @@ services:
       diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.prometheusdb.tls: true
-      traefik.http.routers.prometheusdb.middlewares: authentik@docker
+      traefik.http.routers.prometheusdb.middlewares: authelia@docker
       traefik.http.routers.prometheusdb.entrypoints: websecure
       traefik.http.routers.prometheusdb.rule: Host(`prometheus.${PERSONAL_DOMAINE_NAME}`)
       traefik.http.routers.prometheusdb.service: prometheusdb
@@ -72,8 +80,8 @@ services:
       - "--storage.tsdb.path=/prometheus"
       - "--storage.tsdb.retention.time=${PERSONAL_METRICS_RETENTION_TIME}"
     networks:
-      - prometheus
       - webinternal
+      - prometheus
 
   cadvisor:
     restart: unless-stopped
@@ -129,7 +137,7 @@ services:
       diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.influxdb2.tls: true
-      traefik.http.routers.influxdb2.middlewares: authentik@docker
+      traefik.http.routers.influxdb2.middlewares: authelia@docker
       traefik.http.routers.influxdb2.entrypoints: websecure
       traefik.http.routers.influxdb2.rule: Host(`influxdb2.${PERSONAL_DOMAINE_NAME}`)
       traefik.http.routers.influxdb2.service: influxdb2
@@ -147,8 +155,8 @@ services:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/grafana/influxdb2/data:/var/lib/influxdb2
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/grafana/influxdb2/etc:/etc/influxdb2
     networks:
-      - prometheus
       - webinternal
+      - prometheus
 
 networks:
   prometheus:

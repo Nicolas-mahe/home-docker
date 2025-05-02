@@ -26,6 +26,7 @@
 
 services:
   photoprism:
+    restart: unless-stopped
     ## Use photoprism/photoprism:preview for testing preview builds:
     image: photoprism/photoprism:latest
     container_name: photoprism
@@ -35,7 +36,7 @@ services:
       diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.photoprism.tls: true
-      traefik.http.routers.photoprism.middlewares: authentik@docker
+      traefik.http.routers.photoprism.middlewares: authelia@docker
       traefik.http.routers.photoprism.entrypoints: websecure
       traefik.http.routers.photoprism.rule: Host(`photo.${PERSONAL_DOMAINE_NAME}`)
       traefik.http.routers.photoprism.service: photoprism
@@ -44,7 +45,6 @@ services:
     ## Don't enable automatic restarts until PhotoPrism has been properly configured and tested!
     ## If the service gets stuck in a restart loop, this points to a memory, filesystem, network, or database issue:
     ## https://docs.photoprism.app/getting-started/troubleshooting/#fatal-server-errors
-    # restart: unless-stopped
     stop_grace_period: 10s
     depends_on:
       - mariadb
@@ -118,8 +118,8 @@ services:
       # - "~/Import:/photoprism/import"                  # *Optional* base folder from which files can be imported to originals
       - "/${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/photoprism/data:/photoprism/storage" # *Writable* storage folder for cache, database, and sidecar files (DO NOT REMOVE)
     networks:
-      - photoprism-db
       - webinternal
+      - photoprism-db
 
   ## see https://docs.photoprism.app/getting-started/faq/#should-i-use-sqlite-mariadb-or-mysql
   mariadb:
