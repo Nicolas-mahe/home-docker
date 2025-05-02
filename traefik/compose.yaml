@@ -242,9 +242,8 @@ services:
 
   ################# Crowdsec #################
   redis-bouncer:
-    image: docker.io/library/redis:alpine
-    command: --save 60 1 --loglevel warning
     restart: unless-stopped
+    image: docker.io/library/redis:alpine
     container_name: redis-bouncer
     hostname: redis-bouncer
     healthcheck:
@@ -265,6 +264,7 @@ services:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/crowdsec/redis-bouncer:/data
     networks:
       - crowdsec
+    command: --save 60 1 --loglevel warning
 
   crowdsec:
     restart: unless-stopped
@@ -337,7 +337,7 @@ services:
 
   ################# Authelia #################
   authelia:
-    restart: no #unless-stopped
+    restart: unless-stopped
     image: ghcr.io/authelia/authelia:latest
     container_name: authelia
     hostname: authelia
@@ -383,9 +383,8 @@ services:
         condition: service_started
 
   redis-authelia:
-    image: docker.io/library/redis:alpine
-    command: --save 60 1 --loglevel warning
     restart: unless-stopped
+    image: docker.io/library/redis:alpine
     container_name: redis-authelia
     hostname: redis-authelia
     healthcheck:
@@ -405,6 +404,7 @@ services:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/authelia/redis:/data
     networks:
       - authelia
+    command: --save 60 1 --loglevel warning
 
 secrets:
   HMAC_SECRET_FILE:
