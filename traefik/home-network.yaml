@@ -1,88 +1,128 @@
+---
 http:
   routers:
     box:
-      rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`)"
+      rule: "Host(`box.${PERSONAL_DOMAINE_NAME}`)"
       service: box
       tls: true
       entrypoints:
         - websecure
       middlewares:
-        - authentik@docker
+        - authelia@docker
     dns:
-      rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`)"
+      rule: "Host(`dns.${PERSONAL_DOMAINE_NAME}`)"
       service: dns
       tls: true
       entrypoints:
         - websecure
       middlewares:
-        - authentik@docker
+        - authelia@docker
+    gamescontainermanager:
+      rule: "Host(`games-manager.${PERSONAL_DOMAINE_NAME}`)"
+      service: gamescontainermanager
+      tls: true
+      entrypoints:
+        - websecure
     nas:
-      rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`)"
+      rule: "Host(`nas.${PERSONAL_DOMAINE_NAME}`)"
       service: nas
       tls: true
       entrypoints:
         - websecure
       middlewares:
-        - authentik@docker   
+        - authelia@docker   
     # mailcow:
-    #   rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`)"
+    #   rule: "Host(`mail.${PERSONAL_DOMAINE_NAME}`)"
     #   service: mailcow
-      # tls: true
-      # entrypoints:
-      #   - websecure
+    #   tls: true
+    #   entrypoints:
+    #     - websecure
     #   middlewares:
-    #     - authentik@docker
+    #     - authelia@docker
+    pterodactyl:
+      rule: "Host(`pterodactyl.${PERSONAL_DOMAINE_NAME}`)"
+      service: pterodactyl
+      tls: true
+      entrypoints:
+        - websecure
+      middlewares:
+        - authelia@docker
     pve:
-      rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`)"
+      rule: "Host(`pve.${PERSONAL_DOMAINE_NAME}`)"
       service: pve
       tls: true
       entrypoints:
         - websecure
       middlewares:
-        - authentik@docker
+        - authelia@docker
     pve-1:
-      rule: "Host(`domain-1.${PERSONAL_DOMAINE_NAME`)"
+      rule: "Host(`pve-1.${PERSONAL_DOMAINE_NAME}`)"
       service: pve-1
       tls: true
       entrypoints:
         - websecure
       middlewares:
-        - authentik@docker
-    pve-2:
-      rule: "Host(`domain-2.${PERSONAL_DOMAINE_NAME`)"
-      service: pve-2
+        - authelia@docker
+    # pve-test:
+    #   rule: "Host(`pve-test.${PERSONAL_DOMAINE_NAME}`)"
+    #   service: pve-test
+    #   tls: true
+    #   entrypoints:
+    #     - websecure
+    #   middlewares:
+    #     - authelia@docker
+    python-test:
+      rule: "Host(`python-test.${PERSONAL_DOMAINE_NAME}`)"
+      service: python-test
+      tls: true
+      entrypoints:
+        - websecure 
+    zyxel-switch:
+      rule: "Host(`zyxel-switch.${PERSONAL_DOMAINE_NAME}`)"
+      service: zyxel-switch
       tls: true
       entrypoints:
         - websecure
       middlewares:
-        - authentik@docker
-    wifi:
-      rule: "Host(`wifi.${PERSONAL_DOMAINE_NAME`)"
-      service: wifi
+        - authelia@docker
+    zyxel-wifi:
+      rule: "Host(`zyxel-wifi.${PERSONAL_DOMAINE_NAME}`)"
+      service: zyxel-wifi
       tls: true
       entrypoints:
         - websecure
       middlewares:
-        - authentik@docker
+        - authelia@docker
 
   services:
     box:
       loadBalancer:
         servers:
-          - url: "http://${PERSONAL_NETWORK}.254:${PERSONAL_BOX_PORT}"
+          - url: "https://${PERSONAL_NETWORK}.254:443"
     dns:
       loadBalancer:
         servers:
-          - url: "http://${PERSONAL_NETWORK}.2:${PERSONAL_DNS_PORT}"
+          - url: "http://${PERSONAL_NETWORK}.2:82"
+    gamescontainermanager:
+      loadBalancer:
+        servers:
+          - url: "http://${PERSONAL_NETWORK}.10:5000"
     nas:
       loadBalancer:
         servers:
-          - url: "http://${PERSONAL_NETWORK}.2:${PERSONAL_NAS_PORT}"
+          - url: "http://${PERSONAL_NETWORK}.2:81"
+    # mailcow:
+    #   loadBalancer:
+    #     servers:
+    #       - url: "http://${PERSONAL_NETWORK}.11:8080"
+    pterodactyl:
+      loadBalancer:
+        servers:
+          - url: "http://${PERSONAL_NETWORK}.13:80"
     pve:
       loadBalancer:
         servers:
-          - url: "http://${PERSONAL_NETWORK}.3:${PERSONAL_PVE_PORT}" # pve-1
-          - url: "http://${PERSONAL_NETWORK}.4:${PERSONAL_PVE_PORT}" # pve-2
+          - url: "https://${PERSONAL_NETWORK}.3:8006" # pve-1
         sticky:
           cookie:
             name: pve-host
@@ -90,31 +130,42 @@ http:
             secure: true
         healthCheck:
           path: /
-          port: ${PERSONAL_PVE_PORT}
+          port: 8006
           scheme: https
           interval: "10s"
           timeout: "3s"
-    pve-1:
+    pve-kratos:
       loadBalancer:
         servers:
-          - url: "http://${PERSONAL_NETWORK}.3:${PERSONAL_PVE_PORT}"
-    pve-2:
+          - url: "https://${PERSONAL_NETWORK}.3:8006"
+    # pve-test:
+    #   loadBalancer:
+    #     servers:
+    #       - url: "https://${PERSONAL_NETWORK}.4:8006"
+    python-test:
       loadBalancer:
         servers:
-          - url: "http://${PERSONAL_NETWORK}.4:${PERSONAL_PVE_PORT}"
-    wifi:
+          - url: "http://${PERSONAL_NETWORK}.11:5000"
+    zyxel-switch:
+      loadBalancer:
+        servers:
+          - url: "https://${PERSONAL_NETWORK}.252:443"
+    zyxel-wifi:
       loadBalancer:
         servers:
           - url: "https://${PERSONAL_NETWORK}.253:443"
 
-  #  minecraft:
-  #     loadBalancer:
-  #       servers:
-  #         - url: "udp://${PERSONAL_NETWORK}.6:25565"
+
 
 # udp:
 #   routers:
 #     minecraft:
-#       rule: "Host(`domain.${PERSONAL_DOMAINE_NAME}`)"
 #       service: minecraft
+#       entrypoints:
+#         - minecraft
+#   services:
+#     minecraft:
+#       loadBalancer:
+#         servers:
+#           - address: "${PERSONAL_NETWORK}.10:25565"
 
