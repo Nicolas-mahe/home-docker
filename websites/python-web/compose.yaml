@@ -8,11 +8,12 @@ services:
       diun.enable: true
       diun.watch_repos: true
       traefik.enable: true
-      traefik.http.routers.python-web.tls: true
-      traefik.http.routers.python-web.entrypoints: websecure
-      traefik.http.routers.python-web.rule: Host(`voiture.${PERSONAL_DOMAINE_NAME}`)
-      traefik.http.routers.python-web.service: python-web
-      traefik.http.services.python-web.loadBalancer.server.port: 5000
+      traefik.http.routers.python-voiture.tls: true
+      traefik.http.routers.python-voiture.middlewares: authelia@docker
+      traefik.http.routers.python-voiture.entrypoints: websecure
+      traefik.http.routers.python-voiture.rule: Host(`voiture.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.python-voiture.service: python-voiture
+      traefik.http.services.python-voiture.loadBalancer.server.port: 5000
     environment:
       PUID: 1000
       PGID: 100    
@@ -40,6 +41,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.python-luna.tls: true
+      traefik.http.routers.python-luna.middlewares: authelia@docker
       traefik.http.routers.python-luna.entrypoints: websecure
       traefik.http.routers.python-luna.rule: Host(`luna.${PERSONAL_DOMAINE_NAME}`)
       traefik.http.routers.python-luna.service: python-luna

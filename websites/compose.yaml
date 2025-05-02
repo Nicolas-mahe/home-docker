@@ -59,6 +59,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.candle.tls: true
+      traefik.http.routers.candle.middlewares: authelia@docker
       traefik.http.routers.candle.entrypoints: websecure
       traefik.http.routers.candle.rule: Host(`candle.${PERSONAL_DOMAINE_NAME}`) || Host(`brule-un-cierge.${PERSONAL_DOMAINE_NAME}`) || Host(`bruleuncierge.${PERSONAL_DOMAINE_NAME}`)
       traefik.http.routers.candle.service: candle

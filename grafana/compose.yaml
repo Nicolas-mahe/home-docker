@@ -9,6 +9,7 @@ services:
       diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.gafana.tls: true
+      traefik.http.routers.gafana.middlewares: authelia@docker
       traefik.http.routers.gafana.entrypoints: websecure
       traefik.http.routers.gafana.rule: Host(`monitoring.${PERSONAL_DOMAINE_NAME}`)
       traefik.http.routers.gafana.service: gafana
@@ -20,7 +21,6 @@ services:
       GF_SERVER_ROOT_URL: "https://monitoring.${PERSONAL_DOMAINE_NAME}"
       GF_AUTH_BASIC_ENABLED: true
       GF_AUTH_GENERIC_OAUTH_ENABLED: true
-      traefik.http.routers.prometheusdb.middlewares: authelia@docker
       GF_AUTH_GENERIC_OAUTH_NAME: "Authelia - ${PERSONAL_DOMAINE_NAME}"
       GF_AUTH_GENERIC_OAUTH_CLIENT_ID: "${GF_AUTH_GENERIC_OAUTH_CLIENT_ID}"
       GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: "${GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET}"
