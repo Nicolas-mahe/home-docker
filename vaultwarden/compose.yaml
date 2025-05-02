@@ -10,7 +10,7 @@ services:
       traefik.enable: true
       # admin interface
       traefik.http.routers.vaultwarden-admin.tls: true
-      traefik.http.routers.vaultwarden-admin.middlewares: authentik@docker
+      traefik.http.routers.vaultwarden-admin.middlewares: authelia@docker
       traefik.http.routers.vaultwarden-admin.entrypoints: websecure
       traefik.http.routers.vaultwarden-admin.rule: Host(`vaultwarden.${PERSONAL_DOMAINE_NAME}`) && PathPrefix(`/admin`) 
       traefik.http.routers.vaultwarden-admin.service: vaultwarden-admin

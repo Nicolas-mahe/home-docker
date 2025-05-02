@@ -50,7 +50,7 @@ services:
       diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.whoami.tls: true
-      traefik.http.routers.whoami.middlewares: authentik@docker
+      traefik.http.routers.whoami.middlewares: authelia@docker
       traefik.http.routers.whoami.entrypoints: websecure
       traefik.http.routers.whoami.rule: Host(`whoami.${PERSONAL_DOMAINE_NAME}`)
       traefik.http.routers.whoami.service: whoami
@@ -79,7 +79,7 @@ services:
       diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.dashboard.tls: true
-      traefik.http.routers.dashboard.middlewares: authentik@docker
+      traefik.http.routers.dashboard.middlewares: authelia@docker
       traefik.http.routers.dashboard.entrypoints: websecure
       traefik.http.routers.dashboard.rule: Host(`traefik.${PERSONAL_DOMAINE_NAME}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
       traefik.http.routers.dashboard.service: api@internal
@@ -99,6 +99,7 @@ services:
       - 80:80
       - 443:443
       - 853:853
+      - 8081:8080
       - 25565:25565
     expose:
       - 80
@@ -106,12 +107,10 @@ services:
       - 853
       - 8080
     depends_on:
+      authelia:
+        condition: service_healthy
       crowdsec:
         condition: service_started
-      server:
-        condition: service_healthy
-      worker:
-        condition: service_healthy
     networks:
       - crowdsec
       - prometheus
@@ -119,6 +118,7 @@ services:
       - webinternal
     command:
       - --global.sendAnonymousUsage
+      - --global.checkNewVersion=false
       - --log.level=INFO
       - --log.nocolor=false
       - --accesslog=true
@@ -151,6 +151,11 @@ services:
       - --entrypoints.web.http.redirections.entryPoint.scheme=https
       - --entrypoints.web.http.middlewares=crowdsec@docker,error-pages@docker
       - --entrypoints.websecure.address=:443
+      - --entryPoints.websecure.forwardedHeaders.insecure=false
+      - --entryPoints.websecure.proxyProtocol.insecure=false # need trusted IPs provided
+      # Please see the Forwarded Header Trust section of the Authelia Traefik Integration documentation.
+      - --entryPoints.websecure.forwardedHeaders.trustedIPs=172.18.0.0/16,172.22.0.0/16
+      - --entryPoints.websecure.proxyProtocol.trustedIPs=172.18.0.0/16,172.22.0.0/16
       - --entrypoints.websecure.http.middlewares=crowdsec@docker,error-pages@docker
       - --entrypoints.websecure.http.tls.certResolver=letsencrypt-cloudflare
       - --entrypoints.minecraft.address=:25565/udp # test for minecraft in udp
@@ -304,9 +309,9 @@ services:
         crowdsecurity/whitelist-good-actors
         crowdsecurity/linux
         crowdsecurity/linux-lpe
-        firix/authentik
-        LePresidente/grafana
+        LePresidente/authelia
         LePresidente/adguardhome
+        LePresidente/grafana
         crowdsecurity/nginx
         crowdsecurity/nextcloud
         crowdsecurity/traefik
@@ -326,161 +331,94 @@ services:
       - crowdsec
       - prometheus
       - webexpose
-    depends_on: 
+    depends_on:
       redis-bouncer:
         condition: service_started
 
-  ################# Authentik #################
-  server:
-    image: ghcr.io/goauthentik/server:${AUTHENTIK_TAG:-2024.8.2}
-    restart: unless-stopped
-    container_name: authentik-server
-    hostname: authentik-server
-    command: server
+  ################# Authelia #################
+  authelia:
+    restart: no #unless-stopped
+    image: ghcr.io/authelia/authelia:latest
+    container_name: authelia
+    hostname: authelia
     labels:
       diun.enable: true
       diun.watch_repos: true
       traefik.enable: true
-      traefik.http.routers.authentik-server.tls: true
-      traefik.http.routers.authentik-server.entrypoints: websecure
-      traefik.http.routers.authentik-server.rule: Host(`auth.${PERSONAL_DOMAINE_NAME}`)
-      traefik.http.routers.authentik-server.service: authentik-server  
-      traefik.http.services.authentik-server.loadBalancer.server.port: 9000
-      # middleware authentik
-      traefik.port: 9000
-      traefik.http.middlewares.authentik.forwardauth.address: http://authentik-server:9000/outpost.goauthentik.io/auth/traefik
-      traefik.http.middlewares.authentik.forwardauth.trustForwardHeader: true
-      traefik.http.middlewares.authentik.forwardauth.authResponseHeaders: X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid,X-authentik-jwt,X-authentik-meta-jwks,X-authentik-meta-outpost,X-authentik-meta-provider,X-authentik-meta-app,X-authentik-meta-version
+      traefik.http.routers.authelia.tls: true
+      traefik.http.routers.authelia.entrypoints: websecure
+      traefik.http.routers.authelia.rule: Host(`auth.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.authelia.service: authelia
+      traefik.http.services.authelia.loadBalancer.server.port: 9091
+      traefik.http.middlewares.authelia.forwardAuth.address: 'http://authelia:9091/api/authz/forward-auth'
+      ## The following commented line is for configuring the Authelia URL in the proxy. We strongly suggest this is
+      ## configured in the Session Cookies section of the Authelia configuration.
+      # traefik.http.middlewares.authelia.forwardAuth.address: 'http://authelia:9091/api/authz/forward-auth?authelia_url=https%3A%2F%2Fauth.example.com%2F'
+      traefik.http.middlewares.authelia.forwardAuth.trustForwardHeader: true
+      traefik.http.middlewares.authelia.forwardAuth.authResponseHeaders: 'Remote-User,Remote-Groups,Remote-Email,Remote-Name'
     environment:
       PUID: 1000
-      GUID: 100
+      PGID: 1000
       TZ: Europe/Paris
-      AUTHENTIK_COOKIE_DOMAIN: ${PERSONAL_DOMAINE_NAME}
-      AUTHENTIK_ERROR_REPORTING__ENABLED: false
-      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:?authentik secret key required}
-      AUTHENTIK_REDIS__HOST: redis-authentik
-      AUTHENTIK_POSTGRESQL__HOST: postgresql
-      AUTHENTIK_POSTGRESQL__USER: ${POSTGRES_AUTHENTIK_USER}
-      AUTHENTIK_POSTGRESQL__NAME: ${POSTGRES_AUTHENTIK_DB}
-      AUTHENTIK_POSTGRESQL__PASSWORD: ${POSTGRES_AUTHENTIK_PASSWORD}
-      AUTHENTIK_EMAIL__HOST: ${PERSONAL_SMTP_HOST}
-      AUTHENTIK_EMAIL__PORT: ${PERSONAL_SMTP_PORT}
-      AUTHENTIK_EMAIL__USERNAME: ${PERSONAL_EMAIL_SMTP}
-      AUTHENTIK_EMAIL__PASSWORD: ${PERSONAL_PWD_SMTP}
-      AUTHENTIK_EMAIL__USE_TLS: true
-      AUTHENTIK_EMAIL__USE_SSL: true
-      AUTHENTIK_EMAIL__TIMEOUT: 10
-      AUTHENTIK_EMAIL__FROM: ${PERSONAL_EMAIL_SMTP}
+      AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE: /run/secrets/HMAC_SECRET_FILE
+      AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE: /run/secrets/JWT_SECRET
+      AUTHELIA_SESSION_SECRET_FILE: /run/secrets/SESSION_SECRET
+      AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE: /run/secrets/STORAGE_ENCRYPTION_KEY
+    expose:
+      - 9091
     volumes:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/authentik/media:/media
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/authentik/custom-templates:/templates
-    expose:
-      - 9000
-      - 9443
-    depends_on:
-      postgresql:
-        condition: service_healthy
-      redis-authentik:
-        condition: service_healthy
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/authelia/config:/config
     networks:
       - webinternal
-      - authentik
-
-  worker:
-    image: ghcr.io/goauthentik/server:${AUTHENTIK_TAG:-2024.8.2}
-    restart: unless-stopped
-    command: worker
-    container_name: authentik-worker
-    hostname: authentik-worker
-    environment:
-      PUID: 1000
-      GUID: 100
-      TZ: Europe/Paris
-      AUTHENTIK_COOKIE_DOMAIN: ${PERSONAL_DOMAINE_NAME}
-      AUTHENTIK_ERROR_REPORTING__ENABLED: false
-      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:?authentik secret key required}
-      AUTHENTIK_REDIS__HOST: redis-authentik
-      AUTHENTIK_POSTGRESQL__HOST: postgresql
-      AUTHENTIK_POSTGRESQL__USER: ${POSTGRES_AUTHENTIK_USER}
-      AUTHENTIK_POSTGRESQL__NAME: ${POSTGRES_AUTHENTIK_DB}
-      AUTHENTIK_POSTGRESQL__PASSWORD: ${POSTGRES_AUTHENTIK_PASSWORD}
-      AUTHENTIK_EMAIL__HOST: smtp-mail.outlook.com
-      AUTHENTIK_EMAIL__PORT: 587
-      AUTHENTIK_EMAIL__USERNAME: ${PERSONAL_EMAIL_SMTP}
-      AUTHENTIK_EMAIL__PASSWORD: ${PERSONAL_PWD_SMTP}
-      AUTHENTIK_EMAIL__USE_TLS: true
-      AUTHENTIK_EMAIL__USE_SSL: true
-      AUTHENTIK_EMAIL__TIMEOUT: 10
-      AUTHENTIK_EMAIL__FROM: ${PERSONAL_EMAIL_SMTP}
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/authentik/media:/media
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/authentik/certs:/certs
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/authentik/custom-templates:/templates
+      - authelia
+    secrets: ['HMAC_SECRET_FILE', 'JWT_SECRET', 'SESSION_SECRET', 'STORAGE_ENCRYPTION_KEY']
+    command:
+      - 'authelia'
+      - '--config=/config/configuration.yml'
+      - '--config=/config/configuration.acl.yml'
+      - '--config=/config/configuration.identity_providers.yml'
     depends_on:
-      postgresql:
-        condition: service_healthy
-      redis-authentik:
-        condition: service_healthy
-    networks:
-      - authentik
+      redis-authelia:
+        condition: service_started
 
-  ################# Authentik_ BDD #################
-  postgresql:
-    image: docker.io/library/postgres:16-alpine
-    restart: unless-stopped
-    container_name: authentik-postgresql
-    hostname: authentik-postgresql
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_AUTHENTIK_DB} -U $${POSTGRES_AUTHENTIK_USER}"]
-      start_period: 20s
-      interval: 30s
-      retries: 5
-      timeout: 5s
-    labels:
-      diun.enable: true
-      diun.watch_repos: true
-    environment:
-      TZ: Europe/Paris
-      POSTGRES_PASSWORD: ${POSTGRES_AUTHENTIK_PASSWORD:?database password required}
-      POSTGRES_USER: ${POSTGRES_AUTHENTIK_USER:?database user required}
-      POSTGRES_DB: ${POSTGRES_AUTHENTIK_DB:?database name required}
-    volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/authentik/postgres-db:/var/lib/postgresql/data
-    networks:
-      - authentik
-
-  redis-authentik:
+  redis-authelia:
     image: docker.io/library/redis:alpine
     command: --save 60 1 --loglevel warning
     restart: unless-stopped
-    container_name: redis-authentik
-    hostname: redis-authentik
+    container_name: redis-authelia
+    hostname: redis-authelia
     healthcheck:
       test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
       start_period: 20s
       interval: 30s
       retries: 5
       timeout: 3s
-    labels:
-      diun.enable: true
-      diun.watch_repos: true
     environment:
       PUID: 1000
-      GUID: 100      
+      GUID: 100
       TZ: Europe/Paris
+    expose:
+      - 6379
     volumes:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/authentik/redis-auth:/data
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/authelia/redis:/data
     networks:
-      - authentik
+      - authelia
+
+secrets:
+  HMAC_SECRET_FILE:
+    file: /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-secret/web/HMAC_SECRET_FILE
+  JWT_SECRET:
+    file: /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-secret/web/JWT_SECRET
+  SESSION_SECRET:
+    file: /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-secret/web/SESSION_SECRET
+  STORAGE_ENCRYPTION_KEY:
+    file: /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-secret/web/STORAGE_ENCRYPTION_KEY
 
 networks:
-  authentik:
-    name: authentik
+  authelia:
+    name: authelia
   crowdsec:
     name: crowdsec
   prometheus:
