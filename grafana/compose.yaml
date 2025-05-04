@@ -1,5 +1,6 @@
 services:
   grafana:
+    restart: unless-stopped
     image: docker.io/grafana/grafana-oss
     container_name: grafana
     hostname: grafana
