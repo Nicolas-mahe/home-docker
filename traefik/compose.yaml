@@ -381,6 +381,7 @@ services:
       - 'authelia'
       - '--config=/config/configuration.yml'
       - '--config=/config/configuration.acl.yml'
+      - '--config=/config/configuration.acl.internal.yml'
       - '--config=/config/configuration.identity_providers.yml'
     depends_on:
       redis-authelia:

@@ -20,8 +20,8 @@
         -
           # Required Private Key in PEM DER form.
           key: |
-    
-    
+
+
         # Authorization Policies which can be utilized by clients. The 'policy_name' is an arbitrary value that you pick
         # which is utilized as the value for the 'authorization_policy' on the client.
         authorization_policies:
