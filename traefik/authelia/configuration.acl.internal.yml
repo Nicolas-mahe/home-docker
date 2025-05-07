@@ -8,7 +8,7 @@
 # to everyone. Otherwise restrictions follow the rules defined.
 #
 # Note: One can use the wildcard * to match any subdomain.
-# It must stand at the beginning of the pattern. (example: *.${PERSONAL_DOMAINE_NAME})
+# It must stand at the beginning of the pattern. (${PERSONAL_DOMAINE}: *.${PERSONAL_DOMAINE_NAME})
 #
 # Note: You must put patterns containing wildcards between simple quotes for the YAML to be syntactically correct.
 #
@@ -35,33 +35,28 @@ access_control:
     ## BYPASS
     - domain:
       - 'auth.${PERSONAL_DOMAINE_NAME}'
+      - 'www.${PERSONAL_DOMAINE_NAME}'
       policy: 'bypass'
+      networks:
+        - 'internal'
 
-    ## TWO_FACTOR
+    ## RESTRICTED ACCES
     - domain_regex:
       - '^(pve).*\.${PERSONAL_DOMAINE}\.com$'
-      policy: 'two_factor'
+      policy: 'one_factor'
       subject:
         - 'group:admin'
+      networks:
+        - 'internal'
 
     - domain:
       - 'traefik.${PERSONAL_DOMAINE_NAME}'
-      - 'python-test.${PERSONAL_DOMAINE_NAME}'
-      policy: 'two_factor'
-      subject:
-        - 'group:admin'
-
-    - domain:
-      - 'play.${PERSONAL_DOMAINE_NAME}'
-      policy: 'two_factor'
-      subject:
-        - 'group:admin'
-        - 'group:Gamers'
-
-    ## ONE_FACTOR
-    - domain:
-      - 'www.${PERSONAL_DOMAINE_NAME}'
+      - 'whoami.${PERSONAL_DOMAINE_NAME}'
       policy: 'one_factor'
+      subject:
+        - 'group:admin'
+      networks:
+        - 'internal'
 
     ## ADMIN PATH
     - domain:
@@ -71,16 +66,22 @@ access_control:
       policy: 'two_factor'
       subject:
         - 'group:admin'
+      networks:
+        - 'internal'
     
     ## BYPASS WITHOUT ADMIN PATH
     - domain:
       - 'vaultwarden.${PERSONAL_DOMAINE_NAME}'
       policy: 'bypass'
+      networks:
+        - 'internal'
 
     ## ADMIN
     - domain:
       - '${PERSONAL_DOMAINE_NAME}'
       - '*.${PERSONAL_DOMAINE_NAME}'
-      policy: 'two_factor'
+      policy: 'one_factor'
       subject:
         - 'group:admin'
+      networks:
+        - 'internal'
