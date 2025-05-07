@@ -32,6 +32,63 @@ access_control:
   default_policy: 'deny'
 
   rules:
+  ##################INTERNAL#############
+    ## BYPASS
+    - domain:
+      - 'auth.${PERSONAL_DOMAINE_NAME}'
+      - 'www.${PERSONAL_DOMAINE_NAME}'
+      policy: 'bypass'
+      networks:
+        - 'internal'
+
+    ## RESTRICTED ACCES
+    - domain_regex:
+      - '^(pve).*\.${PERSONAL_DOMAINE}\.com$'
+      policy: 'one_factor'
+      subject:
+        - 'group:admin'
+      networks:
+        - 'internal'
+
+    - domain:
+      - 'traefik.${PERSONAL_DOMAINE_NAME}'
+      - 'whoami.${PERSONAL_DOMAINE_NAME}'
+      policy: 'one_factor'
+      subject:
+        - 'group:admin'
+      networks:
+        - 'internal'
+
+    ## ADMIN PATH
+    - domain:
+      - 'vaultwarden.${PERSONAL_DOMAINE_NAME}'
+      resources:
+        - '^/admin([/?].*)?$'
+      policy: 'two_factor'
+      subject:
+        - 'group:admin'
+      networks:
+        - 'internal'
+    
+    ## BYPASS WITHOUT ADMIN PATH
+    - domain:
+      - 'vaultwarden.${PERSONAL_DOMAINE_NAME}'
+      policy: 'bypass'
+      networks:
+        - 'internal'
+
+    ## ADMIN
+    - domain:
+      - '${PERSONAL_DOMAINE_NAME}'
+      - '*.${PERSONAL_DOMAINE_NAME}'
+      policy: 'one_factor'
+      subject:
+        - 'group:admin'
+      networks:
+        - 'internal'
+
+
+  ##################EXTERNAL#############
     ## BYPASS
     - domain:
       - 'auth.${PERSONAL_DOMAINE_NAME}'
