@@ -125,8 +125,8 @@ totp:
 
   # The allowed digits for a user to pick from.
   allowed_digits:
-  - 8
   - 6
+  - 8
 
 #
 # WebAuthn Configuration
@@ -340,7 +340,7 @@ session:
       #   - The above 'domain' option MUST either:
       #      - Match the host portion of this URI.
       #      - Match the suffix of the host portion when prefixed with '.'.
-      default_redirection_url: 'https://auth.${PERSONAL_DOMAINE_NAME}'
+      default_redirection_url: ''
 
       # Sets the Cookie SameSite value. Possible options are none, lax, or strict.
       # Please read https://www.authelia.com/c/session#same_site

@@ -31,3 +31,56 @@ access_control:
   # resource if there is no policy to be applied to the user.
   default_policy: 'deny'
 
+  rules:
+    ## BYPASS
+    - domain:
+      - 'auth.${PERSONAL_DOMAINE_NAME}'
+      policy: 'bypass'
+
+    ## TWO_FACTOR
+    - domain_regex:
+      - '^(pve).*\.${PERSONAL_DOMAINE}\.com$'
+      policy: 'two_factor'
+      subject:
+        - 'group:admin'
+
+    - domain:
+      - 'traefik.${PERSONAL_DOMAINE_NAME}'
+      - 'python-test.${PERSONAL_DOMAINE_NAME}'
+      policy: 'two_factor'
+      subject:
+        - 'group:admin'
+
+    - domain:
+      - 'play.${PERSONAL_DOMAINE_NAME}'
+      policy: 'two_factor'
+      subject:
+        - 'group:admin'
+        - 'group:Gamers'
+
+    ## ONE_FACTOR
+    - domain:
+      - 'www.${PERSONAL_DOMAINE_NAME}'
+      policy: 'one_factor'
+
+    ## ADMIN PATH
+    - domain:
+      - 'vaultwarden.${PERSONAL_DOMAINE_NAME}'
+      resources:
+        - '^/admin([/?].*)?$'
+      policy: 'two_factor'
+      subject:
+        - 'group:admin'
+    
+    ## BYPASS WITHOUT ADMIN PATH
+    - domain:
+      - 'vaultwarden.${PERSONAL_DOMAINE_NAME}'
+      policy: 'bypass'
+
+    ## ADMIN
+    - domain:
+      - '${PERSONAL_DOMAINE_NAME}'
+      - '*.${PERSONAL_DOMAINE_NAME}'
+      policy: 'two_factor'
+      subject:
+        - 'group:admin'

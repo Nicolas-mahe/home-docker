@@ -1,163 +1,154 @@
 ---
-    ##
-    ## Identity Providers
-    ##
-    identity_providers:
-    
-      #
-      # OpenID Connect (Identity Provider)
-      #
-      # It's recommended you read the documentation before configuration of this section.
-      # See: https://www.authelia.com/c/oidc/provider
-      oidc:
-        # The hmac_secret is used to sign OAuth2 tokens (authorization code, access tokens and refresh tokens).
-        # HMAC Secret can also be set using a secret: https://www.authelia.com/c/secrets
-        hmac_secret: '' # docker-secret
-    
-        # The JWK's issuer option configures multiple JSON Web Keys. It's required that at least one of the JWK's
-        # configured has the RS256 algorithm. For RSA keys (RS or PS) the minimum is a 2048 bit key.
-        jwks:
-        -
-          # Required Private Key in PEM DER form.
-          key: |
+##
+## Identity Providers
+##
+identity_providers:
+
+  #
+  # OpenID Connect (Identity Provider)
+  #
+  # It's recommended you read the documentation before configuration of this section.
+  # See: https://www.authelia.com/c/oidc/provider
+  oidc:
+    # The hmac_secret is used to sign OAuth2 tokens (authorization code, access tokens and refresh tokens).
+    # HMAC Secret can also be set using a secret: https://www.authelia.com/c/secrets
+    hmac_secret: '' # docker-secret
+
+    # The JWK's issuer option configures multiple JSON Web Keys. It's required that at least one of the JWK's
+    # configured has the RS256 algorithm. For RSA keys (RS or PS) the minimum is a 2048 bit key.
+    jwks:
+    -
+      # Required Private Key in PEM DER form.
+      key: |
 
 
-        # Authorization Policies which can be utilized by clients. The 'policy_name' is an arbitrary value that you pick
-        # which is utilized as the value for the 'authorization_policy' on the client.
-        authorization_policies:
-          policy_name:
-            default_policy: 'two_factor'
-            rules:
-              - policy: 'one_factor'
-                subject: 'group:Maison'
-                networks:
-                   - 'internal'
-    
-        # The lifespans configure the expiration for these token types in the duration common syntax. In addition to this
-        # syntax the lifespans can be customized per-client.
-        lifespans:
-          # Configures the default/fallback lifespan for given token types. This behaviour applies to all clients and all
-          # grant types but you can override this behaviour using the custom lifespans.
-          access_token: '1 hour'
-          authorize_code: '1 minute'
-          id_token: '1 hour'
-          refresh_token: '90 minutes'
-    
-        # Cross-Origin Resource Sharing (CORS) settings.
-        cors:
-          # List of endpoints in addition to the metadata endpoints to permit cross-origin requests on.
-          endpoints:
-             - 'authorization'
-             - 'pushed-authorization-request'
-             - 'token'
-             - 'revocation'
-             - 'introspection'
-             - 'userinfo'
-    
-          # # List of allowed origins.
-          # # Any origin with https is permitted unless this option is configured or the
-          # # allowed_origins_from_client_redirect_uris option is enabled.
-          # allowed_origins:
-          #   - 'https://${PERSONAL_DOMAINE_NAME}'
-    
-          # Automatically adds the origin portion of all redirect URI's on all clients to the list of allowed_origins,
-          # provided they have the scheme http or https and do not have the hostname of localhost.
-          allowed_origins_from_client_redirect_uris: true
-    
-        # Clients is a list of registered clients and their configuration.
-        # It's recommended you read the documentation before configuration of a registered client.
-        # See: https://www.authelia.com/c/oidc/registered-clients
-        clients:
-          -
-            # The Client ID is the OAuth 2.0 and OpenID Connect 1.0 Client ID which is used to link an application to a
-            # configuration.
-            client_id: 'XXX'
-    
-            # The description to show to users when they end up on the consent screen. Defaults to the ID above.
-            client_name: 'Portainer'
-    
-            # The client secret is a shared secret between Authelia and the consumer of this client.
-            client_secret: 'XXX'
-    
-            # # Sector Identifiers are occasionally used to generate pairwise subject identifiers. In most cases this is not
-            # # necessary. It is critical to read the documentation for more information.
-            # sector_identifier_uri: 'https://${PERSONAL_DOMAINE_NAME}/sector.json'
-    
-            # Sets the client to public. This should typically not be set, please see the documentation for usage.
-            public: false
-    
-            # Redirect URI's specifies a list of valid case-sensitive callbacks for this client.
-            redirect_uris:
-              - 'https://portainer.${PERSONAL_DOMAINE_NAME}'
-            # Scopes this client is allowed to request.
-            scopes:
-              - 'openid'
-              - 'groups'
-              - 'email'
-              - 'profile'
-    
-            # The consent mode controls how consent is obtained.
-            consent_mode: 'implicit'
-            userinfo_signed_response_alg: 'none'
-            token_endpoint_auth_method: 'client_secret_post'
-        
-        
-          - client_id: 'XXX'
-            client_name: 'Proxmox'
-            client_secret: 'XXX'
-            public: false
-            authorization_policy: 'two_factor'
-            require_pkce: true
-            pkce_challenge_method: 'S256'
-            redirect_uris:
-              - 'https://pve.${PERSONAL_DOMAINE_NAME}'
-              - 'https://pve-1.${PERSONAL_DOMAINE_NAME}'
-            scopes:
-              - 'openid'
-              - 'groups'
-              - 'email'
-              - 'profile'
-    
-            consent_mode: 'implicit'
-            userinfo_signed_response_alg: 'none'
-            token_endpoint_auth_method: 'client_secret_basic'
+    # Authorization Policies which can be utilized by clients. The 'policy_name' is an arbitrary value that you pick
+    # which is utilized as the value for the 'authorization_policy' on the client.
+    # The lifespans configure the expiration for these token types in the duration common syntax. In addition to this
+    # syntax the lifespans can be customized per-client.
+    lifespans:
+      # Configures the default/fallback lifespan for given token types. This behaviour applies to all clients and all
+      # grant types but you can override this behaviour using the custom lifespans.
+      access_token: '1 hour'
+      authorize_code: '1 minute'
+      id_token: '1 hour'
+      refresh_token: '90 minutes'
+
+    # Cross-Origin Resource Sharing (CORS) settings.
+    cors:
+      # List of endpoints in addition to the metadata endpoints to permit cross-origin requests on.
+      endpoints:
+         - 'authorization'
+         - 'pushed-authorization-request'
+         - 'token'
+         - 'revocation'
+         - 'introspection'
+         - 'userinfo'
+
+      # # List of allowed origins.
+      # # Any origin with https is permitted unless this option is configured or the
+      # # allowed_origins_from_client_redirect_uris option is enabled.
+      # allowed_origins:
+      #   - 'https://${PERSONAL_DOMAINE_NAME}'
+
+      # Automatically adds the origin portion of all redirect URI's on all clients to the list of allowed_origins,
+      # provided they have the scheme http or https and do not have the hostname of localhost.
+      allowed_origins_from_client_redirect_uris: true
+
+    # Clients is a list of registered clients and their configuration.
+    # It's recommended you read the documentation before configuration of a registered client.
+    # See: https://www.authelia.com/c/oidc/registered-clients
+    clients:
+      -
+        # The Client ID is the OAuth 2.0 and OpenID Connect 1.0 Client ID which is used to link an application to a
+        # configuration.
+        client_id: 'XXX'
+
+        # The description to show to users when they end up on the consent screen. Defaults to the ID above.
+        client_name: 'Portainer'
+
+        # The client secret is a shared secret between Authelia and the consumer of this client.
+        client_secret: 'XXX'
+
+        # # Sector Identifiers are occasionally used to generate pairwise subject identifiers. In most cases this is not
+        # # necessary. It is critical to read the documentation for more information.
+        # sector_identifier_uri: 'https://${PERSONAL_DOMAINE_NAME}/sector.json'
+
+        # Sets the client to public. This should typically not be set, please see the documentation for usage.
+        public: false
+
+        # Redirect URI's specifies a list of valid case-sensitive callbacks for this client.
+        redirect_uris:
+          - 'https://management.${PERSONAL_DOMAINE_NAME}'
+        # Scopes this client is allowed to request.
+        scopes:
+          - 'openid'
+          - 'groups'
+          - 'email'
+          - 'profile'
+
+        # The consent mode controls how consent is obtained.
+        consent_mode: 'implicit'
+        userinfo_signed_response_alg: 'none'
+        token_endpoint_auth_method: 'client_secret_post'
     
     
-          - client_id: 'XXX'
-            client_name: 'Grafana'
-            client_secret: 'XXX'
-            public: false
-            authorization_policy: 'one_factor'
-            require_pkce: true
-            pkce_challenge_method: 'S256'
-            redirect_uris:
-              - 'https://Grafana.${PERSONAL_DOMAINE_NAME}/login/generic_oauth'
-            scopes:
-              - 'openid'
-              - 'groups'
-              - 'email'
-              - 'profile'
-    
-            consent_mode: 'implicit'
-            userinfo_signed_response_alg: 'none'
-            token_endpoint_auth_method: 'client_secret_basic'
-    
-    
-          - client_id: 'XXX'
-            client_name: 'NextCloud'
-            client_secret: 'XXX'
-            public: false
-            authorization_policy: 'one_factor'
-            require_pkce: true
-            pkce_challenge_method: 'S256'
-            redirect_uris:
-              - 'https://cloud.${PERSONAL_DOMAINE_NAME}/apps/oidc_login/oidc'
-            scopes:
-              - 'openid'
-              - 'groups'
-              - 'email'
-              - 'profile'
-    
-            consent_mode: 'implicit'
-            userinfo_signed_response_alg: 'none'
-            token_endpoint_auth_method: 'client_secret_basic'
+      - client_id: 'XXX'
+        client_name: 'Proxmox'
+        client_secret: 'XXX'
+        public: false
+        authorization_policy: 'two_factor'
+        require_pkce: true
+        pkce_challenge_method: 'S256'
+        redirect_uris:
+          - 'https://pve.${PERSONAL_DOMAINE_NAME}'
+          - 'https://pve-1.${PERSONAL_DOMAINE_NAME}'
+        scopes:
+          - 'openid'
+          - 'groups'
+          - 'email'
+          - 'profile'
+
+        consent_mode: 'implicit'
+        userinfo_signed_response_alg: 'none'
+        token_endpoint_auth_method: 'client_secret_basic'
+
+
+      - client_id: 'XXX'
+        client_name: 'Grafana'
+        client_secret: 'XXX'
+        public: false
+        authorization_policy: 'one_factor'
+        require_pkce: true
+        pkce_challenge_method: 'S256'
+        redirect_uris:
+          - 'https://Grafana.${PERSONAL_DOMAINE_NAME}/login/generic_oauth'
+        scopes:
+          - 'openid'
+          - 'groups'
+          - 'email'
+          - 'profile'
+
+        consent_mode: 'implicit'
+        userinfo_signed_response_alg: 'none'
+        token_endpoint_auth_method: 'client_secret_basic'
+
+
+      - client_id: 'XXX'
+        client_name: 'NextCloud'
+        client_secret: 'XXX'
+        public: false
+        authorization_policy: 'one_factor'
+        require_pkce: true
+        pkce_challenge_method: 'S256'
+        redirect_uris:
+          - 'https://cloud.${PERSONAL_DOMAINE_NAME}/apps/oidc_login/oidc'
+        scopes:
+          - 'openid'
+          - 'groups'
+          - 'email'
+          - 'profile'
+
+        consent_mode: 'implicit'
+        userinfo_signed_response_alg: 'none'
+        token_endpoint_auth_method: 'client_secret_basic'
