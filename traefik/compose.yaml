@@ -341,7 +341,7 @@ services:
   ################# Authelia #################
   authelia:
     restart: unless-stopped
-    image: ghcr.io/authelia/authelia:latest
+    image: ghcr.io/authelia/authelia:${AUTHELIA_TAG:-4.39.1}
     container_name: authelia
     hostname: authelia
     labels:
