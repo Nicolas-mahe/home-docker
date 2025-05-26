@@ -49,6 +49,8 @@ Agent:
 sudo apt update && sudo apt full-upgrade -y && sudo apt autoremove -y && docker pull portainer/agent:alpine-sts && docker compose -f /home/docker/home-docker/Portainer/agent/docker-compose.yml up -d --force-recreate && docker image prune --filter "dangling=true" -f
 
 ## Setting AMD passthrough
-update grub */etc/default/grub* edit line *GRUB_CMDLINE_LINUX_DEFAULT*
+update grub *nano /etc/default/grub* edit line *GRUB_CMDLINE_LINUX_DEFAULT*
 
 `GRUB_CMDLINE_LINUX_DEFAULT="quiet splash amd_iommu=on iommu=pt pcie_acs_override=downstream,multifunction"`
+
+and run *update-grub*
