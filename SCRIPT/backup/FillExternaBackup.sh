@@ -286,17 +286,17 @@ read -r Remote_Games_port < $Data_Dir/docker/docker-secret/common/Remote_Games_S
 
 # Minecraft vars
 Minecraft_Path="$Docker_Path/minecraft/s5/prod/backups"
-Minecraft_Backups_Path="$Backups_Path/Minecraft/s5"
+Minecraft_Backups_Path="$Backups_Path/games/Minecraft/s5"
 Minecraft_Backups_Extension="zip"
 
 # PalWorld vars
 PalWorld_Path="$Docker_Path/palworld/games/common/PalServer/Pal/Saved/SaveGames/0/39B9ABFE445430F386A231B68504F49A"
-PalWorld_Backups_Path="$Backups_Path/PalWorld/s1"
+PalWorld_Backups_Path="$Backups_Path/games/PalWorld/s1"
 PalWorld_Backups_Extension="????"
 
 # Satisfactory vars
 Satisfactory_Path="$Docker_Path/satisfactory/backups"
-Satisfactory_Backups_Path="$Backups_Path/Satisfactory/s1"
+Satisfactory_Backups_Path="$Backups_Path/games/Satisfactory/s1"
 Satisfactory_Backups_Extension="sav"
 
 if [ "$TimeToExec" -eq 1 ] || [ "$TimeToExec" -eq 2 ]; then
