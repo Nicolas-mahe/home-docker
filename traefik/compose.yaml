@@ -1,88 +1,63 @@
+# docker network create --driver=overlay web
+# echo "vm.overcommit_memory=1" >> /etc/sysctl.conf && /sbin/sysctl -p /etc/sysctl.conf
+
 services:
   ################# DNS setting #################
   ## Without Public IP
   cloudflare-tunnel:
-    user: "0:0"
-    restart: unless-stopped
-    image: docker.io/cloudflare/cloudflared
-    container_name: cloudflare-tunnel
-    hostname: cloudflare-tunnel
+    image: docker.io/cloudflare/cloudflared:latest
+    deploy:
+      restart_policy:
+        condition: on-failure
     labels:
-      diun.enable: true
-      diun.watch_repos: true
+      diun.enable: "true"
+      diun.watch_repos: "true"
     environment:
       - TUNNEL_TOKEN=${CF_TUNNEL_TOKEN}
-    volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
     networks:
-      - webexpose
+      - web
     command: tunnel --no-autoupdate run
-
-  ## Throw Public IP
-  # cloudflare-ddns:
-  #   restart: always
-  #   image: oznu/cloudflare-ddns
-  #   container_name: cloudflare-ddns
-  #   hostname: cloudflare-ddns
-  #   labels:
-  #     diun.enable: true
-  #     diun.watch_repos: true
-  #   environment:
-  #     API_KEY: ${DNS_API_KEY}
-  #     ZONE: ${PERSONAL_DOMAINE_NAME}
-  #     PROXIED: true
-  #     TZ: Europe/Paris
-  #     DELETE_ON_STOP: true
-  #   volumes:
-  #     - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
-  #   networks:
-  #     - webexpose
 
   ################# Traefik #################
 
   whoami:
-    restart: unless-stopped
-    image: docker.io/traefik/whoami
-    container_name: whoami
-    hostname: whoami
-    labels:
-      diun.enable: true
-      diun.watch_repos: true
-      traefik.enable: true
-      traefik.http.routers.whoami.tls: true
-      traefik.http.routers.whoami.middlewares: authelia@docker
-      traefik.http.routers.whoami.entrypoints: websecure
-      traefik.http.routers.whoami.rule: Host(`whoami.${PERSONAL_DOMAINE_NAME}`)
-      traefik.http.routers.whoami.service: whoami
-      traefik.http.services.whoami.loadBalancer.server.port: 80
+    image: docker.io/traefik/whoami:latest
+    hostname: '{{.Node.Hostname}}'
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+      labels:
+        diun.enable: "true"
+        diun.watch_repos: "true"
+        traefik.enable: "true"
+        traefik.http.routers.whoami.tls: "true"
+        traefik.http.routers.whoami.middlewares: "authelia@swarm"
+        traefik.http.routers.whoami.entrypoints: "websecure"
+        traefik.http.routers.whoami.rule: Host(`whoami.${PERSONAL_DOMAINE_NAME}`)
+        traefik.http.routers.whoami.service: "whoami"
+        traefik.http.services.whoami.loadbalancer.server.port: "80"
     environment:
-      PUID: 1000
-      PGID: 100
       TZ: Europe/Paris
-    volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
-    expose:
-      - 80
     networks:
-      - webinternal
-    depends_on: 
-      traefik:
-        condition: service_started
+      - web
 
   traefik:
-    restart: unless-stopped
     image: docker.io/library/traefik:${TRAEFIK_TAG:-v3.2.1}
-    container_name: traefik
-    hostname: traefik
-    labels:
-      diun.enable: true
-      diun.watch_repos: true
-      traefik.enable: true
-      traefik.http.routers.dashboard.tls: true
-      traefik.http.routers.dashboard.middlewares: authelia@docker
-      traefik.http.routers.dashboard.entrypoints: websecure
-      traefik.http.routers.dashboard.rule: Host(`traefik.${PERSONAL_DOMAINE_NAME}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
-      traefik.http.routers.dashboard.service: api@internal
+    hostname: '{{.Node.Hostname}}'
+    deploy:
+      restart_policy:
+        condition: on-failure
+      labels:
+        diun.enable: "true"
+        diun.watch_repos: "true"
+        traefik.enable: "true"
+        traefik.http.routers.dashboard.tls: "true"
+        traefik.http.routers.dashboard.middlewares: "authelia@swarm"
+        traefik.http.routers.dashboard.entrypoints: "websecure"
+        traefik.http.routers.dashboard.rule: Host(`traefik.${PERSONAL_DOMAINE_NAME}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+        traefik.http.routers.dashboard.service: "api@internal"
+        traefik.http.services.error-pages.loadbalancer.server.port: 8080
     environment:
       PUID: 1000
       PGID: 100
@@ -90,33 +65,44 @@ services:
       CF_DNS_API_TOKEN: ${PERSONAL_CF_TRAEFIK_API}
       CF_API_EMAIL: ${PERSONAL_CF_MAIL}
     volumes:
-      - /run/docker.sock:/run/docker.sock:ro
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/conf/:/etc/traefik/conf/
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/certs/:/etc/traefik/certs/
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/logs/:/var/log/traefik
+      - type: bind
+        source: /run/docker.sock
+        target: /run/docker.sock
+        read_only: true
+      - type: bind
+        source: /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/conf/
+        target: /etc/traefik/conf/
+      - type: bind
+        source: /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/certs/
+        target: /etc/traefik/certs/
+      - type: bind
+        source: /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/logs/
+        target: /var/log/traefik
     ports:
-      - 80:80
-      - 443:443
-      - 853:853
-      - 25565:25565
-    expose:
-      - 80
-      - 443
-      - 853
-      - 8080
-    depends_on:
-      authelia:
-        condition: service_healthy
-      crowdsec:
-        condition: service_started
+      - target: 80
+        published: 80
+        protocol: tcp
+        mode: ingress
+      - target: 443
+        published: 443
+        protocol: tcp
+        mode: ingress
+      - target: 853
+        published: 853
+        protocol: tcp
+        mode: ingress
+      - target: 25565
+        published: 25565
+        protocol: udp
+        mode: ingress
+      - target: 8080
+        published: 8080
+        protocol: tcp
+        mode: ingress
     networks:
-      - crowdsec
-      - prometheus
-      - webexpose
-      - webinternal
+      - web
     command:
-      - --global.sendAnonymousUsage
+      - --global.sendAnonymousUsage=false
       - --global.checkNewVersion=false
       - --log.level=INFO
       - --log.nocolor=false
@@ -125,16 +111,6 @@ services:
       - --api.insecure=true
       - --metrics.addinternals
       - --metrics.prometheus=true
-
-# Certificates management
-      # - --certificatesresolvers.staging.acme.email=${PERSONAL_CF_MAIL}
-      # - --certificatesresolvers.staging.acme.storage=/etc/traefik/certs/acme.json
-      # - --certificatesresolvers.staging.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory
-      # - --certificatesresolvers.staging.acme.httpChallenge.entryPoint=web
-      # - --certificatesresolvers.production.acme.email=${PERSONAL_CF_MAIL}
-      # - --certificatesresolvers.production.acme.storage=/etc/traefik/certs/acme.json
-      # - --certificatesresolvers.production.acme.caServer=https://acme-v02.api.letsencrypt.org/directory
-      # - --certificatesresolvers.production.acme.httpChallenge.entryPoint=web
       - --certificatesresolvers.letsencrypt-cloudflare.acme.dnschallenge=true
       - --certificatesresolvers.letsencrypt-cloudflare.acme.dnschallenge.provider=cloudflare
       - --certificatesResolvers.letsencrypt-cloudflare.acme.dnschallenge.resolvers=1.1.1.1:53,1.0.0.1:53
@@ -143,166 +119,146 @@ services:
       - --certificatesresolvers.letsencrypt-cloudflare.acme.storage=/etc/traefik/certs/acme-wildcard.json
       - --entrypoints.websecure.http.tls.domains[0].main=${PERSONAL_DOMAINE_NAME}
       - --entrypoints.websecure.http.tls.domains[0].sans=*.${PERSONAL_DOMAINE_NAME}
-
-# Entrypoint management
       - --entrypoints.web.address=:80
       - --entrypoints.web.http.redirections.entryPoint.to=websecure
       - --entrypoints.web.http.redirections.entryPoint.scheme=https
-      - --entrypoints.web.http.middlewares=crowdsec@docker,error-pages@docker
+      - --entrypoints.web.http.middlewares=crowdsec@swarm,error-pages@swarm
       - --entrypoints.websecure.address=:443
-      - --entryPoints.websecure.forwardedHeaders.insecure=false
-      - --entryPoints.websecure.proxyProtocol.insecure=false # need trusted IPs provided
-      # Please see the Forwarded Header Trust section of the Authelia Traefik Integration documentation.
-      - --entryPoints.websecure.forwardedHeaders.trustedIPs=172.18.0.0/16,172.22.0.0/16
-      - --entryPoints.websecure.proxyProtocol.trustedIPs=172.18.0.0/16,172.22.0.0/16
-      - --entrypoints.websecure.http.middlewares=crowdsec@docker,error-pages@docker
+      - --entryPoints.websecure.forwardedHeaders.insecure=true #false
+      - --entryPoints.websecure.proxyProtocol.insecure=true #false
+      # - --entryPoints.websecure.forwardedHeaders.trustedIPs=172.18.0.0/16,172.22.0.0/16
+      # - --entryPoints.websecure.proxyProtocol.trustedIPs=172.18.0.0/16,172.22.0.0/16
+      - --entrypoints.websecure.http.middlewares=crowdsec@swarm,error-pages@swarm
       - --entrypoints.websecure.http.tls.certResolver=letsencrypt-cloudflare
       - --entrypoints.minecraft.address=:25565/udp # test for minecraft in udp
       - --entrypoints.dot.address=:853
-      - --serversTransport.insecureSkipVerify=true  # need to put a validate cert everywhere for delete it
-
-# Provider definition
-      - --providers.docker.exposedbydefault=false
-      - --providers.docker.network=webinternal
+      - --serversTransport.insecureSkipVerify=true
+      - --providers.swarm.endpoint=unix:///var/run/docker.sock
+      - --providers.swarm.exposedByDefault=false
+      - --providers.swarm.network=web
       - --providers.file.directory=/etc/traefik/conf
       - --providers.file.watch=true
-
-# Crowdsec definition
       - --experimental.plugins.bouncer.moduleName=github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
       - --experimental.plugins.bouncer.version=${CROWDSEC_PLUGIN_VERSION:?bouncer version required}
 
+# Certificates management
+
+# Entrypoint management
+
+# Provider definition
+
+# Crowdsec definition
+
   error-pages:
-    restart: unless-stopped
     image: ghcr.io/patbec/traefik-error-pages:latest
-    container_name: error-pages
-    hostname: error-pages
-    labels:
-      diun.enable: true
-      diun.watch_repos: true
-      traefik.enable: true
-      traefik.http.routers.error-pages.tls: true
-      traefik.http.routers.error-pages.entrypoints: websecure
-      traefik.http.routers.error-pages.rule: HostRegexp(`{host:.+}`)
-      traefik.http.routers.error-pages.priority: 1
-      traefik.http.routers.error-pages.service: error-pages
-      traefik.http.services.error-pages.loadBalancer.server.port: 8090
-      traefik.http.middlewares.error-pages.errors.status: 400-599
-      traefik.http.middlewares.error-pages.errors.service: error-pages
-      traefik.http.middlewares.error-pages.errors.query: /{status}.html
-    volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+      labels:
+        diun.enable: "true"
+        diun.watch_repos: "true"
+        traefik.enable: "true"
+        traefik.http.routers.error-pages.tls: "true"
+        traefik.http.routers.error-pages.entrypoints: "websecure"
+        traefik.http.routers.error-pages.rule: HostRegexp(`{host:.+}`)
+        traefik.http.routers.error-pages.priority: "1"
+        traefik.http.routers.error-pages.service: "error-pages"
+        traefik.http.services.error-pages.loadbalancer.server.port: "8090"
+        traefik.http.middlewares.error-pages.errors.status: "400-599"
+        traefik.http.middlewares.error-pages.errors.service: "error-pages"
+        traefik.http.middlewares.error-pages.errors.query: "/{status}.html"
     environment:
-      PUID: 1000
-      PGID: 100
       TZ: Europe/Paris
       PROXY_NAME: traefik
       PROXY_LOCATION: ${PROXY_LOCATION:-France}
       PROXY_SUPPORT_MESSAGE: ${PROXY_SUPPORT_MESSAGE:-Retry in few minutes or send mail at:}
       PROXY_SUPPORT_MAIL: ${PROXY_SUPPORT_MAIL:-contact@${PERSONAL_DOMAINE_NAME}}
-    expose:
-      - 8090
-    depends_on:
-      traefik:
-        condition: service_started
     networks:
-      - webinternal
+      - web
 
   nginx-utils:
-    restart: unless-stopped
     image: docker.io/nginx:alpine
-    container_name: web-utils
-    hostname: web-utils
-    labels:
-      diun.enable: true
-      diun.watch_repos: true
-      traefik.enable: true
-      traefik.http.routers.web-utils.tls: true
-      traefik.http.routers.web-utils.middlewares: authelia@docker
-      traefik.http.routers.web-utils.entrypoints: websecure
-      traefik.http.routers.web-utils.rule: Host(`utils.${PERSONAL_DOMAINE_NAME}`)
-      traefik.http.routers.web-utils.service: web-utils
-      traefik.http.services.web-utils.loadBalancer.server.port: 80
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+      labels:
+        diun.enable: "true"
+        diun.watch_repos: "true"
+        traefik.enable: "true"
+        traefik.http.routers.web-utils.tls: "true"
+        traefik.http.routers.web-utils.middlewares: "authelia@swarm"
+        traefik.http.routers.web-utils.entrypoints: "websecure"
+        traefik.http.routers.web-utils.rule: Host(`utils.${PERSONAL_DOMAINE_NAME}`)
+        traefik.http.routers.web-utils.service: "web-utils"
+        traefik.http.services.web-utils.loadbalancer.server.port: "80"
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
-      # - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/traefik/nginx.conf:/etc/nginx/nginx.conf:ro
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/web-utils:/usr/share/nginx/html:ro
+      - type: bind
+        source: /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/web-utils
+        target: /usr/share/nginx/html
+        read_only: true
     environment:
-      PUID: 1000
-      PGID: 100
       TZ: Europe/Paris
       NGINX_HOST: utils.${PERSONAL_DOMAINE_NAME}
-    expose:
-      - 80
-    depends_on:
-      traefik:
-        condition: service_started
     networks:
-      - webinternal
-
+      - web
 
   ################# Crowdsec #################
   redis-bouncer:
-    restart: unless-stopped
     image: docker.io/library/redis:alpine
-    container_name: redis-bouncer
     hostname: redis-bouncer
-    labels:
-      diun.enable: true
-      diun.watch_repos: true
-    healthcheck:
-      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
-      start_period: 20s
-      interval: 30s
-      retries: 5
-      timeout: 3s
-#    labels:
-#       diun.enable: true
-#       diun.watch_repos: true
+    deploy:
+      restart_policy:
+        condition: on-failure
+    # healthcheck:
+    #   test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+    #   start_period: 20s
+    #   interval: 30s
+    #   retries: 5
+    #   timeout: 3s
     environment:
-      PUID: 1000
-      GUID: 100
       TZ: Europe/Paris
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/crowdsec/redis-bouncer:/data
+      - type: bind
+        source: /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/crowdsec/redis-bouncer
+        target: /data
     networks:
-      - crowdsec
-    command: --save 60 1 --loglevel warning
+      - web
+    command: --save 60 1 --loglevel warning --stop-writes-on-bgsave-error no
 
   crowdsec:
-    restart: unless-stopped
-    image: ghcr.io/crowdsecurity/crowdsec
-    container_name: crowdsec
+    image: ghcr.io/crowdsecurity/crowdsec:latest
     hostname: crowdsec
-    security_opt:
-      - no-new-privileges=true
-    labels:
-      diun.enable: true
-      diun.watch_repos: true
-      traefik.enable: true
-      traefik.docker.network: crowdsec
-      traefik.http.middlewares.crowdsec.plugin.bouncer.enabled: true
-      traefik.http.middlewares.crowdsec.plugin.bouncer.logLevel: INFO
-      traefik.http.middlewares.crowdsec.plugin.bouncer.defaultDecisionSeconds: 86400
-      traefik.http.middlewares.crowdsec.plugin.bouncer.httpTimeoutSeconds: 10
-      traefik.http.middlewares.crowdsec.plugin.bouncer.crowdsecMode: live
-      traefik.http.middlewares.crowdsec.plugin.bouncer.crowdsecLapiKey: ${CROWDSEC_API_TRAEFIK?:crowdsec api required}
-      traefik.http.middlewares.crowdsec.plugin.bouncer.crowdsecLapiHost: crowdsec:8080
-      traefik.http.middlewares.crowdsec.plugin.bouncer.crowdsecLapiScheme: http
-      traefik.http.middlewares.crowdsec.plugin.bouncer.clientTrustedIPs: ${PERSONAL_IP_RANGES}
-      traefik.http.middlewares.crowdsec.plugin.bouncer.forwardedHeadersTrustedIPs: ${CF_PROXY_IP}
-      traefik.http.middlewares.crowdsec.plugin.bouncer.forwardedHeadersCustomName: CF-Connecting-IP,X-Forwarded-For,X-Real-Ip
-      traefik.http.middlewares.crowdsec.plugin.bouncer.captchaProvider: recaptcha
-      traefik.http.middlewares.crowdsec.plugin.bouncer.captchaSiteKey: ${CROWDSEC_CAPTCHA_SITE_KEY?:captcha key required}
-      traefik.http.middlewares.crowdsec.plugin.bouncer.captchaSecretKey: ${CROWDSEC_CAPTCHA_SECRET_KEY?:captcha secret required}
-      traefik.http.middlewares.crowdsec.plugin.bouncer.captchaGracePeriodSeconds: 1800
-      traefik.http.middlewares.crowdsec.plugin.bouncer.captchaHTMLFilePath: /etc/traefik/conf/captcha.html
-      traefik.http.middlewares.crowdsec.plugin.bouncer.banHTMLFilePath: /etc/traefik/conf/ban.html
-      traefik.http.middlewares.crowdsec.plugin.bouncer.RedisCacheHost: redis-bouncer:6379
-      traefik.http.middlewares.crowdsec.plugin.bouncer.RedisCacheEnabled: true
+    deploy:
+      restart_policy:
+        condition: on-failure
+      labels:
+        diun.enable: "true"
+        diun.watch_repos: "true"
+        traefik.enable: "true"
+        # traefik.swarm.network: "crowdsec"
+        traefik.http.services.crowdsec.loadbalancer.server.port: 8080 # required by swarm but not used.
+        traefik.http.middlewares.crowdsec.plugin.bouncer.enabled: "true"
+        traefik.http.middlewares.crowdsec.plugin.bouncer.logLevel: "INFO"
+        traefik.http.middlewares.crowdsec.plugin.bouncer.defaultDecisionSeconds: 86400
+        traefik.http.middlewares.crowdsec.plugin.bouncer.httpTimeoutSeconds: 10
+        traefik.http.middlewares.crowdsec.plugin.bouncer.crowdsecMode: "live"
+        traefik.http.middlewares.crowdsec.plugin.bouncer.crowdsecLapiKey: ${CROWDSEC_API_TRAEFIK?:crowdsec api required}
+        traefik.http.middlewares.crowdsec.plugin.bouncer.crowdsecLapiHost: "crowdsec:8080"
+        traefik.http.middlewares.crowdsec.plugin.bouncer.crowdsecLapiScheme: "http"
+        traefik.http.middlewares.crowdsec.plugin.bouncer.clientTrustedIPs: ${PERSONAL_IP_RANGES}
+        traefik.http.middlewares.crowdsec.plugin.bouncer.forwardedHeadersTrustedIPs: ${CF_PROXY_IP}
+        traefik.http.middlewares.crowdsec.plugin.bouncer.forwardedHeadersCustomName: CF-Connecting-IP,X-Forwarded-For,X-Real-Ip
+        traefik.http.middlewares.crowdsec.plugin.bouncer.captchaProvider: "recaptcha"
+        traefik.http.middlewares.crowdsec.plugin.bouncer.captchaSiteKey: ${CROWDSEC_CAPTCHA_SITE_KEY?:captcha key required}
+        traefik.http.middlewares.crowdsec.plugin.bouncer.captchaSecretKey: ${CROWDSEC_CAPTCHA_SECRET_KEY?:captcha secret required}
+        traefik.http.middlewares.crowdsec.plugin.bouncer.captchaGracePeriodSeconds: 1800
+        traefik.http.middlewares.crowdsec.plugin.bouncer.captchaHTMLFilePath: /etc/traefik/conf/captcha.html
+        traefik.http.middlewares.crowdsec.plugin.bouncer.banHTMLFilePath: /etc/traefik/conf/ban.html
+        traefik.http.middlewares.crowdsec.plugin.bouncer.RedisCacheHost: "redis-bouncer:6379"
+        traefik.http.middlewares.crowdsec.plugin.bouncer.RedisCacheEnabled: "true"
     environment:
-      PUID: 1000
-      PGID: 100
       TZ: Europe/Paris
       CUSTOM_HOSTNAME: crowdsec
       BOUNCER_KEY_TRAEFIK: ${CROWDSEC_API_TRAEFIK:?crowdsec api required}
@@ -320,113 +276,97 @@ services:
         crowdsecurity/traefik
         Dominic-Wagner/vaultwarden
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro #Can read logs from socket!
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/crowdsec/config:/etc/crowdsec #Config Crowdsec
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/crowdsec/data:/var/lib/crowdsec/data/ #Config Crowdsec
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/logs/:/var/log/traefik:ro #Logs Traefik
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/nextcloud/config/log/:/var/log/nextcloud/:ro #Logs nginx + php Nextcloud
-      - /var/log/nginx/:/var/log/openmediavault/:ro #Logs nginx OpenMediaVault
-    expose:
-      - 6060 #monitoring
-      - 8080
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+        read_only: true
+      - type: bind
+        source: /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/crowdsec/config
+        target: /etc/crowdsec
+      - type: bind
+        source: /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/crowdsec/data
+        target: /var/lib/crowdsec/data/
     networks:
-      - crowdsec
-      - prometheus
-      - webexpose
-    depends_on:
-      redis-bouncer:
-        condition: service_started
+      - web
 
   ################# Authelia #################
   authelia:
-    restart: unless-stopped
     image: ghcr.io/authelia/authelia:${AUTHELIA_TAG:-4.39.1}
-    container_name: authelia
     hostname: authelia
-    labels:
-      diun.enable: true
-      diun.watch_repos: true
-      traefik.enable: true
-      traefik.http.routers.authelia.tls: true
-      traefik.http.routers.authelia.entrypoints: websecure
-      traefik.http.routers.authelia.rule: Host(`auth.${PERSONAL_DOMAINE_NAME}`)
-      traefik.http.routers.authelia.service: authelia
-      traefik.http.services.authelia.loadBalancer.server.port: 9091
-      traefik.http.middlewares.authelia.forwardAuth.address: 'http://authelia:9091/api/authz/forward-auth'
-      ## The following commented line is for configuring the Authelia URL in the proxy. We strongly suggest this is
-      ## configured in the Session Cookies section of the Authelia configuration.
-      # traefik.http.middlewares.authelia.forwardAuth.address: 'http://authelia:9091/api/authz/forward-auth?authelia_url=https%3A%2F%2Fauth.example.com%2F'
-      traefik.http.middlewares.authelia.forwardAuth.trustForwardHeader: true
-      traefik.http.middlewares.authelia.forwardAuth.authResponseHeaders: 'Remote-User,Remote-Groups,Remote-Email,Remote-Name'
+    deploy:
+      restart_policy:
+        condition: on-failure
+      labels:
+        diun.enable: "true"
+        diun.watch_repos: "true"
+        traefik.enable: "true"
+        traefik.http.routers.authelia.tls: "true"
+        traefik.http.routers.authelia.entrypoints: "websecure"
+        traefik.http.routers.authelia.rule: Host(`auth.${PERSONAL_DOMAINE_NAME}`)
+        traefik.http.routers.authelia.service: "authelia"
+        traefik.http.services.authelia.loadbalancer.server.port: "9091"
+        traefik.http.middlewares.authelia.forwardAuth.address: 'http://authelia:9091/api/authz/forward-auth'
+        traefik.http.middlewares.authelia.forwardAuth.trustForwardHeader: "true"
+        traefik.http.middlewares.authelia.forwardAuth.authResponseHeaders: 'Remote-User,Remote-Groups,Remote-Email,Remote-Name'
     environment:
-      PUID: 1000
-      PGID: 1000
       TZ: Europe/Paris
-      AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE: /run/secrets/HMAC_SECRET_FILE
-      AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE: /run/secrets/JWT_SECRET
-      AUTHELIA_SESSION_SECRET_FILE: /run/secrets/SESSION_SECRET
-      AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE: /run/secrets/STORAGE_ENCRYPTION_KEY
-    expose:
-      - 9091
+      AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET: 60z3SvMJ0FGiBENjb5M7D6jJltinzybuVWOceMcakcIBAoWWmsZI6RTYxoHfnwDTtXKQyj2epM0pgzey9elZufnvq67SQEfBYgWowV1cwHTT7s8AorquRIwxPrUo2pv4
+      AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET: rtxGs9mP6KuUGAbTk4fUDCevep3stKofonfAHvTL38iDYWnWjKreqYAjAbk3iAue5Ci74Ua2dpy7mfd5d5ag2rUJZx3qvfkykS9x4iC8TpMAjpR2etfCMXcpeYAth6ConME6Rt2nC62KzaD8i662E4b3QEQPNdSikRpk7CntEykCYvke49aTDUB8w37G2qdvh2dEoCbvJDEdiE9CPYw9mhHa667PBR4kqYkVMc6EGqQPc2f6Bcq3oJiXefzi8ant
+      AUTHELIA_SESSION_SECRET: ToXe8mXpCTRYbqNTeYZgjyCwCytQ3XyuUtGyGn2jtQ44xWPKmdVvY5A59eUNxiu2bZrHAcJq82rX8dK3ec8JX4Yy8bvz8gZE8775F7r9hHXP4LqgmxnPWL8AMBAbP26n
+      AUTHELIA_STORAGE_ENCRYPTION_KEY: 4M5YJQcP8vofuGl7dmxKTWgGHjdHNNBsQInChD76QdskWK3y49jVJ27i5p0sKwgU5Y23ZPnuGatY3dZF4eHaRD3jJkvEKBn9QTwMgFRG6Ijlodi0NmgPTLOJMJicmJtG
+      # AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE: /run/secrets/HMAC_SECRET_FILE
+      # AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE: /run/secrets/JWT_SECRET
+      # AUTHELIA_SESSION_SECRET_FILE: /run/secrets/SESSION_SECRET
+      # AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE: /run/secrets/STORAGE_ENCRYPTION_KEY
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/authelia/config:/config
+      - type: bind
+        source: /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/authelia/config
+        target: /config
     networks:
-      - webinternal
-      - authelia
-    secrets: ['HMAC_SECRET_FILE', 'JWT_SECRET', 'SESSION_SECRET', 'STORAGE_ENCRYPTION_KEY']
+      - web
+    # secrets:
+    #   - HMAC_SECRET_FILE
+    #   - JWT_SECRET
+    #   - SESSION_SECRET
+    #   - STORAGE_ENCRYPTION_KEY
     command:
       - 'authelia'
       - '--config=/config/configuration.yml'
       - '--config=/config/configuration.acl.yml'
       - '--config=/config/configuration.identity_providers.yml'
-    depends_on:
-      redis-authelia:
-        condition: service_started
 
   redis-authelia:
-    restart: unless-stopped
     image: docker.io/library/redis:alpine
-    container_name: redis-authelia
     hostname: redis-authelia
-    healthcheck:
-      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
-      start_period: 20s
-      interval: 30s
-      retries: 5
-      timeout: 3s
+    deploy:
+      restart_policy:
+        condition: on-failure
+    # healthcheck:
+    #   test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+    #   start_period: 20s
+    #   interval: 30s
+    #   retries: 5
+    #   timeout: 3s
     environment:
-      PUID: 1000
-      GUID: 100
       TZ: Europe/Paris
-    expose:
-      - 6379
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/authelia/redis:/data
+      - type: bind
+        source: /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/authelia/redis
+        target: /data
     networks:
-      - authelia
-    command: --save 60 1 --loglevel warning
+      - web
+    command: --save 60 1 --loglevel warning --stop-writes-on-bgsave-error no
 
-secrets:
-  HMAC_SECRET_FILE:
-    file: /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-secret/web/HMAC_SECRET_FILE
-  JWT_SECRET:
-    file: /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-secret/web/JWT_SECRET
-  SESSION_SECRET:
-    file: /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-secret/web/SESSION_SECRET
-  STORAGE_ENCRYPTION_KEY:
-    file: /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-secret/web/STORAGE_ENCRYPTION_KEY
+# secrets:
+#   HMAC_SECRET_FILE:
+#     file: /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-secret/web/HMAC_SECRET_FILE.txt
+#   JWT_SECRET:
+#     file: /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-secret/web/JWT_SECRET.txt
+#   SESSION_SECRET:
+#     file: /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-secret/web/SESSION_SECRET.txt
+#   STORAGE_ENCRYPTION_KEY:
+#     file: /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-secret/web/STORAGE_ENCRYPTION_KEY.txt
 
 networks:
-  authelia:
-    name: authelia
-  crowdsec:
-    name: crowdsec
-  prometheus:
-    name: prometheus
-  webexpose:
-    name: webexpose
-  webinternal:
-    name: webinternal
+  web:
+    external: true
