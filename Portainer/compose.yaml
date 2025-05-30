@@ -1,54 +1,53 @@
 services:
   portainer:
-    restart: always
     image: docker.io/portainer/portainer-ee:${PERSONAL_PORTAINER_VERSION:-lts}
-    container_name: portainer-ee
     hostname: portainer-ee
-    labels:
-      diun.enable: true
-      diun.watch_repos: true
-      traefik.enable: true
-      traefik.http.routers.portainer.tls: true
-      traefik.http.routers.portainer.middlewares: authelia@docker
-      traefik.http.routers.portainer.entrypoints: websecure
-      traefik.http.routers.portainer.rule: Host(`management.${PERSONAL_DOMAINE_NAME}`)
-      traefik.http.routers.portainer.service: portainer
-      traefik.http.services.portainer.loadBalancer.server.port: 9000
-    environment:
-      PUID: 1000
-      PGID: 100
-      TZ: Europe/Paris
-    expose:
-      - 9000
+    command: -H tcp://tasks.agent:9001 --tlsskipverify
+    ports:
+      - "9443:9443"
+      - "9000:9000"
+      - "8000:8000"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/portainer:/data
     networks:
-    - webinternal
-    depends_on:
-      portainer_agent:
-        condition: service_started
+      - web
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        condition: on-failure
+      labels:
+        diun.enable: "true"
+        diun.watch_repos: "true"
+        traefik.enable: "true"
+        traefik.http.routers.portainer.tls: "true"
+        traefik.http.routers.portainer.middlewares: "authelia@swarm"
+        traefik.http.routers.portainer.entrypoints: "websecure"
+        traefik.http.routers.portainer.rule: Host(`management.${PERSONAL_DOMAINE_NAME}`)
+        traefik.http.routers.portainer.service: "portainer"
+        traefik.http.services.portainer.loadbalancer.server.port: "9000"
 
   portainer_agent:
-    restart: always
     image: docker.io/portainer/agent:${PERSONAL_PORTAINER_VERSION:-lts}
-    container_name: portainer_agent
-    hostname: portainer_agent
-    labels:
-      diun.enable: true
-      diun.watch_repos: true
-    environment:
-      TZ: Europe/Paris
-    expose:
-      - 9001
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-config/volumes:/var/lib/docker/volumes
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/volumes:/var/lib/docker/volumes
     networks:
-    - webinternal
+      - web
+    deploy:
+      mode: global
+      placement:
+        constraints: [node.platform.os == linux]
+      restart_policy:
+        condition: on-failure
+      labels:
+        diun.enable: true
+        diun.watch_repos: true
 
 networks:
-  webinternal:
-    name: webinternal
+  web:
+    external: true
+
