@@ -14,4 +14,5 @@ echo \
 sudo apt-get update &&
 
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y &&
-sudo docker run hello-world
+sudo docker run --rm --name hello-world hello-world
+sudo docker image prune -f -a
