@@ -87,18 +87,18 @@ services:
         published: 443
         protocol: tcp
         mode: host
-      - target: 853
-        published: 853
-        protocol: tcp
-        mode: host
-      - target: 25565
-        published: 25565
-        protocol: udp
-        mode: host
       - target: 8080
         published: 8080
         protocol: tcp
         mode: host
+      # - target: 853
+      #   published: 853
+      #   protocol: tcp
+      #   mode: host
+      # - target: 25565
+      #   published: 25565
+      #   protocol: udp
+      #   mode: host
     networks:
       - web
     command:
@@ -133,8 +133,8 @@ services:
       # - --entryPoints.websecure.proxyProtocol.trustedIPs=172.18.0.0/16,172.22.0.0/16
       - --entrypoints.websecure.http.middlewares=crowdsec@swarm,error-pages@swarm
       - --entrypoints.websecure.http.tls.certResolver=letsencrypt-cloudflare
-      - --entrypoints.minecraft.address=:25565/udp # test for minecraft in udp
-      - --entrypoints.dot.address=:853
+      # - --entrypoints.minecraft.address=:25565/udp # test for minecraft in udp
+      # - --entrypoints.dot.address=:853
       - --serversTransport.insecureSkipVerify=true
       - --providers.swarm.endpoint=unix:///var/run/docker.sock
       - --providers.swarm.exposedByDefault=false
