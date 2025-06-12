@@ -140,7 +140,7 @@ services:
       - --certificatesResolvers.letsencrypt-cloudflare.acme.dnschallenge.resolvers=1.1.1.1:53,1.0.0.1:53
       - --certificatesResolvers.letsencrypt-cloudflare.acme.dnschallenge.propagation.delaybeforechecks=0
       - --certificatesresolvers.letsencrypt-cloudflare.acme.email=${PERSONAL_CF_MAIL}
-      - --certificatesresolvers.letsencrypt-cloudflare.acme.storage=/etc/traefik/certs/acme-wildcard.json
+      - --certificatesresolvers.letsencrypt-cloudflare.acme.storage=/etc/traefik/certs/acme.json
       - --entrypoints.websecure.http.tls.domains[0].main=${PERSONAL_DOMAINE_NAME}
       - --entrypoints.websecure.http.tls.domains[0].sans=*.${PERSONAL_DOMAINE_NAME}
 
