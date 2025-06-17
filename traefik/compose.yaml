@@ -94,7 +94,6 @@ services:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/conf/:/etc/traefik/conf/
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/certs/:/etc/traefik/certs/
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/logs/:/var/log/traefik
     ports:
       - 80:80
       - 443:443
