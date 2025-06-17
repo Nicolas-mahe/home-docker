@@ -1,7 +1,7 @@
 services:
   python-voiture:
     restart: unless-stopped
-    image: python:alpine3.21
+    image: python:3.12-alpine3.21
     container_name: python-mathieu
     hostname: python-mathieu
     labels:
@@ -35,7 +35,7 @@ services:
     
   python-luna:
     restart: unless-stopped
-    image: python:alpine3.21
+    image: python:3.12-alpine3.21
     container_name: python-luna
     hostname: python-luna
     labels:
