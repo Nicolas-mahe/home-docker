@@ -325,7 +325,6 @@ services:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/crowdsec/config:/etc/crowdsec #Config Crowdsec
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/crowdsec/data:/var/lib/crowdsec/data/ #Config Crowdsec
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/nextcloud/config/log/:/var/log/nextcloud/:ro #Logs nginx + php Nextcloud
-      - /var/log/nginx/:/var/log/openmediavault/:ro #Logs nginx OpenMediaVault
     expose:
       - 6060 #monitoring
       - 8080
