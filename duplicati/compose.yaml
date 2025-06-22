@@ -30,6 +30,8 @@ services:
       - /${RAID_DATA_DIRECTORY:?raid path is required}/partage:/source/partage
     expose:
       - 8200
+    ports:
+      - ${PERSONAL_DUPLICATI_PORT}:8200
     networks:
       - webinternal
     secrets:
