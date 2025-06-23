@@ -95,10 +95,10 @@ services:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/conf/:/etc/traefik/conf/
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/certs/:/etc/traefik/certs/
     ports:
-      - 80:80
-      - 443:443
+      - 80:80        # HTTP
+      - 443:443      # HTTPS
       - 853:853
-      - 25565:25565
+      - 25565:25565  # Minecraft
     expose:
       - 80
       - 443
