@@ -1,0 +1,80 @@
+services:
+  gitlab:
+    image: gitlab/gitlab-ee:18.1.1-ee.0
+    container_name: gitlab
+    restart: unless-stopped
+    hostname: 'gitlab.${PERSONAL_DOMAINE_NAME}'
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'https://gitlab.${PERSONAL_DOMAINE_NAME}'
+        nginx['ssl_certificate'] = "/etc/letsencrypt/live/gitlab.${PERSONAL_DOMAINE_NAME}/fullchain.pem"
+        nginx['ssl_certificate_key'] = "/etc/letsencrypt/live/gitlab.${PERSONAL_DOMAINE_NAME}/privkey.pem"
+        gitlab_rails['time_zone'] = "Europe/Paris"
+        gitlab_rails['smtp_enable'] = true
+        gitlab_rails['smtp_address'] = "mail.${MAIL_SERVER_DOMAIN_NAME}"
+        gitlab_rails['smtp_port'] = 465
+        gitlab_rails['smtp_user_name'] = "gitlab@${PERSONAL_DOMAINE_NAME}"
+        gitlab_rails['smtp_password'] = "${MAIL_SERVER_PASSWORD}"
+        gitlab_rails['smtp_domain'] = "${MAIL_SERVER_DOMAIN_NAME}"
+        gitlab_rails['smtp_authentication'] = "login"
+        gitlab_rails['smtp_enable_starttls_auto'] = false
+        gitlab_rails['smtp_tls'] = true
+        gitlab_rails['smtp_pool'] = true
+        gitlab_rails['gitlab_email_from'] = 'gitlab@${PERSONAL_DOMAINE_NAME}'
+        gitlab_rails['trusted_proxies'] = ['192.168.1.10','172.22.0.0/16','173.245.48.0/20','103.21.244.0/22','103.22.200.0/22','103.31.4.0/22','141.101.64.0/18','108.162.192.0/18','190.93.240.0/20','188.114.96.0/20','197.234.240.0/22','198.41.128.0/17','162.158.0.0/15','104.16.0.0/13','104.24.0.0/14','172.64.0.0/13','131.0.72.0/22','2400:cb00::/32','2606:4700::/32','2803:f800::/32','2405:b500::/32','2405:8100::/32','2a06:98c0::/29','2c0f:f248::/32']
+        registry_external_url 'https://registry.${PERSONAL_DOMAINE_NAME}'
+        registry['registry_https_addr'] = "0.0.0.0:5050"
+        registry_nginx['enable'] = true
+        registry_nginx['listen_port'] = 5050
+        registry_nginx['listen_https'] = true
+        registry_nginx['ssl_certificate'] = "/etc/letsencrypt/live/gitlab.${PERSONAL_DOMAINE_NAME}/fullchain.pem"
+        registry_nginx['ssl_certificate_key'] = "/etc/letsencrypt/live/gitlab.${PERSONAL_DOMAINE_NAME}/privkey.pem"
+        gitlab_rails['registry_enabled'] = true
+        gitlab_rails['registry_host'] = "registry.${PERSONAL_DOMAINE_NAME}"
+        gitlab_rails['registry_port'] = "5050"
+        gitlab_rails['registry_path'] = "/var/opt/gitlab/gitlab-rails/shared/registry"
+        letsencrypt['enable'] = false
+    ports:
+      - "80:80"
+      - "443:443"
+      - "22:22"
+      - "5050:5050" # Port Docker Registry
+    volumes:
+      - /data/docker/docker-data/gitlab/certs:/etc/letsencrypt:ro
+      - /data/docker/docker-data/gitlab/config:/etc/gitlab
+      - /data/docker/docker-data/gitlab/logs:/var/log/gitlab
+      - /data/docker/docker-data/gitlab/data:/var/opt/gitlab
+    depends_on:
+      certbot:
+        condition: service_completed_successfully
+
+  certbot:
+    image: certbot/dns-cloudflare:v4.1.1
+    container_name: certbot_gitlab
+    volumes:
+      - /data/docker/docker-data/gitlab/certs:/etc/letsencrypt
+      - /data/docker/docker-data/gitlab/certbot:/var/lib/letsencrypt
+    secrets:
+      - source: cloudflare_api_token
+        target: cloudflare.ini
+    command:
+      - certonly
+      - --dns-cloudflare
+      - --dns-cloudflare-credentials
+      - /run/secrets/cloudflare.ini
+      - --dns-cloudflare-propagation-seconds
+      - "30"
+      - --non-interactive
+      - --agree-tos
+      - --email
+      - contact@${PERSONAL_DOMAINE_NAME}
+      - -d
+      - gitlab.${PERSONAL_DOMAINE_NAME}
+      - -d
+      - registry.${PERSONAL_DOMAINE_NAME}
+      - --cert-name
+      - gitlab.${PERSONAL_DOMAINE_NAME}
+
+secrets:
+  cloudflare_api_token:
+    file: /data/docker/docker-secret/cloudflare.ini
