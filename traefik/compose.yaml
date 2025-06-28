@@ -65,9 +65,6 @@ services:
       - 80
     networks:
       - webinternal
-    depends_on: 
-      traefik:
-        condition: service_started
 
   traefik:
     restart: unless-stopped
@@ -147,14 +144,14 @@ services:
       - --entrypoints.web.address=:80
       - --entrypoints.web.http.redirections.entryPoint.to=websecure
       - --entrypoints.web.http.redirections.entryPoint.scheme=https
-      - --entrypoints.web.http.middlewares=crowdsec@docker,error-pages@docker
+      - --entrypoints.web.http.middlewares=error-pages@docker #,crowdsec@docker
       - --entrypoints.websecure.address=:443
       - --entryPoints.websecure.forwardedHeaders.insecure=false
       - --entryPoints.websecure.proxyProtocol.insecure=false # need trusted IPs provided
       # Please see the Forwarded Header Trust section of the Authelia Traefik Integration documentation.
       - --entryPoints.websecure.forwardedHeaders.trustedIPs=172.18.0.0/16,172.22.0.0/16
       - --entryPoints.websecure.proxyProtocol.trustedIPs=172.18.0.0/16,172.22.0.0/16
-      - --entrypoints.websecure.http.middlewares=crowdsec@docker,error-pages@docker
+      - --entrypoints.websecure.http.middlewares=error-pages@docker #,crowdsec@docker
       - --entrypoints.websecure.http.tls.certResolver=letsencrypt-cloudflare
       - --entrypoints.minecraft.address=:25565/udp # test for minecraft in udp
       - --entrypoints.dot.address=:853
@@ -200,9 +197,6 @@ services:
       PROXY_SUPPORT_MAIL: ${PROXY_SUPPORT_MAIL:-contact@${PERSONAL_DOMAINE_NAME}}
     expose:
       - 8090
-    depends_on:
-      traefik:
-        condition: service_started
     networks:
       - webinternal
 
@@ -232,12 +226,8 @@ services:
       NGINX_HOST: utils.${PERSONAL_DOMAINE_NAME}
     expose:
       - 80
-    depends_on:
-      traefik:
-        condition: service_started
     networks:
       - webinternal
-
 
   ################# Crowdsec #################
   redis-bouncer:
@@ -254,9 +244,6 @@ services:
       interval: 30s
       retries: 5
       timeout: 3s
-#    labels:
-#       diun.enable: true
-#       diun.watch_repos: true
     environment:
       PUID: 1000
       GUID: 100
@@ -333,7 +320,7 @@ services:
       - webexpose
     depends_on:
       redis-bouncer:
-        condition: service_started
+        condition: service_healthy
 
   ################# Authelia #################
   authelia:
@@ -380,7 +367,7 @@ services:
       - '--config=/config/configuration.identity_providers.yml'
     depends_on:
       redis-authelia:
-        condition: service_started
+        condition: service_healthy
 
   redis-authelia:
     restart: unless-stopped
