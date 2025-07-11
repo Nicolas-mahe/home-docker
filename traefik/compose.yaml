@@ -1,22 +1,27 @@
 services:
   ################# DNS setting #################
   ## Without Public IP
-  cloudflare-tunnel:
-    user: "0:0"
+  cloudflared:
     restart: unless-stopped
     image: docker.io/cloudflare/cloudflared
-    container_name: cloudflare-tunnel
-    hostname: cloudflare-tunnel
+    container_name: cloudflared
+    hostname: cloudflared
     labels:
       diun.enable: true
       diun.watch_repos: true
     environment:
       - TUNNEL_TOKEN=${CF_TUNNEL_TOKEN}
+      - TUNNEL_METRICS=0.0.0.0:60123
     volumes:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
     networks:
       - webexpose
     command: tunnel --no-autoupdate run
+    healthcheck:
+      test: ["CMD", "cloudflared", "tunnel", "--metrics", "localhost:60123", "ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   ## Throw Public IP
   # cloudflare-ddns:
@@ -56,11 +61,7 @@ services:
       traefik.http.routers.whoami.service: whoami
       traefik.http.services.whoami.loadBalancer.server.port: 80
     environment:
-      PUID: 1000
-      PGID: 100
       TZ: Europe/Paris
-    volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
     expose:
       - 80
     networks:
@@ -94,23 +95,30 @@ services:
     ports:
       - 80:80        # HTTP
       - 443:443      # HTTPS
-      - 853:853
-      - 25565:25565  # Minecraft
+      # - 25565:25565  # Minecraft
     expose:
       - 80
       - 443
-      - 853
       - 8080
     depends_on:
       authelia:
         condition: service_healthy
       crowdsec:
+        condition: service_healthy
+      cloudflared:
+        condition: service_healthy
+      error-pages:
         condition: service_started
     networks:
       - crowdsec
       - prometheus
       - webexpose
       - webinternal
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/ping"]
+      timeout: 5s
+      retries: 3
+      start_period: 15s
     command:
       - --global.sendAnonymousUsage
       - --global.checkNewVersion=false
@@ -119,18 +127,11 @@ services:
       - --accesslog=true
       - --api.dashboard=true
       - --api.insecure=true
+      - --ping=true
       - --metrics.addinternals
       - --metrics.prometheus=true
 
-# Certificates management
-      # - --certificatesresolvers.staging.acme.email=${PERSONAL_CF_MAIL}
-      # - --certificatesresolvers.staging.acme.storage=/etc/traefik/certs/acme.json
-      # - --certificatesresolvers.staging.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory
-      # - --certificatesresolvers.staging.acme.httpChallenge.entryPoint=web
-      # - --certificatesresolvers.production.acme.email=${PERSONAL_CF_MAIL}
-      # - --certificatesresolvers.production.acme.storage=/etc/traefik/certs/acme.json
-      # - --certificatesresolvers.production.acme.caServer=https://acme-v02.api.letsencrypt.org/directory
-      # - --certificatesresolvers.production.acme.httpChallenge.entryPoint=web
+      # Certificates management
       - --certificatesresolvers.letsencrypt-cloudflare.acme.dnschallenge=true
       - --certificatesresolvers.letsencrypt-cloudflare.acme.dnschallenge.provider=cloudflare
       - --certificatesResolvers.letsencrypt-cloudflare.acme.dnschallenge.resolvers=1.1.1.1:53,1.0.0.1:53
@@ -140,30 +141,29 @@ services:
       - --entrypoints.websecure.http.tls.domains[0].main=${PERSONAL_DOMAINE_NAME}
       - --entrypoints.websecure.http.tls.domains[0].sans=*.${PERSONAL_DOMAINE_NAME}
 
-# Entrypoint management
+      # Entrypoint management
       - --entrypoints.web.address=:80
       - --entrypoints.web.http.redirections.entryPoint.to=websecure
       - --entrypoints.web.http.redirections.entryPoint.scheme=https
-      - --entrypoints.web.http.middlewares=error-pages@docker #,crowdsec@docker
+      # - --entrypoints.web.http.middlewares=error-pages@docker #,crowdsec@docker
       - --entrypoints.websecure.address=:443
       - --entryPoints.websecure.forwardedHeaders.insecure=false
       - --entryPoints.websecure.proxyProtocol.insecure=false # need trusted IPs provided
       # Please see the Forwarded Header Trust section of the Authelia Traefik Integration documentation.
       - --entryPoints.websecure.forwardedHeaders.trustedIPs=172.18.0.0/16,172.22.0.0/16
       - --entryPoints.websecure.proxyProtocol.trustedIPs=172.18.0.0/16,172.22.0.0/16
-      - --entrypoints.websecure.http.middlewares=error-pages@docker #,crowdsec@docker
+      # - --entrypoints.websecure.http.middlewares=error-pages@docker #,crowdsec@docker
       - --entrypoints.websecure.http.tls.certResolver=letsencrypt-cloudflare
-      - --entrypoints.minecraft.address=:25565/udp # test for minecraft in udp
-      - --entrypoints.dot.address=:853
+      # - --entrypoints.minecraft.address=:25565/udp # test for minecraft in udp
       - --serversTransport.insecureSkipVerify=true  # need to put a validate cert everywhere for delete it
 
-# Provider definition
+      # Provider definition
       - --providers.docker.exposedbydefault=false
       - --providers.docker.network=webinternal
       - --providers.file.directory=/etc/traefik/conf
       - --providers.file.watch=true
 
-# Crowdsec definition
+      # Crowdsec definition
       - --experimental.plugins.bouncer.moduleName=github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
       - --experimental.plugins.bouncer.version=${CROWDSEC_PLUGIN_VERSION:?bouncer version required}
 
@@ -197,6 +197,11 @@ services:
       PROXY_SUPPORT_MAIL: ${PROXY_SUPPORT_MAIL:-contact@${PERSONAL_DOMAINE_NAME}}
     expose:
       - 8090
+    # healthcheck:
+    #   test: ["CMD-SHELL", "wget", "--spider", "-q", "http://localhost:8090/404.html"]
+    #   timeout: 5s
+    #   retries: 3
+    #   start_period: 15s
     networks:
       - webinternal
 
@@ -226,6 +231,11 @@ services:
       NGINX_HOST: utils.${PERSONAL_DOMAINE_NAME}
     expose:
       - 80
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:80/index.html"]
+      timeout: 5s
+      retries: 3
+      start_period: 1s
     networks:
       - webinternal
 
@@ -240,7 +250,7 @@ services:
       diun.watch_repos: true
     healthcheck:
       test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
-      start_period: 20s
+      start_period: 15s
       interval: 30s
       retries: 5
       timeout: 3s
@@ -318,6 +328,12 @@ services:
       - crowdsec
       - prometheus
       - webexpose
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
     depends_on:
       redis-bouncer:
         condition: service_healthy
@@ -376,7 +392,7 @@ services:
     hostname: redis-authelia
     healthcheck:
       test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
-      start_period: 20s
+      start_period: 15s
       interval: 30s
       retries: 5
       timeout: 3s
