@@ -291,15 +291,13 @@ services:
         crowdsecurity/linux
         crowdsecurity/linux-lpe
         LePresidente/authelia
-        LePresidente/adguardhome
         LePresidente/grafana
-        crowdsecurity/nginx
-        crowdsecurity/nextcloud
         crowdsecurity/traefik
         Dominic-Wagner/vaultwarden
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro #Can read logs from socket!
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/crowdsec/config:/etc/crowdsec #Config Crowdsec
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/crowdsec/conf:/etc/traefik/conf #Additional Config Crowdsec
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/crowdsec/data:/var/lib/crowdsec/data/ #Config Crowdsec
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/nextcloud/config/log/:/var/log/nextcloud/:ro #Logs nginx + php Nextcloud
     expose:

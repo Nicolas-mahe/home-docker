@@ -1,36 +1,15 @@
 ---
 source: docker
 container_name:
- - adguardhome
+ - authelia
 labels:
-  type: adguardhome
----
-source: docker
-container_name:
- - authentik-server
-labels:
-  type: authentik
+  type: authelia
 ---
 source: docker
 container_name:
  - grafana
 labels:
   type: grafana
----
-filenames:
-  - /var/log/nextcloud/nextcloud.log
-labels:
-  type: nextcloud
----
-filenames:
-  - /var/log/nextcloud/nginx/*.log
-labels:
-  type: nginx
----
-filenames:
-  - /var/log/openmediavault/*.*
-labels:
-  type: nextcloud
 ---
 source: docker
 container_name:
