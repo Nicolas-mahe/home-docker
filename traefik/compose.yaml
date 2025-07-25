@@ -251,7 +251,7 @@ services:
 
   crowdsec:
     restart: unless-stopped
-    image: ghcr.io/crowdsecurity/crowdsec
+    image: ghcr.io/crowdsecurity/crowdsec:${CROWDSEC_TAG:-v1.6.10}
     container_name: crowdsec
     hostname: crowdsec
     security_opt:
@@ -320,7 +320,7 @@ services:
   ################# Authelia #################
   authelia:
     restart: unless-stopped
-    image: ghcr.io/authelia/authelia:${AUTHELIA_TAG:-4.39.1}
+    image: ghcr.io/authelia/authelia:${AUTHELIA_TAG:-4.39.4}
     container_name: authelia
     hostname: authelia
     labels:
