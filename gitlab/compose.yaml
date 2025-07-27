@@ -4,6 +4,9 @@ services:
     container_name: gitlab
     restart: unless-stopped
     hostname: 'gitlab.${PERSONAL_DOMAINE_NAME}'
+    labels:
+      diun.enable: true
+      diun.watch_repos: true      
     environment:
       GITLAB_OMNIBUS_CONFIG: |
         external_url 'https://gitlab.${PERSONAL_DOMAINE_NAME}'
@@ -35,25 +38,40 @@ services:
         gitlab_rails['registry_path'] = "/var/opt/gitlab/gitlab-rails/shared/registry"
         letsencrypt['enable'] = false
     ports:
-      - "80:80"
-      - "443:443"
+      - "444:443"
       - "22:22"
       - "5050:5050" # Port Docker Registry
     volumes:
-      - /data/docker/docker-data/gitlab/certs:/etc/letsencrypt:ro
-      - /data/docker/docker-data/gitlab/config:/etc/gitlab
-      - /data/docker/docker-data/gitlab/logs:/var/log/gitlab
-      - /data/docker/docker-data/gitlab/data:/var/opt/gitlab
+      -  /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/certs:/etc/letsencrypt:ro
+      -  /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/config:/etc/gitlab
+      -  /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/logs:/var/log/gitlab
+      -  /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/data:/var/opt/gitlab
     depends_on:
       certbot:
-        condition: service_completed_successfully
+        condition: service_started #service_completed_successfully
+
+  gitlab-runner:
+    image: gitlab/gitlab-runner:latest
+    container_name: gitlab-runner
+    hostname: gitlab-runner
+    restart: always
+    labels:
+      diun.enable: true
+      diun.watch_repos: true  
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/runner:/etc/gitlab-runner
 
   certbot:
     image: certbot/dns-cloudflare:v4.1.1
     container_name: certbot_gitlab
+    restart: no
+    labels:
+      diun.enable: true
+      diun.watch_repos: true  
     volumes:
-      - /data/docker/docker-data/gitlab/certs:/etc/letsencrypt
-      - /data/docker/docker-data/gitlab/certbot:/var/lib/letsencrypt
+      -  /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/certs:/etc/letsencrypt
+      -  /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/certbot:/var/lib/letsencrypt
     secrets:
       - source: cloudflare_api_token
         target: cloudflare.ini
@@ -77,4 +95,4 @@ services:
 
 secrets:
   cloudflare_api_token:
-    file: /data/docker/docker-secret/cloudflare.ini
+    file:  /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-secret/cloudflare.ini
