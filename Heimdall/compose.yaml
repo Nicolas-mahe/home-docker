@@ -8,11 +8,8 @@ services:
       diun.enable: true
       diun.watch_repos: true
     environment:
-      PUID: 1000
-      PGID: 100
       TZ: Europe/Paris
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/heimdall:/config
     networks:
     - web

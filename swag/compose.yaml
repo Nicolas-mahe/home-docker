@@ -12,8 +12,6 @@ services:
     security_opt:
       - no-new-privileges=true
     environment:
-      PUID: 1000
-      PGID: 100
       TZ: Europe/Paris
       URL: ${PERSONAL_DOMAINE_NAME}
       VALIDATION: dns
@@ -40,7 +38,6 @@ services:
         lscr.io/linuxserver/mods:swag-dbip
         lscr.io/linuxserver/mods:swag-f2bdiscord
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/swag:/config #Config Swag
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/authelia/config/authelia.log:/authelia/authelia.log:ro #Logs Authelia
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/nextcloud/config/nextcloud.log:/nextcloud/nextcloud.log:ro #Logs Nextcloud
@@ -66,14 +63,11 @@ services:
     depends_on:
       - authelia
     environment:
-      PUID: 1000
-      PGID: 100
       TZ: Europe/Paris
       CUSTOM_HOSTNAME: crowdsec
       BOUNCER_KEY_SWAG: ${CROWDSEC_API_KEY}
       COLLECTIONS: crowdsecurity/http-cve crowdsecurity/whitelist-good-actors crowdsecurity/nginx crowdsecurity/nextcloud LePresidente/authelia Dominic-Wagner/vaultwarden
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/crowdsec/config:/etc/crowdsec #Config Crowdsec
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/crowdsec/data:/var/lib/crowdsec/data/ #Config Crowdsec
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/swag/log/nginx:/var/log/nginx:ro #Logs Swag
@@ -96,11 +90,8 @@ services:
       diun.enable: true
       diun.watch_repos: true
     environment:
-      PUID: 1000
-      PGID: 100
       TZ: Europe/Paris
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/authelia/config:/config
     expose:
       - 9091

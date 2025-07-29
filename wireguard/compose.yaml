@@ -13,8 +13,6 @@ services:
       diun.enable: true
       diun.watch_repos: true
     environment:
-      PUID: 1000
-      PGID: 100
       TZ: Europe/Paris
       ALLOWEDIPS: 0.0.0.0/0
       INTERFACE: eth0
@@ -28,7 +26,6 @@ services:
     ports:
       - ${PERSONAL_PORT_WIREGUARD}:51820/udp
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/wireguard:/config
       - /lib/modules:/lib/modules
     networks:

@@ -15,15 +15,12 @@ services:
       traefik.http.routers.duplicati.service: duplicati
       traefik.http.services.duplicati.loadBalancer.server.port: 8200
     environment:
-      PUID: 1000
-      PGID: 100
       TZ: Europe/Paris
       SETTINGS_ENCRYPTION_KEY: /run/secrets/SETTINGS_ENCRYPTION_KEY
       DUPLICATI__DISABLE_DB_ENCRYPTION: false
       DUPLICATI__WEBSERVICE_ALLOWED_HOSTNAMES: duplicati.${PERSONAL_DOMAINE_NAME}
       DUPLICATI__WEBSERVICE_PASSWORD: ${DUPLICATI_WEB_PWD}
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/duplicati:/data
       - /${RAID_DATA_DIRECTORY:?raid path is required}/backups:/backups
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker:/source/docker

@@ -16,8 +16,6 @@ services:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/websites/${SKYBLOG1}.skyrock.com:/usr/share/nginx/html:ro
     environment:
-      PUID: 1000
-      PGID: 100
       TZ: Europe/Paris
       NGINX_HOST: ${SKYBLOG1}.${PERSONAL_DOMAINE_NAME}
     expose:
@@ -39,7 +37,6 @@ services:
       traefik.http.routers.skyblog2.service: skyblog2
       traefik.http.services.skyblog2.loadBalancer.server.port: 80
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/websites/${SKYBLOG2}.skyrock.com:/usr/share/nginx/html:ro
     environment:
       PUID: 1000
@@ -65,11 +62,8 @@ services:
       traefik.http.routers.candle.service: candle
       traefik.http.services.candle.loadBalancer.server.port: 80
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/websites/candle:/usr/share/nginx/html:ro
     environment:
-      UID: 1000
-      GID: 100
       TZ: Europe/Paris
       NGINX_HOST: candle.${PERSONAL_DOMAINE_NAME}
     expose:

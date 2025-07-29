@@ -18,11 +18,8 @@ services:
       traefik.http.routers.python-pronostic.service: python-pronostic
       traefik.http.services.python-pronostic.loadBalancer.server.port: 5000
     environment:
-      PUID: 1000
-      PGID: 100
       TZ: Europe/Paris
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
       - python-pronostic:/data
     env_file:
       - stack.env
