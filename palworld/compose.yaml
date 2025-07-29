@@ -10,11 +10,8 @@ services:
       gamecontainermanager.enable: true
       gamecontainermanager.group: Palworld
     environment:
-      PUID: 1000
-      PGID: 1000
       TZ: Europe/Paris
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/palworld/logs:/home/steam/Steam/logs
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/palworld/games:/home/steam/Steam/steamapps/
     ports:

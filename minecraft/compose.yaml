@@ -16,8 +16,6 @@ services:
     tty: true
     stdin_open: true
     environment:
-      PGID: 100
-      PUID: 1000
       TZ: Europe/Paris
       ALLOW_FLIGHT: TRUE
       BROADCAST_CONSOLE_TO_OPS: TRUE
@@ -55,7 +53,6 @@ services:
       VERSION: "1.18.2"
       VIEW_DISTANCE: 10
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/minecraft/s5/prod:/data
       # - /${RAID_DATA_DIRECTORY:?raid path is required}/backups/Minecraft/s5:/backups
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/minecraft/RaBByT.jpg:/icon.jpg:ro
@@ -85,8 +82,6 @@ services:
       gamecontainermanager.enable: true
       gamecontainermanager.customlabel0: "${PERSONAL_MINECRAFT_SERVER2_URL}"
     environment:
-      PGID: 100
-      PUID: 1000
       TZ: Europe/Paris
       AUTOPAUSE_TIMEOUT_EST: "1200"
       ENABLE_AUTOPAUSE: TRUE
@@ -129,7 +124,6 @@ services:
       VERSION: "1.18.2"
       VIEW_DISTANCE: 7
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/minecraft/s5/creative:/data
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/minecraft/RaBByT-Creative.jpg:/icon.jpg:ro
     ports:
@@ -189,9 +183,8 @@ services:
       diun.watch_repos: true
       gamecontainermanager.enable: true
     environment:
+      TZ: Europe/Paris
       SECRET_KEY: ${PLAYIT_SECRET_KEY}
-    volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
     networks:
       - games
     depends_on:

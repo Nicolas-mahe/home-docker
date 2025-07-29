@@ -24,12 +24,9 @@ services:
       traefik.http.services.vaultwarden.loadBalancer.server.port: 80
     environment:
       DOMAIN: https://vaultwarden.${PERSONAL_DOMAINE_NAME}
-      PUID: 1000
-      PGID: 100
       TZ: Europe/Paris
       ADMIN_TOKEN: ${ADMIN_TOKEN}
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/vaultwarden/:/data/
     expose:
       - 80

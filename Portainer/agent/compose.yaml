@@ -14,7 +14,6 @@ services:
       - ${PERSONAL_AGENT_PORT}:9001
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-config/volumes:/var/lib/docker/volumes
     networks:
     - webinternal

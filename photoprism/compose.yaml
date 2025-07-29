@@ -113,7 +113,6 @@ services:
     working_dir: "/photoprism" # do not change or remove
     volumes:
       - /${RAID_DATA_DIRECTORY:?raid path is required}/partage/photos:/photoprism/originals # Original media files (DO NOT REMOVE)
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
       # - "/example/family:/photoprism/originals/family" # *Additional* media folders can be mounted like this
       # - "~/Import:/photoprism/import"                  # *Optional* base folder from which files can be imported to originals
       - "/${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/photoprism/data:/photoprism/storage" # *Writable* storage folder for cache, database, and sidecar files (DO NOT REMOVE)

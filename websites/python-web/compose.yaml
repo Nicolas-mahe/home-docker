@@ -14,12 +14,9 @@ services:
       traefik.http.routers.python-voiture.rule: Host(`voiture.${PERSONAL_DOMAINE_NAME}`)
       traefik.http.routers.python-voiture.service: python-voiture
       traefik.http.services.python-voiture.loadBalancer.server.port: 5000
-    environment:
-      PUID: 1000
-      PGID: 100    
+    environment:  
       TZ: Europe/Paris
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
       - python-mathieu:/data
     env_file:
       - stack.env
@@ -47,11 +44,8 @@ services:
       traefik.http.routers.python-luna.service: python-luna
       traefik.http.services.python-luna.loadBalancer.server.port: 5000
     environment:
-      PUID: 1000
-      PGID: 100    
       TZ: Europe/Paris
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
       - python-luna:/data
     env_file:
       - stack.env

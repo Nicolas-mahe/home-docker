@@ -15,14 +15,11 @@ services:
       traefik.http.routers.portainer.service: portainer
       traefik.http.services.portainer.loadBalancer.server.port: 9000
     environment:
-      PUID: 1000
-      PGID: 100
       TZ: Europe/Paris
     expose:
       - 9000
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/portainer:/data
     networks:
     - webinternal
@@ -44,7 +41,6 @@ services:
       - 9001
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-config/volumes:/var/lib/docker/volumes
     networks:
     - webinternal

@@ -16,8 +16,6 @@ services:
       traefik.http.routers.gafana.service: gafana
       traefik.http.services.gafana.loadBalancer.server.port: 3000
     environment:
-      PUID: 1000
-      PGID: 100
       TZ: Europe/Paris
       GF_SERVER_ROOT_URL: "https://monitoring.${PERSONAL_DOMAINE_NAME}"
       GF_AUTH_BASIC_ENABLED: true
@@ -40,7 +38,6 @@ services:
       GF_AUTH_GOOGLE_AUTO_LOGIN: false
       GF_AUTH_GITHUB_AUTO_LOGIN: false
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/grafana/data:/var/lib/grafana
     expose:
       - 3000
@@ -66,10 +63,7 @@ services:
       traefik.http.services.prometheusdb.loadBalancer.server.port: 9090
     environment:
       TZ: Europe/Paris
-      PUID: 1000
-      PGID: 100
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/grafana/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/grafana/prometheus:/prometheus
     ports:
@@ -96,7 +90,6 @@ services:
     environment:
       TZ: Europe/Paris
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
       - /:/rootfs:ro
       - /run:/run:ro
       - /sys:/sys:ro
@@ -152,7 +145,6 @@ services:
     ports:
       - 8086:8086
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/grafana/influxdb2/data:/var/lib/influxdb2
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/grafana/influxdb2/etc:/etc/influxdb2
     networks:

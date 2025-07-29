@@ -10,15 +10,12 @@ services:
     ports:
       - 80:80
     environment:
-      PUID: 1000
-      PGID: 1000
       TZ: Europe/Paris
       WORDPRESS_DB_HOST: wordpress_db
       WORDPRESS_DB_USER: ${DB_USER}
       WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
       WORDPRESS_DB_NAME: ${DB_NAME}
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/wordpress/data:/var/www/html
     networks:
       - web
@@ -32,15 +29,12 @@ services:
       diun.enable: true
       diun.watch_repos: true
     environment:
-      PUID: 1000
-      PGID: 100
       TZ: Europe/Paris
       MYSQL_DATABASE: ${DB_NAME}
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${ROOT_PWD}
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/wordpress/mariadb:/config
     networks:
       - web

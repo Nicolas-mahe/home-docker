@@ -36,8 +36,6 @@ services:
   #     PROXIED: true
   #     TZ: Europe/Paris
   #     DELETE_ON_STOP: true
-  #   volumes:
-  #     - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
   #   networks:
   #     - webexpose
 
