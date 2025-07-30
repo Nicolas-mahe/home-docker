@@ -7,7 +7,7 @@ CredSSp connexion:
 ` winrm set winrm/config/service/auth '@{CredSSP="true"}' `
 
 ## Server
-`pip install requests-credssp `
+`pip install requests-credssp`
 
 1. Requierment for Ansible:
 
