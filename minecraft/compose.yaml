@@ -70,7 +70,7 @@ services:
     #       memory: 8000M
 
   server-creative:
-    restart: unless-stopped
+    restart: no
     image: docker.io/itzg/minecraft-server:java17-jdk
     container_name: minecraft-server-creative
     hostname: minecraft-server-creative
