@@ -1,7 +1,7 @@
 services:
   librespeed:
     restart: unless-stopped
-    image: lscr.io/linuxserver/librespeed
+    image: lscr.io/linuxserver/librespeed:${LIBRESPEED_TAG:-latest}
     container_name: librespeed
     hostname: librespeed
     labels:
