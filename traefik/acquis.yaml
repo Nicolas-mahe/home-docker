@@ -23,3 +23,9 @@ container_name:
 labels:
   type: Vaultwarden
 ---
+source: docker
+container_name:
+ - immich_server
+labels:
+  type: immich
+---
