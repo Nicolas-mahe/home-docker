@@ -46,9 +46,12 @@ services:
       -  /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/config:/etc/gitlab
       -  /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/logs:/var/log/gitlab
       -  /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/data:/var/opt/gitlab
-    depends_on:
-      certbot:
-        condition: service_started #service_completed_successfully
+#     depends_on:
+#       certbot:
+#         condition: service_started #service_completed_successfully
+    networks:
+      - gitlab
+      - webinternal
 
   gitlab-runner:
     image: gitlab/gitlab-runner:v18.2.1
@@ -61,6 +64,8 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/runner:/etc/gitlab-runner
+    networks:
+      - gitlab
 
   certbot:
     image: certbot/dns-cloudflare:v4.1.1
@@ -92,7 +97,14 @@ services:
       - registry.${PERSONAL_DOMAINE_NAME}
       - --cert-name
       - gitlab.${PERSONAL_DOMAINE_NAME}
+    networks:
+      - gitlab
 
 secrets:
   cloudflare_api_token:
     file:  /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-secret/cloudflare.ini
+networks:
+  gitlab:
+    name: gitlab
+  webinternal:
+    name: webinternal
