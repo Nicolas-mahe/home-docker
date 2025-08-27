@@ -140,6 +140,9 @@ services:
       - --entrypoints.web.http.redirections.entryPoint.scheme=https
       - --entrypoints.web.http.middlewares=crowdsec@docker,error-pages@docker
       - --entrypoints.websecure.address=:443
+      - --entrypoints.websecure.transport.respondingTimeouts.readTimeout=600s
+      - --entrypoints.websecure.transport.respondingTimeouts.idleTimeout=600s
+      - --entrypoints.websecure.transport.respondingTimeouts.writeTimeout=600s
       - --entryPoints.websecure.forwardedHeaders.insecure=false
       - --entryPoints.websecure.proxyProtocol.insecure=false # need trusted IPs provided
       # Please see the Forwarded Header Trust section of the Authelia Traefik Integration documentation.
