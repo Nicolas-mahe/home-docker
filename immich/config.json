@@ -125,7 +125,7 @@
       "modelName": "buffalo_l"
     },
     "urls": [
-      "http://immich-machine-learning:3003"
+      "http://immich_machine_learning:3003"
     ]
   },
   "map": {
