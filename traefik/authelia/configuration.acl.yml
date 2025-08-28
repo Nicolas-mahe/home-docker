@@ -29,13 +29,29 @@
 access_control:
   # Default policy can either be 'bypass', 'one_factor', 'two_factor' or 'deny'. It is the policy applied to any
   # resource if there is no policy to be applied to the user.
-  default_policy: 'deny'
+  default_policy: 'two_factor'
 
   rules:
   ##################INTERNAL#############
     ## BYPASS
     - domain:
+      - '${PERSONAL_DOMAINE_NAME}'
       - 'auth.${PERSONAL_DOMAINE_NAME}'
+      - 'brainstorm.${PERSONAL_DOMAINE_NAME}'
+      - 'brule-un-cierge.${PERSONAL_DOMAINE_NAME}'
+      - 'bruleuncierge.${PERSONAL_DOMAINE_NAME}'
+      - 'candle.${PERSONAL_DOMAINE_NAME}'
+      - 'cloud.${PERSONAL_DOMAINE_NAME}'
+      - 'dauphin-47400.${PERSONAL_DOMAINE_NAME}'
+      - 'games-manager.${PERSONAL_DOMAINE_NAME}'
+      - 'gitlab.${PERSONAL_DOMAINE_NAME}'
+      - 'librespeed.${PERSONAL_DOMAINE_NAME}'
+      - 'luna.${PERSONAL_DOMAINE_NAME}'
+      - 'moi-unique-aux-monde.${PERSONAL_DOMAINE_NAME}'
+      - 'play.${PERSONAL_DOMAINE_NAME}'
+      - 'registry.${PERSONAL_DOMAINE_NAME}'
+      - 'utils.${PERSONAL_DOMAINE_NAME}'
+      - 'voiture.${PERSONAL_DOMAINE_NAME}'
       - 'www.${PERSONAL_DOMAINE_NAME}'
       policy: 'bypass'
       networks:
@@ -43,7 +59,9 @@ access_control:
 
     ## RESTRICTED ACCES
     - domain_regex:
-      - '^(pve).*\.${PERSONAL_DOMAINE}\.com$'
+      - '^(pve).*\.chou-dou\.com$'
+      - '^(pdc).*\.chou-dou\.com$'
+      - '^(zyxel).*\.chou-dou\.com$'
       policy: 'one_factor'
       subject:
         - 'group:admin'
@@ -51,7 +69,16 @@ access_control:
         - 'internal'
 
     - domain:
+      - 'box.${PERSONAL_DOMAINE_NAME}'
+      - 'dns.${PERSONAL_DOMAINE_NAME}'
+      - 'duplicati.${PERSONAL_DOMAINE_NAME}'
+      - 'influxdb2.${PERSONAL_DOMAINE_NAME}'
+      - 'management.${PERSONAL_DOMAINE_NAME}'
+      - 'monitoring.${PERSONAL_DOMAINE_NAME}'
+      - 'nas.${PERSONAL_DOMAINE_NAME}'
       - 'traefik.${PERSONAL_DOMAINE_NAME}'
+      - 'prometheus.${PERSONAL_DOMAINE_NAME}'
+      - 'python-test.${PERSONAL_DOMAINE_NAME}'
       - 'whoami.${PERSONAL_DOMAINE_NAME}'
       policy: 'one_factor'
       subject:
@@ -61,6 +88,19 @@ access_control:
 
     ## ADMIN PATH
     - domain:
+      - 'pronostic.${PERSONAL_DOMAINE_NAME}'
+      resources:
+        - '^/liste([/?].*)?$'
+        - '^/add_result([/?].*)?$'
+      policy: 'two_factor'
+      subject:
+        - 'group:admin'
+        - 'group:Maison'
+      networks:
+        - 'internal'
+
+    - domain:
+      - 'photos.${PERSONAL_DOMAINE_NAME}'
       - 'vaultwarden.${PERSONAL_DOMAINE_NAME}'
       resources:
         - '^/admin([/?].*)?$'
@@ -69,9 +109,11 @@ access_control:
         - 'group:admin'
       networks:
         - 'internal'
-    
+
     ## BYPASS WITHOUT ADMIN PATH
     - domain:
+      - 'photos.${PERSONAL_DOMAINE_NAME}'
+      - 'pronostic.${PERSONAL_DOMAINE_NAME}'
       - 'vaultwarden.${PERSONAL_DOMAINE_NAME}'
       policy: 'bypass'
       networks:
@@ -91,25 +133,48 @@ access_control:
   ##################EXTERNAL#############
     ## BYPASS
     - domain:
+      - '${PERSONAL_DOMAINE_NAME}'
       - 'auth.${PERSONAL_DOMAINE_NAME}'
+      - 'brainstorm.${PERSONAL_DOMAINE_NAME}'
+      - 'brule-un-cierge.${PERSONAL_DOMAINE_NAME}'
+      - 'bruleuncierge.${PERSONAL_DOMAINE_NAME}'
+      - 'candle.${PERSONAL_DOMAINE_NAME}'
+      - 'cloud.${PERSONAL_DOMAINE_NAME}'
+      - 'games-manager.${PERSONAL_DOMAINE_NAME}'
+      - 'gitlab.${PERSONAL_DOMAINE_NAME}'
+      - 'luna.${PERSONAL_DOMAINE_NAME}'
+      - 'play.${PERSONAL_DOMAINE_NAME}'
+      - 'registry.${PERSONAL_DOMAINE_NAME}'
+      - 'utils.${PERSONAL_DOMAINE_NAME}'
+      - 'voiture.${PERSONAL_DOMAINE_NAME}'
       policy: 'bypass'
 
     ## TWO_FACTOR
     - domain_regex:
-      - '^(pve).*\.${PERSONAL_DOMAINE}\.com$'
+      - '^(pve).*\.chou-dou\.com$'
+      - '^(pdc).*\.chou-dou\.com$'
+      - '^(zyxel).*\.chou-dou\.com$'
       policy: 'two_factor'
       subject:
         - 'group:admin'
 
     - domain:
+      - 'box.${PERSONAL_DOMAINE_NAME}'
+      - 'dns.${PERSONAL_DOMAINE_NAME}'
+      - 'duplicati.${PERSONAL_DOMAINE_NAME}'
+      - 'influxdb2.${PERSONAL_DOMAINE_NAME}'
+      - 'nas.${PERSONAL_DOMAINE_NAME}'
       - 'traefik.${PERSONAL_DOMAINE_NAME}'
+      - 'prometheus.${PERSONAL_DOMAINE_NAME}'
       - 'python-test.${PERSONAL_DOMAINE_NAME}'
+      - 'whoami.${PERSONAL_DOMAINE_NAME}'
       policy: 'two_factor'
       subject:
         - 'group:admin'
 
     - domain:
-      - 'play.${PERSONAL_DOMAINE_NAME}'
+      - 'management.${PERSONAL_DOMAINE_NAME}'
+      - 'monitoring.${PERSONAL_DOMAINE_NAME}'
       policy: 'two_factor'
       subject:
         - 'group:admin'
@@ -117,11 +182,25 @@ access_control:
 
     ## ONE_FACTOR
     - domain:
+      - 'dauphin-47400.${PERSONAL_DOMAINE_NAME}'
+      - 'librespeed.${PERSONAL_DOMAINE_NAME}'
+      - 'moi-unique-aux-monde.${PERSONAL_DOMAINE_NAME}'
       - 'www.${PERSONAL_DOMAINE_NAME}'
       policy: 'one_factor'
 
     ## ADMIN PATH
     - domain:
+      - 'pronostic.${PERSONAL_DOMAINE_NAME}'
+      resources:
+        - '^/liste([/?].*)?$'
+        - '^/add_result([/?].*)?$'
+      policy: 'two_factor'
+      subject:
+        - 'group:admin'
+        - 'group:Maison'
+
+    - domain:
+      - 'photos.${PERSONAL_DOMAINE_NAME}'
       - 'vaultwarden.${PERSONAL_DOMAINE_NAME}'
       resources:
         - '^/admin([/?].*)?$'
@@ -131,6 +210,8 @@ access_control:
     
     ## BYPASS WITHOUT ADMIN PATH
     - domain:
+      - 'photos.${PERSONAL_DOMAINE_NAME}'
+      - 'pronostic.${PERSONAL_DOMAINE_NAME}'
       - 'vaultwarden.${PERSONAL_DOMAINE_NAME}'
       policy: 'bypass'
 
