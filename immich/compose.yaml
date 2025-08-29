@@ -89,6 +89,5 @@ volumes:
 networks:
   immich:
     name: immich
-    internal: true
   webinternal:
     name: webinternal
