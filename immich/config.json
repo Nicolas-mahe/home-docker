@@ -108,6 +108,8 @@
     "level": "log"
   },
   "machineLearning": {
+    "enabled": true,
+    "urls": ["http://immich-machine-learning:3003"],
     "clip": {
       "enabled": true,
       "modelName": "ViT-SO400M-16-SigLIP2-384__webli"
@@ -116,17 +118,13 @@
       "enabled": true,
       "maxDistance": 0.01
     },
-    "enabled": true,
     "facialRecognition": {
       "enabled": true,
-      "maxDistance": 0.5,
-      "minFaces": 3,
+      "modelName": "buffalo_l",
       "minScore": 0.7,
-      "modelName": "buffalo_l"
-    },
-    "urls": [
-      "http://immich_machine_learning:3003"
-    ]
+      "maxDistance": 0.5,
+      "minFaces": 3
+    }
   },
   "map": {
     "darkStyle": "https://tiles.immich.cloud/v1/style/dark.json",
