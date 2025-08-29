@@ -112,7 +112,7 @@
     "urls": ["http://immich-machine-learning:3003"],
     "clip": {
       "enabled": true,
-      "modelName": "ViT-SO400M-16-SigLIP2-384__webli"
+      "modelName": "ViT-B-32__openai"
     },
     "duplicateDetection": {
       "enabled": true,
