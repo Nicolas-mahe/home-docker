@@ -17,6 +17,7 @@ services:
     env_file:
       - stack.env
     environment:
+      TZ: Europe/Paris
       IMMICH_CONFIG_FILE: /immich-config.json
     # extends:
     #   file: hwaccel.transcoding.yml
@@ -45,6 +46,8 @@ services:
     labels:
       diun.enable: true
       diun.watch_repos: true
+    environment:
+      TZ: Europe/Paris
     env_file:
       - stack.env
     volumes:
@@ -59,6 +62,8 @@ services:
     labels:
       diun.enable: true
       diun.watch_repos: true
+    environment:
+      TZ: Europe/Paris
     volumes:
       - redis:/data
     healthcheck:
@@ -75,11 +80,11 @@ services:
       diun.enable: true
       diun.watch_repos: true
     environment:
+      TZ: Europe/Paris
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_DB: ${DB_DATABASE_NAME}
       POSTGRES_INITDB_ARGS: '--data-checksums'
-      TZ: Europe/Paris
     volumes:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/immich/postgres:/var/lib/postgresql/data
     networks:
