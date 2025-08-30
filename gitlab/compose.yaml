@@ -1,6 +1,6 @@
 services:
   gitlab:
-    image: gitlab/gitlab-ee:18.2.1-ee.0
+    image: gitlab/gitlab-ee:${GITLAB_TAG:-18.2.1-ee.0}
     container_name: gitlab
     restart: unless-stopped
     hostname: 'gitlab.${PERSONAL_DOMAINE_NAME}'
@@ -54,7 +54,7 @@ services:
       - webinternal
 
   gitlab-runner:
-    image: gitlab/gitlab-runner:v18.2.1
+    image: gitlab/gitlab-runner:${RUNNER_TAG:-v18.2.1}
     container_name: gitlab-runner
     hostname: gitlab-runner
     restart: always
@@ -67,38 +67,38 @@ services:
     networks:
       - gitlab
 
-  certbot:
-    image: certbot/dns-cloudflare:v4.1.1
-    container_name: certbot_gitlab
-    restart: no
-    labels:
-      diun.enable: true
-      diun.watch_repos: true  
-    volumes:
-      -  /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/certs:/etc/letsencrypt
-      -  /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/certbot:/var/lib/letsencrypt
-    secrets:
-      - source: cloudflare_api_token
-        target: cloudflare.ini
-    command:
-      - certonly
-      - --dns-cloudflare
-      - --dns-cloudflare-credentials
-      - /run/secrets/cloudflare.ini
-      - --dns-cloudflare-propagation-seconds
-      - "30"
-      - --non-interactive
-      - --agree-tos
-      - --email
-      - contact@${PERSONAL_DOMAINE_NAME}
-      - -d
-      - gitlab.${PERSONAL_DOMAINE_NAME}
-      - -d
-      - registry.${PERSONAL_DOMAINE_NAME}
-      - --cert-name
-      - gitlab.${PERSONAL_DOMAINE_NAME}
-    networks:
-      - gitlab
+  # certbot:
+  #   image: certbot/dns-cloudflare:v4.1.1
+  #   container_name: certbot_gitlab
+  #   restart: no
+  #   labels:
+  #     diun.enable: true
+  #     diun.watch_repos: true  
+  #   volumes:
+  #     -  /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/certs:/etc/letsencrypt
+  #     -  /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/certbot:/var/lib/letsencrypt
+  #   secrets:
+  #     - source: cloudflare_api_token
+  #       target: cloudflare.ini
+  #   command:
+  #     - certonly
+  #     - --dns-cloudflare
+  #     - --dns-cloudflare-credentials
+  #     - /run/secrets/cloudflare.ini
+  #     - --dns-cloudflare-propagation-seconds
+  #     - "30"
+  #     - --non-interactive
+  #     - --agree-tos
+  #     - --email
+  #     - contact@${PERSONAL_DOMAINE_NAME}
+  #     - -d
+  #     - gitlab.${PERSONAL_DOMAINE_NAME}
+  #     - -d
+  #     - registry.${PERSONAL_DOMAINE_NAME}
+  #     - --cert-name
+  #     - gitlab.${PERSONAL_DOMAINE_NAME}
+  #   networks:
+  #     - gitlab
 
 secrets:
   cloudflare_api_token:
