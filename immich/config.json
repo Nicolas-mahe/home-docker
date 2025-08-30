@@ -201,7 +201,7 @@
     "email": {
       "albumInviteTemplate": "",
       "albumUpdateTemplate": "",
-      "welcomeTemplate": ""
+      "welcomeTemplate": "<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Nouvel Compte</title>\n    <style>\n        body {\n            font-family: Arial, sans-serif;\n            margin: 40px;\n        }\n        .container {\n            max-width: 600px;\n        }\n        .highlight {\n            font-weight: bold;\n        }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <p>Bonjour <span class=\"highlight\">{displayName}</span>!</p>\n        <p>Un nouveau compte a été créé pour vous afin de consulter les photos de Laura & Nicolas.</p>\n        <p>Connectez-vous sur le site web ou l'application mobile avec vos identifiants ci-dessous:</p>\n        <p><span class=\"highlight\">Adresse web:</span> {baseUrl}</p>\n        <p><span class=\"highlight\">Nom d'utilisateur:</span> {username}</p>\n        <p><span class=\"highlight\">Mot de passe:</span> {password}</p>\n    </div>\n</body>\n</html>"
     }
   },
   "theme": {
