@@ -270,7 +270,7 @@ services:
       traefik.http.middlewares.crowdsec.plugin.bouncer.crowdsecLapiScheme: http
       traefik.http.middlewares.crowdsec.plugin.bouncer.clientTrustedIPs: ${PERSONAL_IP_RANGES}
       traefik.http.middlewares.crowdsec.plugin.bouncer.forwardedHeadersTrustedIPs: ${CF_PROXY_IP}
-      traefik.http.middlewares.crowdsec.plugin.bouncer.forwardedHeadersCustomName: CF-Connecting-IP,X-Forwarded-For,X-Real-Ip
+      traefik.http.middlewares.crowdsec.plugin.bouncer.forwardedHeadersCustomName: X-Forwarded-For
       traefik.http.middlewares.crowdsec.plugin.bouncer.captchaProvider: recaptcha
       traefik.http.middlewares.crowdsec.plugin.bouncer.captchaSiteKey: ${CROWDSEC_CAPTCHA_SITE_KEY?:captcha key required}
       traefik.http.middlewares.crowdsec.plugin.bouncer.captchaSecretKey: ${CROWDSEC_CAPTCHA_SECRET_KEY?:captcha secret required}
