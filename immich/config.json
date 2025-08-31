@@ -108,8 +108,6 @@
     "level": "log"
   },
   "machineLearning": {
-    "enabled": true,
-    "urls": ["http://immich-machine-learning:3003"],
     "clip": {
       "enabled": true,
       "modelName": "ViT-B-32__openai"
@@ -118,13 +116,17 @@
       "enabled": true,
       "maxDistance": 0.01
     },
+    "enabled": true,
     "facialRecognition": {
       "enabled": true,
-      "modelName": "buffalo_l",
-      "minScore": 0.7,
       "maxDistance": 0.5,
-      "minFaces": 3
-    }
+      "minFaces": 3,
+      "minScore": 0.7,
+      "modelName": "buffalo_l"
+    },
+    "urls": [
+      "http://immich-machine-learning:3003"
+    ]
   },
   "map": {
     "darkStyle": "https://tiles.immich.cloud/v1/style/dark.json",
