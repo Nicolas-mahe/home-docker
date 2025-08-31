@@ -64,7 +64,7 @@ services:
     environment:
       TZ: Europe/Paris
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/grafana/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/grafana/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/grafana/prometheus:/prometheus
     ports:
       - 9090:9090
