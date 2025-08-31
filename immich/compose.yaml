@@ -17,8 +17,9 @@ services:
     env_file:
       - stack.env
     environment:
-      TZ: Europe/Paris
       IMMICH_CONFIG_FILE: /immich-config.json
+      IMMICH_TRUSTED_PROXIES: 172.18.0.0/16
+      TZ: Europe/Paris
     # extends:
     #   file: hwaccel.transcoding.yml
     #   service: cpu # set to one of [nvenc, quicksync, rkmpp, vaapi, vaapi-wsl] for accelerated transcoding
