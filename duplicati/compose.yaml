@@ -1,7 +1,7 @@
 services:
   duplicati:
     restart: unless-stopped
-    image: docker.io/duplicati/duplicati:${TAG_DUPLICATI}
+    image: docker.io/duplicati/duplicati:${TAG_DUPLICATI:-latest}
     container_name: duplicati
     hostname: duplicati
     labels:
@@ -28,7 +28,7 @@ services:
     expose:
       - 8200
     ports:
-      - ${PERSONAL_DUPLICATI_PORT}:8200
+      - ${PERSONAL_DUPLICATI_PORT:-8200}:8200
     networks:
       - webinternal
     secrets:

@@ -1,7 +1,7 @@
 services:
   grafana:
     restart: unless-stopped
-    image: docker.io/grafana/grafana-oss
+    image: docker.io/grafana/grafana-oss${GRAFANA_TAG:-latest}
     container_name: grafana
     hostname: grafana
     user: "${PERSONAL_GRAFANA_UID:-0}:${PERSONAL_GRAFANA_GID:-0}"
@@ -47,7 +47,7 @@ services:
 
   prometheus:
     restart: unless-stopped
-    image: docker.io/prom/prometheus
+    image: docker.io/prom/prometheus:${PROMETHEUS_TAG:-latest}
     container_name: prometheus
     hostname: prometheus
     user: "${PERSONAL_GRAFANA_UID:-0}:${PERSONAL_GRAFANA_GID:-0}"
@@ -80,7 +80,7 @@ services:
 
   cadvisor:
     restart: unless-stopped
-    image: gcr.io/cadvisor/cadvisor # google registry
+    image: gcr.io/cadvisor/cadvisor:${CADVISOR_TAG:-latest} # google registry
     container_name: cadvisor
     hostname: cadvisor
     privileged: true
@@ -104,7 +104,7 @@ services:
 
   node_exporter:
     restart: unless-stopped
-    image: quay.io/prometheus/node-exporter
+    image: quay.io/prometheus/node-exporter:${NODE_EXPORTER_TAG:-latest}
     container_name: node_exporter
     hostname: node_exporter
     pid: host
@@ -123,7 +123,7 @@ services:
 
   # influxdb:
   #   restart: unless-stopped
-  #   image: docker.io/library/influxdb:2.7.10-alpine
+  #   image: docker.io/library/influxdb:${INFLUXDB2_TAG:-2.7.10-alpine}
   #   container_name: influxdb2
   #   hostname: influxdb2
   #   labels:

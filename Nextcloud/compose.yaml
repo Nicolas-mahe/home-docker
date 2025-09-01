@@ -1,7 +1,7 @@
 services:
   nextcloud:
     restart: unless-stopped
-    image: lscr.io/linuxserver/nextcloud
+    image: lscr.io/linuxserver/nextcloud:${NEXTCLOUD_TAG:-latest}
     hostname: nextcloud
     container_name: nextcloud
     labels:
@@ -41,7 +41,7 @@ services:
 
   mariadb:
     restart: unless-stopped
-    image: lscr.io/linuxserver/mariadb
+    image: lscr.io/linuxserver/mariadb:${MARIADB_TAG:-latest}
     container_name: nextcloud_db
     hostname: nextcloud_db
     labels:

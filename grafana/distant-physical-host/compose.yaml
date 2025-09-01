@@ -1,7 +1,7 @@
 services:
   cadvisor:
     restart: unless-stopped
-    image: gcr.io/cadvisor/cadvisor # google registry
+    image: gcr.io/cadvisor/cadvisor:${CADVISOR_TAG:-latest} # google registry
     container_name: cadvisor
     hostname: cadvisor
     privileged: true
@@ -26,7 +26,7 @@ services:
 
   node_exporter:
     restart: unless-stopped
-    image: quay.io/prometheus/node-exporter
+    image: quay.io/prometheus/node-exporter:${NODE_EXPORTER_TAG:-latest}
     container_name: node_exporter
     hostname: node_exporter
     pid: host

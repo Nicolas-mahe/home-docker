@@ -1,14 +1,14 @@
 services:
   adguardhome:
     restart: always
-    image: docker.io/adguard/adguardhome
+    image: docker.io/adguard/adguardhome:${ADGUARDHOME_TAG:-latest}
     container_name: adguardhome
     hostname: adguardhome
     labels:
       diun.enable: true
       diun.watch_repos: true
     environment:
-      ADGUARDHOME_INTERFACE: ${ADGUARDHOME_INTERFACE}
+      ADGUARDHOME_INTERFACE: ${ADGUARDHOME_INTERFACE:-eth0}
       TZ: Europe/Paris
     volumes:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/adguard/data:/opt/adguardhome/work

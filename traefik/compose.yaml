@@ -3,7 +3,7 @@ services:
   ## Without Public IP
   cloudflared:
     restart: unless-stopped
-    image: docker.io/cloudflare/cloudflared
+    image: docker.io/cloudflare/cloudflared:${CLOUDFLARED_TAG:-latest}
     container_name: cloudflared
     hostname: cloudflared
     labels:
@@ -43,7 +43,7 @@ services:
 
   whoami:
     restart: unless-stopped
-    image: docker.io/traefik/whoami
+    image: docker.io/traefik/whoami:${WHOAMI_TAG:-latest}
     container_name: whoami
     hostname: whoami
     labels:
@@ -65,7 +65,7 @@ services:
 
   traefik:
     restart: unless-stopped
-    image: docker.io/library/traefik:${TRAEFIK_TAG:-v3.2.1}
+    image: docker.io/library/traefik:${TRAEFIK_TAG:-v3.5.1}
     container_name: traefik
     hostname: traefik
     labels:
@@ -163,7 +163,7 @@ services:
 
   error-pages:
     restart: unless-stopped
-    image: ghcr.io/patbec/traefik-error-pages:latest
+    image: ghcr.io/patbec/traefik-error-pages:${ERROR_PAGES_TAG:-latest}
     container_name: error-pages
     hostname: error-pages
     labels:
@@ -197,7 +197,7 @@ services:
 
   nginx-utils:
     restart: unless-stopped
-    image: docker.io/nginx:alpine
+    image: docker.io/nginx:${NGINX_TAG:-alpine}
     container_name: web-utils
     hostname: web-utils
     labels:
@@ -228,7 +228,7 @@ services:
   ################# Crowdsec #################
   redis-bouncer:
     restart: unless-stopped
-    image: docker.io/library/redis:alpine
+    image: docker.io/library/redis:${REDIS_TAG:-alpine}
     container_name: redis-bouncer
     hostname: redis-bouncer
     labels:
@@ -320,7 +320,7 @@ services:
   ################# Authelia #################
   authelia:
     restart: unless-stopped
-    image: ghcr.io/authelia/authelia:${AUTHELIA_TAG:-4.39.4}
+    image: ghcr.io/authelia/authelia:${AUTHELIA_TAG:-4.39.5}
     container_name: authelia
     hostname: authelia
     labels:
@@ -363,7 +363,7 @@ services:
 
   redis-authelia:
     restart: unless-stopped
-    image: docker.io/library/redis:alpine
+    image: docker.io/library/redis:${REDIS_TAG:-alpine}
     container_name: redis-authelia
     hostname: redis-authelia
     healthcheck:

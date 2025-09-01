@@ -1,7 +1,7 @@
 services:
   skyblog1:
     restart: unless-stopped
-    image: docker.io/nginx:alpine
+    image: docker.io/nginx:${NGINX_TAG:-alpine}
     container_name: web-skyblog1
     hostname: web-skyblog1
     labels:
@@ -25,7 +25,7 @@ services:
 
   skyblog2:
     restart: unless-stopped
-    image: docker.io/nginx:alpine
+    image: docker.io/nginx:${NGINX_TAG:-alpine}
     container_name: web-skyblog2
     hostname: web-skyblog2
     labels:
@@ -50,7 +50,7 @@ services:
 
   candle:
     restart: unless-stopped
-    image: docker.io/nginx:alpine
+    image: docker.io/nginx:${NGINX_TAG:-alpine}
     container_name: web-candle
     hostname: web-candle
     labels:
@@ -73,7 +73,7 @@ services:
 
   python-pronostic:
     restart: unless-stopped
-    image: python:3.12-alpine3.21
+    image: python:${PYTHON_TAG:-3.12-alpine3.21}
     container_name: python-pronostic
     hostname: python-pronostic
     labels:
