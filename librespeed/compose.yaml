@@ -19,6 +19,8 @@ services:
       PASSWORD: ${PERSONAL_LIBRESPEED_PWD}
     volumes:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/librespeed:/config
+    ports:
+      - ${LIBRESPEED_PORT:-8080}:80
     expose:
       - 80
     networks:
