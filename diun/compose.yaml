@@ -1,9 +1,9 @@
 services:
   diun:
     restart: unless-stopped
-    image: docker.io/crazymax/diun
+    image: docker.io/crazymax/diun:${DIUN_TAG:-latest}
     container_name: diun
-    hostname: diun.${PERSONAL_HOST}
+    hostname: diun.${PERSONAL_HOST:?hostname is required}
     command: serve
     labels:
       diun.enable: true
@@ -15,7 +15,7 @@ services:
       DIUN_WATCH_WORKERS: 20
       DIUN_WATCH_SCHEDULE: 0 17,22 * * *
       DIUN_PROVIDERS_DOCKER: true
-      DIUN_NOTIF_DISCORD_WEBHOOKURL: ${DIUN_NOTIF_DISCORD_WEBHOOKURL}
+      DIUN_NOTIF_DISCORD_WEBHOOKURL: ${DIUN_NOTIF_DISCORD_WEBHOOKURL:?webhook is required}
       DIUN_NOTIF_DISCORD_RENDERFIELDS: true
       DIUN_NOTIF_DISCORD_TIMEOUT: 10s
       DIUN_NOTIF_DISCORD_TEMPLATEBODY: |

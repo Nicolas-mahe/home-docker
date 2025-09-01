@@ -1,7 +1,7 @@
 services:
   wordpress:
     restart: unless-stopped
-    image: wordpress
+    image: wordpress:${WORDPRESS_TAG:-latest}
     container_name: wordpress
     hostname: wordpress
     labels:
@@ -22,7 +22,7 @@ services:
 
   wordpress_db:
     restart: unless-stopped
-    image: lscr.io/linuxserver/mariadb
+    image: lscr.io/linuxserver/mariadb:${MARIADB_TAG:-latest}
     container_name: wordpress_db
     hostname: wordpress_db
     labels:

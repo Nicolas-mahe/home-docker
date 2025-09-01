@@ -28,7 +28,7 @@ services:
   photoprism:
     restart: unless-stopped
     ## Use photoprism/photoprism:preview for testing preview builds:
-    image: photoprism/photoprism:latest
+    image: photoprism/photoprism:${PHOTOPRISM_TAG:-latest}
     container_name: photoprism
     hostname: photoprism
     labels:
@@ -122,7 +122,7 @@ services:
 
   ## see https://docs.photoprism.app/getting-started/faq/#should-i-use-sqlite-mariadb-or-mysql
   mariadb:
-    image: mariadb:11
+    image: mariadb:${MARIADB_TAG:-11}
     container_name: photoprism-db
     hostname: photoprism-db
     ## If MariaDB gets stuck in a restart loop, this points to a memory or filesystem issue:

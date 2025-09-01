@@ -1,7 +1,7 @@
 services:
   heimdall:
     restart: unless-stopped
-    image: lscr.io/linuxserver/heimdall
+    image: lscr.io/linuxserver/heimdall:${HEIMDALL_TAG:-latest}
     container_name: heimdall
     hostname: heimdall
     labels:
@@ -12,8 +12,8 @@ services:
     volumes:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/heimdall:/config
     networks:
-    - web
+    - webinternal
 
 networks:
-  web:
-    external: true
+  webinternal:
+    name: webinternal

@@ -1,7 +1,7 @@
 services:
   swag:
     restart: always
-    image: lscr.io/linuxserver/swag
+    image: lscr.io/linuxserver/swag:${SWAG_TAG:-latest}
     container_name: swag
     hostname: swag
     labels:
@@ -52,7 +52,7 @@ services:
 
   crowdsec:
     restart: always
-    image: ghcr.io/crowdsecurity/crowdsec
+    image: ghcr.io/crowdsecurity/crowdsec:${CROWDSEC_TAG:-latest}
     container_name: crowdsec
     hostname: crowdsec
     security_opt:
@@ -81,7 +81,7 @@ services:
 
   authelia:
     restart: always
-    image: ghcr.io/authelia/authelia
+    image: ghcr.io/authelia/authelia:${AUTHELIA_TAG:-latest}
     container_name: authelia
     hostname: authelia
     security_opt:

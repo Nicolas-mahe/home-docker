@@ -1,7 +1,7 @@
 services:
   vaultwarden:
     restart: unless-stopped
-    image: docker.io/vaultwarden/server:latest-alpine
+    image: docker.io/vaultwarden/server:${VAULTWARDEN_TAG:-latest-alpine}
     container_name: vaultwarden
     hostname: vaultwarden
     labels:
