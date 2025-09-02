@@ -10,15 +10,18 @@ services:
       traefik.enable: true
       traefik.http.routers.nextcloud.tls: true
       traefik.http.routers.nextcloud.entrypoints: websecure
-      traefik.http.routers.nextcloud.middlewares: authelia@docker
+      traefik.http.routers.nextcloud.middlewares: authelia@docker,nextcloud-headers@docker
       traefik.http.routers.nextcloud.rule: Host(`cloud.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.nextcloud.service: nextcloud
       traefik.http.services.nextcloud.loadBalancer.server.port: 80
+      # Middleware HSTS
+      traefik.http.middlewares.nextcloud-headers.headers.customResponseHeaders.Strict-Transport-Security: 'max-age=15552000; includeSubDomains; preload'
     environment:
       NEXTCLOUD_ADMIN_USER: ${NEXTCLOUD_ADMIN_USER}
       NEXTCLOUD_ADMIN_PASSWORD: ${NEXTCLOUD_ADMIN_PASSWORD}
       NEXTCLOUD_TRUSTED_DOMAINS: "cloud.${PERSONAL_DOMAIN_NAME} ${NEXTCLOUD_TRUSTED_DOMAINS}"
       NEXTCLOUD_INIT_HTACCES: true
+      OVERWRITEPROTOCOL: https
       TRUSTED_PROXIES: ${TRUSTED_PROXIES}
       POSTGRES_HOST: nextcloud-postgres:5432
       POSTGRES_DB: ${POSTGRES_DB}
@@ -35,13 +38,12 @@ services:
       MAIL_DOMAIN: ${MAIL_DOMAIN}
     volumes:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/nextcloud:/var/www/html
-      - /${RAID_DATA_DIRECTORY:?raid path is required}/partage/:/mnt/partage
-      - /${RAID_DATA_DIRECTORY:?raid path is required}/backups/:/mnt/backups
-    ports:
-      - ${PERSONAL_NEXTCLOUD_PORT}:80
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/Nextcloud/hooks:/docker-entrypoint-hooks.d
+      - /${RAID_DATA_DIRECTORY:?raid path is required}/partage:/mnt/partage
+      - /${RAID_DATA_DIRECTORY:?raid path is required}/backups:/mnt/backups
     networks:
-      - nextcloud
       - webinternal
+      - nextcloud
   postgres:
     restart: unless-stopped
     image: docker.io/postgres:${POSTGRES_TAG:-17.6-bookworm}
