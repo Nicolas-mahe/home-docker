@@ -4,7 +4,6 @@
 
 services:
   server:
-    restart: unless-stopped
     image: docker.io/itzg/minecraft-server:java17-jdk
     container_name: minecraft-server
     hostname: minecraft-server
@@ -63,7 +62,12 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "6.0"
+          cpus: "8.0"
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 5
+        window: 300s
 
   # server-creative:
   #   restart: no
