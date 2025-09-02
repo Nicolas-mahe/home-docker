@@ -54,7 +54,7 @@ services:
       VIEW_DISTANCE: 10
     volumes:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/minecraft/s5/prod:/data
-      # - /${RAID_DATA_DIRECTORY:?raid path is required}/backups/Minecraft/s5:/backups
+      - /${RAID_DATA_DIRECTORY:?raid path is required}/backups/Games/Minecraft/s5:/data/backups
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/minecraft/RaBByT.jpg:/icon.jpg:ro
     ports:
       - ${PERSONAL_PORT_MINECRAFT}:25565
