@@ -34,7 +34,7 @@ services:
       FORGEVERSION: "40.2.21"
       ICON: /icon.jpg
       MAX_PLAYERS: 5
-      MEMORY: "16G"
+      MEMORY: "18G"
       MODE: survival # 0=survival, 1=creative, 2=adventure, 3=spectator
       MOTD: "§b§l§oRaBByT Season 5:§r§r§r§l§o §r§r§r§2§l§o Ragnamod-VII-7.1.7\n§6§kC'est rigolo cette ligne qui bouge tout le temps"
       ONLINE_MODE: TRUE
@@ -63,8 +63,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "6.0" 
-          memory: 20000M
+          cpus: "6.0"
 
   server-creative:
     restart: no
@@ -100,7 +99,7 @@ services:
       ICON: /icon.jpg
       MAX_PLAYERS: 5
       MAX_TICK_TIME: "-1"
-      MEMORY: "14G"
+      MEMORY: "16G"
       MODE: creative # 0=survival, 1=creative, 2=adventure, 3=spectator
       MOTD: "§b§l§oRaBByT Season 5:§r§r§r§l§o §r§r§r§4§l§oCREATIVE Ragnamod-7.1.7§r§r§r\n§6§kC'est rigolo cette ligne qui bouge tout le temps"
       ONLINE_MODE: TRUE
@@ -133,8 +132,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "6.0" 
-          memory: 8000M
+          cpus: "6.0"
 
   # backups: # Not needed to due a backup mod in stack
   #   restart: unless-stopped
