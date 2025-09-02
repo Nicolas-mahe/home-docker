@@ -1,9 +1,9 @@
 services:
-  nextcloud:
+  app:
     restart: unless-stopped
-    image: lscr.io/linuxserver/nextcloud:${NEXTCLOUD_TAG:-latest}
-    hostname: nextcloud
-    container_name: nextcloud
+    image: docker.io/nextcloud:${NEXTCLOUD_TAG:-latest}
+    container_name: nextcloud-app
+    hostname: nextcloud-app
     labels:
       diun.enable: true
       diun.watch_repos: true
@@ -11,54 +11,58 @@ services:
       traefik.http.routers.nextcloud.tls: true
       traefik.http.routers.nextcloud.entrypoints: websecure
       traefik.http.routers.nextcloud.middlewares: authelia@docker
-      traefik.http.routers.nextcloud.rule: Host(`cloud.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.nextcloud.rule: Host(`cloud.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.nextcloud.service: nextcloud
       traefik.http.services.nextcloud.loadBalancer.server.port: 80
     environment:
-      TZ: Europe/Paris
-      NEXTCLOUD_TRUSTED_DOMAINS: cloud.${PERSONAL_DOMAINE_NAME}
-      # DOCKER_MODS_DEBUG: ${DOCKER_MODS_DEBUG}
-      # DOCKER_MODS: |
-      #   lscr.io/linuxserver/mods:nextcloud-mediadc
-      #   lscr.io/linuxserver/mods:nextcloud-memories
-      #   lscr.io/linuxserver/mods:universal-package-install
-      # INSTALL_PACKAGES: "git|cmake|g++|dlib|libx11" # Facerecognition's requirement: PDlib
+      NEXTCLOUD_ADMIN_USER: ${NEXTCLOUD_ADMIN_USER}
+      NEXTCLOUD_ADMIN_PASSWORD: ${NEXTCLOUD_ADMIN_PASSWORD}
+      NEXTCLOUD_TRUSTED_DOMAINS: "cloud.${PERSONAL_DOMAIN_NAME} ${NEXTCLOUD_TRUSTED_DOMAINS}"
+      TRUSTED_PROXIES: ${TRUSTED_PROXIES}
+      POSTGRES_HOST: nextcloud-postgres:5432
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      REDIS_HOST: nextcloud-redis
+      REDIS_HOST_PASSWORD: ${REDIS_PASSWORD}
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/nextcloud/config:/config
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/nextcloud/data:/data
-      - /${RAID_DATA_DIRECTORY:?raid path is required}/partage/:/mnt/partage
-      - /${RAID_DATA_DIRECTORY:?raid path is required}/backups/:/mnt/backups
-    depends_on:
-      - mariadb
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/nextcloud/app:/var/www/html
     ports:
-      - ${PERSONAL_NEXTCLOUD_PORT?:port mandatory}:443
+      - ${PERSONAL_NEXTCLOUD_PORT}:80
     networks:
-      - cloud-db
+      - nextcloud
       - webinternal
-
-  mariadb:
+  postgres:
     restart: unless-stopped
-    image: lscr.io/linuxserver/mariadb:${MARIADB_TAG:-latest}
-    container_name: nextcloud_db
-    hostname: nextcloud_db
+    image: docker.io/postgres:${POSTGRES_TAG:-17.6-bookworm}
+    container_name: nextcloud-postgres
+    hostname: nextcloud-postgres
     labels:
       diun.enable: true
       diun.watch_repos: true
     environment:
-      PUID: 1000
-      PGID: 100
-      TZ: Europe/Paris
-      MYSQL_ROOT_PASSWORD: ${ROOT_PWD}
-      MARIADB_EXTRA_FLAGS: "--log_bin_trust_function_creators=1"
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/nextcloud/mariadb:/config
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/nextcloud/db:/var/lib/postgresql/data
     networks:
-      - cloud-db
+      - nextcloud
+
+  redis:
+    restart: unless-stopped
+    image: docker.io/redis:alpine
+    container_name: nextcloud-redis
+    hostname: nextcloud-redis
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/nextcloud/redis:/data
+    networks:
+      - nextcloud
 
 networks:
-  cloud-db:
-    name: cloud-db
+  nextcloud:
+    name: nextcloud
     internal: true
   webinternal:
     name: webinternal
