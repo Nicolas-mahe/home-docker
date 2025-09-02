@@ -13,6 +13,7 @@ services:
       - 7777:7777/tcp
     volumes:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/satisfactory:/config
+      - /${RAID_DATA_DIRECTORY:?raid path is required}/backups/Games/Satisfactory/:/config/backups
     environment:
       name: value
       MAXPLAYERS: 4
