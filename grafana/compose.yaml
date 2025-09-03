@@ -1,7 +1,7 @@
 services:
   grafana:
     restart: unless-stopped
-    image: docker.io/grafana/grafana-oss${GRAFANA_TAG:-latest}
+    image: docker.io/grafana/grafana-oss:${GRAFANA_TAG:-latest}
     container_name: grafana
     hostname: grafana
     user: "${PERSONAL_GRAFANA_UID:-0}:${PERSONAL_GRAFANA_GID:-0}"
