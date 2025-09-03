@@ -13,5 +13,5 @@ php occ app:enable oidc_login || true
 export CONFIG_FILE="/var/www/html/config/config.php"
 
 echo "⚙️ Ajout de la configuration OIDC via enable-oidc.php..."
-php /docker-entrypoint-hooks.d/post-installation/enable-oidc.php
+php /docker-entrypoint-hooks.d/post-installation/00-enable-oidc.php
 echo "✅ Configuration OIDC terminée."
