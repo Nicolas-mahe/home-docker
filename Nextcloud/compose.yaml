@@ -1,6 +1,6 @@
 services:
   app:
-    restart: no # unless-stopped
+    restart: unless-stopped
     image: docker.io/nextcloud:${NEXTCLOUD_TAG:-latest}
     container_name: nextcloud-app
     hostname: nextcloud-app
