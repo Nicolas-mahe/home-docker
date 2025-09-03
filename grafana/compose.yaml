@@ -152,11 +152,11 @@ services:
   #     - monitoring
 
 volumes:
-  grafana:
-    name: grafana
-  monitoring:
-    name: monitoring
+  prometheus:
+    name: prometheus
 
 networks:
+  monitoring:
+    name: monitoring
   webinternal:
     name: webinternal
