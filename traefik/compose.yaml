@@ -298,7 +298,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro #Can read logs from socket!
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/crowdsec/config:/etc/crowdsec #Config Crowdsec
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/crowdsec/conf:/etc/traefik/conf #Additional Config Crowdsec
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/crowdsec/html:/etc/traefik/conf #Additional Config Crowdsec
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/crowdsec/data:/var/lib/crowdsec/data/ #Config Crowdsec
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/nextcloud/config/log/:/var/log/nextcloud/:ro #Logs nginx + php Nextcloud
     expose:
@@ -348,7 +348,7 @@ services:
     expose:
       - 9091
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/authelia/config:/config
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/authelia:/config
     networks:
       - webinternal
       - authelia
