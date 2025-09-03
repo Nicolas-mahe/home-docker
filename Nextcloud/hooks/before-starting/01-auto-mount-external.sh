@@ -22,12 +22,6 @@ get_storage_id() {
         }' "$LABEL"
 }
 
-# Creer le group si il n'existe pas
-if ! php occ group:list | grep -q "$ALLOWED_GROUP"; then
-  echo "➕ Création du groupe '$ALLOWED_GROUP'..."
-  php occ group:add "$ALLOWED_GROUP"
-fi
-
 # Parcours tous les sous-dossiers dans /mnt
 for DIR in /mnt/*; do
   if [ -d "$DIR" ]; then
