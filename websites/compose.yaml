@@ -92,7 +92,7 @@ services:
     environment:
       TZ: Europe/Paris
     volumes:
-      - python-pronostic:/data
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/websites/pronostic:/data
     env_file:
       - stack.env
     command:
