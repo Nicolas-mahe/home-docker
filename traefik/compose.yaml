@@ -243,7 +243,7 @@ services:
     environment:
       TZ: Europe/Paris
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/crowdsec/redis-bouncer:/data
+      - crowdsec-redis:/data
     networks:
       - crowdsec
     command: --save 60 1 --loglevel warning
@@ -378,7 +378,7 @@ services:
     expose:
       - 6379
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/authelia/redis:/data
+      - authelia-redis:/data
     networks:
       - authelia
     command: --save 60 1 --loglevel warning
@@ -392,6 +392,12 @@ secrets:
     file: /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-secret/web/SESSION_SECRET
   STORAGE_ENCRYPTION_KEY:
     file: /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-secret/web/STORAGE_ENCRYPTION_KEY
+
+volumes:
+  authelia-redis:
+    name: authelia-redis
+  crowdsec-redis:
+    name: crowdsec-redis
 
 networks:
   authelia:
