@@ -286,9 +286,10 @@ services:
       COLLECTIONS: |
         crowdsecurity/appsec-generic-rules
         crowdsecurity/appsec-virtual-patching
-        crowdsecurity/whitelist-good-actors
         crowdsecurity/linux
         crowdsecurity/linux-lpe
+        crowdsecurity/nextcloud
+        crowdsecurity/whitelist-good-actors
         LePresidente/authelia
         LePresidente/grafana
         crowdsecurity/traefik
