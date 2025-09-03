@@ -21,7 +21,7 @@ services:
       DUPLICATI__WEBSERVICE_ALLOWED_HOSTNAMES: duplicati.${PERSONAL_DOMAINE_NAME}
       DUPLICATI__WEBSERVICE_PASSWORD: ${DUPLICATI_WEB_PWD}
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/duplicati:/data
+      - duplicati:/data
       - /${RAID_DATA_DIRECTORY:?raid path is required}/backups:/backups
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker:/source/docker
       - /${RAID_DATA_DIRECTORY:?raid path is required}/partage:/source/partage
@@ -37,6 +37,10 @@ services:
 secrets:
   SETTINGS_ENCRYPTION_KEY:
     file: /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-secret/duplicati/SETTINGS_ENCRYPTION_KEY.txt
+
+volumes:
+  duplicati:
+    name: duplicati
 
 networks:
   webinternal:
