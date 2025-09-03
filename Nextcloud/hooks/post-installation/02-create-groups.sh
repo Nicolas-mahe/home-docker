@@ -13,15 +13,7 @@ else
 fi
 
 # Ajout de l'utilisateur admin au(x) groupe(s)
-if php occ user:list | grep -q "$ADMIN_USER"; then
-  if php occ group:list-members "$ALLOWED_GROUP" | grep -q "$ADMIN_USER"; then
-    echo "ℹ️ L’utilisateur '$ADMIN_USER' est déjà membre du groupe '$ALLOWED_GROUP'."
-  else
-    echo "👤 Ajout de l’utilisateur '$ADMIN_USER' au groupe '$ALLOWED_GROUP'..."
-    php occ group:adduser "$ALLOWED_GROUP" "$ADMIN_USER"
-  fi
-else
-  echo "⚠️ L’utilisateur '$ADMIN_USER' n’existe pas encore dans Nextcloud, impossible de l’ajouter."
-fi
+php occ group:adduser "$ALLOWED_GROUP" "$ADMIN_USER"
+echo "👤 Ajout de l’utilisateur '$ADMIN_USER' au groupe '$ALLOWED_GROUP'..."
 
 echo "✅ Configuration des groupes terminée."
