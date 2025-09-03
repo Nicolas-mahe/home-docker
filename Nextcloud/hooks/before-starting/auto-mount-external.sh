@@ -34,19 +34,19 @@ for DIR in /mnt/*; do
     else
       echo "➕ Ajout du stockage externe '$LABEL'..."
       php occ files_external:create "/$LABEL" local null::null -c datadir="$DIR"
-    fi
 
-    # Récupère l'ID
-    STORAGE_ID=$(get_storage_id "$LABEL")
-    echo "🔍 L'ID du stockage '$LABEL' est le $STORAGE_ID"
+      # Récupère l'ID
+      STORAGE_ID=$(get_storage_id "$LABEL")
+      echo "🔍 L'ID du stockage '$LABEL' est le $STORAGE_ID"
 
-    if [ -n "$STORAGE_ID" ]; then
-      echo "👥 Restriction du stockage '$LABEL' (ID=$STORAGE_ID) au groupe '$ALLOWED_GROUP'..."
-      php occ files_external:applicable --add-group="$ALLOWED_GROUP" "$STORAGE_ID"
-    else
-      echo "⚠️ Impossible de récupérer l'ID du stockage '$LABEL'."
+      if [ -n "$STORAGE_ID" ]; then
+        echo "👥 Restriction du stockage '$LABEL' (ID=$STORAGE_ID) au groupe '$ALLOWED_GROUP'..."
+        php occ files_external:applicable --add-group="$ALLOWED_GROUP" "$STORAGE_ID"
+      else
+        echo "⚠️ Impossible de récupérer l'ID du stockage '$LABEL'."
+      fi
     fi
   fi
 done
 
-echo "✅ Tous les stockages externes sont configurés et restreints au groupe '$ALLOWED_GROUP'."
+echo "✅ Tous les stockages externes sont configurés."
