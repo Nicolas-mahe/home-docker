@@ -21,9 +21,11 @@ services:
       MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS}
       NEXTCLOUD_ADMIN_PASSWORD: ${NEXTCLOUD_ADMIN_PASSWORD}
       NEXTCLOUD_ADMIN_USER: ${NEXTCLOUD_ADMIN_USER}
+      NEXTCLOUD_API_TOKEN: ${NEXTCLOUD_API_TOKEN}
       NEXTCLOUD_EXTERNAL_GROUP: ${NEXTCLOUD_EXTERNAL_GROUP}
       NEXTCLOUD_INIT_HTACCES: true
-      NEXTCLOUD_TRUSTED_DOMAINS: "cloud.${PERSONAL_DOMAIN_NAME}"
+      NEXTCLOUD_DEFAULT_QUOTA: ${NEXTCLOUD_DEFAULT_QUOTA}
+      NEXTCLOUD_TRUSTED_DOMAINS: "cloud.${PERSONAL_DOMAIN_NAME} nextcloud-app"
       NEXTCLOUD_SITE_NAME: ${NEXTCLOUD_SITE_NAME}
       NEXTCLOUD_SLOGAN: ${NEXTCLOUD_SLOGAN}
       OIDC_CLIENT_ID: ${OIDC_CLIENT_ID}
@@ -45,6 +47,7 @@ services:
       TRUSTED_PROXIES: ${TRUSTED_PROXIES}
     volumes:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/nextcloud:/var/www/html
+      - /${RAID_DATA_DIRECTORY:?raid path is required}/nextcloud:/var/www/html/data
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/Nextcloud/hooks:/docker-entrypoint-hooks.d
       - /${RAID_DATA_DIRECTORY:?raid path is required}/partage:/mnt/partage
       - /${RAID_DATA_DIRECTORY:?raid path is required}/backups:/mnt/backups
