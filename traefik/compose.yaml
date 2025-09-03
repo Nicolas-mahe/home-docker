@@ -102,7 +102,7 @@ services:
         condition: service_started
     networks:
       - crowdsec
-      - prometheus
+      - monitoring
       - webexpose
       - webinternal
     healthcheck:
@@ -306,7 +306,7 @@ services:
       - 8080
     networks:
       - crowdsec
-      - prometheus
+      - monitoring
       - webexpose
     healthcheck:
       test: ["CMD-SHELL", "wget --spider -q http://localhost:8080/health"]
@@ -404,8 +404,8 @@ networks:
     name: authelia
   crowdsec:
     name: crowdsec
-  prometheus:
-    name: prometheus
+  monitoring:
+    name: monitoring
   webexpose:
     name: webexpose
   webinternal:
