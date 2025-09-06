@@ -128,6 +128,69 @@ delete_old_files() {
     fi
 }
 
+# Function to perform backup of a container application
+# Parameters:
+#   $1 - AppName: Name of the application/container
+#   $2 - CommandToRun: Backup command to execute in the container
+#   $3 - BackupFolderName: Name of the folder containing backups
+#   $4 - BackupPrefix: Prefix for backup files (optional)
+#   $5 - BackupSuffix: Suffix for backup files (optional)
+#   $6 - BackupRetention: Number of backups to retain (default: 2)
+# Returns:
+#   0 if backup successful, 1 if failed, 2 if container not found
+perform_backup() {
+    local AppName="$1"
+    local CommandToRun="$2"
+    local BackupFolderName="$3"
+    local BackupPrefix="${4:-}"
+    local BackupSuffix="${5:-}"
+    local BackupRetention="${6:-2}"
+    local return_code=0
+
+    log_info "Starting $AppName backup process..."
+    local container_info
+    container_info=$(get_container_info "$AppName" endswith)
+
+    if [ -n "$container_info" ]; then
+        # Extract container information
+        local container_id
+        local container_name
+        local container_status
+        container_id=$(echo "$container_info" | jq -r '.ID')
+        container_name=$(echo "$container_info" | jq -r '.Names')
+        container_status=$(echo "$container_info" | jq -r '.Status')
+
+        log_info "Container found: ID=$container_id, Name=$container_name, Status=$container_status"
+        
+        # Execute backup command
+        log_info "Initiating $AppName backup process..."
+        if docker exec -t "$container_id" $CommandToRun; then
+            log_success "$AppName backup completed successfully"
+        else
+            log_error "$AppName backup failed"
+            return_code=1
+        fi
+
+        # Clean up old backup files if backup was successful
+        if [ $return_code -eq 0 ]; then
+            local HostBackupPath
+            HostBackupPath=$(echo "$container_info" | jq -r '.Mounts' | tr ',' '\n')
+            log_info "Checking backup paths: $HostBackupPath"
+            
+            for path in $HostBackupPath; do
+                if ls "$path" | grep -q "$BackupFolderName"; then
+                    delete_old_files "$path/$BackupFolderName" "$BackupPrefix" "$BackupSuffix" "$BackupRetention"
+                fi
+            done
+        fi
+    else
+        log_warning "$AppName container not found or not running, skipping ..."
+        return_code=2
+    fi
+
+    return $return_code
+}
+
 #===============================================================================
 # INITIALIZATION
 #===============================================================================
@@ -140,45 +203,17 @@ log_info "Starting backup process at: $exec_date"
 # MAIN EXECUTION
 #===============================================================================
 
-AppName="gitlab"
-CommandToRun="gitlab-backup create"
-BackupFolderName="backups"
-BackupPrefix=""
-BackupSuffix="gitlab_backup.tar"
-BackupRetention="2"
+# GitLab
+APP_CONFIG=(
+    "gitlab"                # AppName
+    "gitlab-backup create"  # CommandToRun
+    "backups"              # BackupFolderName
+    ""                     # BackupPrefix
+    "gitlab_backup.tar"    # BackupSuffix
+    "2"                    # BackupRetention
+)
 
-log_info "Starting $AppName backup process..."
-container_info=$(get_container_info "$AppName" endswith)
-
-if [ -n "$container_info" ]; then
-    # Extract container information
-    container_id=$(echo "$container_info" | jq -r '.ID')
-    container_name=$(echo "$container_info" | jq -r '.Names')
-    container_status=$(echo "$container_info" | jq -r '.Status')
-
-    log_info "Container found: ID=$container_id, Name=$container_name, Status=$container_status"
-    
-    # Execute backup command
-    log_info "Initiating $AppName backup process..."
-    docker exec -t "$container_id" $CommandToRun
-
-    # Check if backup was successful
-    if [ $? -eq 0 ]; then
-        log_success "$AppName backup completed successfully"
-    else
-        log_error "$AppName backup failed"
-    fi
-    # Clean up old backup files
-    HostBackupPath=$(echo "$container_info" | jq -r '.Mounts' | tr ',' '\n')
-    echo "HostBackupPath: $HostBackupPath"
-    for path in $HostBackupPath
-    do
-        if ls "$path" | grep -q "$BackupFolderName"; then
-            delete_old_files "$path/$BackupFolderName" "$BackupPrefix" "$BackupSuffix" $BackupRetention
-        fi
-    done
-else
-    log_warning "$AppName container not found or not running, skipping ..."
-fi
+# Execute backup with configuration
+perform_backup "${APP_CONFIG[@]}"
 
 log_success "Script completed successfully"
