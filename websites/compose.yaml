@@ -80,7 +80,7 @@ services:
       traefik.enable: true
       traefik.http.routers.python-pronostics-liste.tls: true
       traefik.http.routers.python-pronostics-liste.entrypoints: websecure
-      traefik.http.routers.python-pronostics-liste.rule: Host(`pronostics.${PERSONAL_DOMAINE_NAME}`) && PathPrefix(`/liste`)
+      traefik.http.routers.python-pronostics-liste.rule: Host(`pronostic.${PERSONAL_DOMAINE_NAME}`) && PathPrefix(`/liste`)
       traefik.http.routers.python-pronostics-liste.middlewares: authelia@docker
       traefik.http.routers.python-pronostics-liste.service: python-pronostics
       traefik.http.routers.python-pronostics.tls: true
