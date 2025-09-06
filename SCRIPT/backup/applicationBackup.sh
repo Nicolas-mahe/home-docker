@@ -171,55 +171,54 @@ perform_backup() {
     local BackupSuffix="${6:-}"
     local BackupRetention="${7:-2}"
     local return_code=0
+    local HostBackupPath
+    local container_id
+    local container_name
+    local container_status
+    local command_to_execute
+    local container_info
 
     log_info "Starting $AppName backup process..."
-    local container_info
     container_info=$(get_container_info "$AppName" "$Cpattern")
 
     if [ -n "$container_info" ]; then
         # Extract container information
-        local container_id
-        local container_name
-        local container_status
-        local evaluated_command
         container_id=$(echo "$container_info" | jq -r '.ID')
         container_name=$(echo "$container_info" | jq -r '.Names')
         container_status=$(echo "$container_info" | jq -r '.Status')
+        HostBackupPath=$(echo "$container_info" | jq -r '.Mounts' | tr ',' '\n')
         get_container_env "$(echo "$container_info" | jq -r '.ID')"
 
         log_info "Container found: ID=$container_id, Name=$container_name, Status=$container_status"
         
-        # Execute backup command
-        log_info "Initiating $AppName backup process..."
-
         # Interpret vars in command
         if [[ -n "${CONTAINER_ENV[POSTGRES_USER]}" ]]; then
-            evaluated_command="${CommandToRun/__POSTGRES_USER__/${CONTAINER_ENV[POSTGRES_USER]:-postgres}}"
+            command_to_execute="${CommandToRun/__POSTGRES_USER__/${CONTAINER_ENV[POSTGRES_USER]}}"
         else
-            evaluated_command="$CommandToRun"
+            command_to_execute="$CommandToRun"
         fi
+        log_info "Executing command: docker exec -t $container_id $command_to_execute"
 
-        log_info "Executing command: docker exec -t $container_id $evaluated_command"
-
-        # Execute backup command
-        if docker exec -t "$container_id" $evaluated_command; then
+        # docker exec -t "$container_id" $command_to_execute
+        # Check if backup was successful
+        if [ $? -eq 0 ]; then
             log_success "$AppName backup completed successfully"
         else
             log_error "$AppName backup failed"
             return_code=1
         fi
 
-        # Clean up old backup files if backup was successful
-        if [ $return_code -eq 0 ]; then
-            local HostBackupPath
-            HostBackupPath=$(echo "$container_info" | jq -r '.Mounts' | tr ',' '\n')
+        # Clean up old backup files if backup was successful and HostBackupPath is contains values with '/'
+        if [[ $return_code -eq 0 && -n "$HostBackupPath" && "$HostBackupPath" == */* ]]; then
             log_info "Checking backup paths: $HostBackupPath"
-            
+
             for path in $HostBackupPath; do
                 if ls "$path" | grep -q "$BackupFolderName"; then
                     delete_old_files "$path/$BackupFolderName" "$BackupPrefix" "$BackupSuffix" "$BackupRetention"
                 fi
             done
+        else
+            log_info "No valid backup paths found, skipping old backup cleanup."
         fi
     else
         log_warning "$AppName container not found or not running, skipping ..."
@@ -265,4 +264,5 @@ APP_CONFIG=(
     '2'
 )
 perform_backup "${APP_CONFIG[@]}"
+
 log_success "Script completed successfully"
