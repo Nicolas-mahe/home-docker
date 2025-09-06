@@ -175,5 +175,7 @@ if [ -n "$container_info" ]; then
         fi
     done
 else
-    log_warning "$AppName container not found or not running"
+    log_warning "$AppName container not found or not running, skipping ..."
 fi
+
+log_success "Backups Process completed successfully"
