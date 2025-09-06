@@ -206,9 +206,9 @@ perform_backup() {
         fi
         command_to_execute="${command_to_execute/__FILE_NAME__/${BackupFileName}}"
 
-        log_info "Executing command: docker exec -t $container_id $command_to_execute"
+        log_info "Executing command: docker exec -t $container_id sh -c \"$command_to_execute\""
 
-        if docker exec -t "$container_id" $command_to_execute; then
+        if docker exec -t "$container_id" sh -c "$command_to_execute"; then
             log_success "$container_name backup completed successfully"
         else
             log_error "$container_name backup failed"
@@ -276,6 +276,18 @@ APP_CONFIG=(
     "backups"
     ""
     "postgres_backup.sql"
+    "2"
+)
+perform_backup "${APP_CONFIG[@]}"
+
+# Pronostic (SQLite)
+APP_CONFIG=(
+    "pronostic"
+    "endswith"
+    "sqlite3 /data/instance/pronostics.db '.backup /data/instance/sqlite.db'"
+    "instance"
+    ""
+    "sqlite.db"
     "2"
 )
 perform_backup "${APP_CONFIG[@]}"
