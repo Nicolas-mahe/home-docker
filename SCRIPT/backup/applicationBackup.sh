@@ -140,9 +140,12 @@ log_info "Starting backup process at: $exec_date"
 # MAIN EXECUTION
 #===============================================================================
 
-# Process GitLab backup
 AppName="gitlab"
+CommandToRun="gitlab-backup create"
 BackupFolderName="backups"
+BackupPrefix=""
+BackupSuffix="gitlab_backup.tar"
+BackupRetention="2"
 
 log_info "Starting $AppName backup process..."
 container_info=$(get_container_info "$AppName" endswith)
@@ -157,7 +160,7 @@ if [ -n "$container_info" ]; then
     
     # Execute backup command
     log_info "Initiating $AppName backup process..."
-    docker exec -t "$container_id" gitlab-backup create
+    docker exec -t "$container_id" $CommandToRun
 
     # Check if backup was successful
     if [ $? -eq 0 ]; then
@@ -171,11 +174,11 @@ if [ -n "$container_info" ]; then
     for path in $HostBackupPath
     do
         if ls "$path" | grep -q "$BackupFolderName"; then
-            delete_old_files "$path/$BackupFolderName" "" "gitlab_backup.tar" 2
+            delete_old_files "$path/$BackupFolderName" "$BackupPrefix" "$BackupSuffix" $BackupRetention
         fi
     done
 else
     log_warning "$AppName container not found or not running, skipping ..."
 fi
 
-log_success "Backups Process completed successfully"
+log_success "Script completed successfully"
