@@ -5,24 +5,24 @@
 #===============================================================================
 
 # Color definitions for logs
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
 BLUE='\033[0;34m'
-PURPLE='\033[0;35m'
 CYAN='\033[0;36m'
+GREEN='\033[0;32m'
 NC='\033[0m' # No Color
+PURPLE='\033[0;35m'
+RED='\033[0;31m'
+YELLOW='\033[0;33m'
 
 #===============================================================================
 # FUNCTIONS
 #===============================================================================
 
 # Log functions for different message types
-log_debug() { echo -e "${PURPLE}[DEBUG]${NC} $1" >&2; }
-log_info() { echo -e "${BLUE}[INFO]${NC} $1" >&2; }
-log_success() { echo -e "${GREEN}[SUCCESS]${NC} $1" >&2; }
-log_warning() { echo -e "${YELLOW}[WARNING]${NC} $1" >&2; }
-log_error() { echo -e "${RED}[ERROR]${NC} $1" >&2; }
+log_debug() { echo -e "${PURPLE}[D]${NC} $1" >&2; }
+log_info() { echo -e "${BLUE}[I]${NC} $1" >&2; }
+log_success() { echo -e "${GREEN}[S]${NC} $1" >&2; }
+log_warning() { echo -e "${YELLOW}[W]${NC} $1" >&2; }
+log_error() { echo -e "${RED}[E]${NC} $1" >&2; }
 
 # Delete old files if the number of files exceeds $NbBackups
 # Parameters:
@@ -147,18 +147,17 @@ get_container_info() {
             ;;
     esac
     
-    log_info "Searching for container ($mode match): $pattern"
     docker ps -f "name=${pattern}" --format '{{json .}}' --no-trunc
 }
 
 # Function to perform backup of a container application
 # Parameters:
 #   $1 - AppName: Name of the application/container
-#   $2 - Cpattern: Container name pattern (optional)
-#   $3 - CommandToRun: Backup command to execute in the container
-#   $4 - BackupFolderName: Name of the folder containing backups
-#   $5 - BackupPrefix: Prefix for backup files (optional)
-#   $6 - BackupSuffix: Suffix for backup files (optional)
+#   $2 - Cpattern: Container name pattern (optional) see 'get_container_info'
+#   $3 - CommandToRun: Command to execute in the container
+#   $4 - BackupFolderName: Name of the folder containing backups on host
+#   $5 - BackupPrefix: Prefix for backup files to sort (optional)
+#   $6 - BackupSuffix: Suffix for backup files to sort (optional)
 #   $7 - BackupRetention: Number of backups to retain (default: 2)
 # Returns:
 #   0 if backup successful, 1 if failed, 2 if container not found
@@ -170,8 +169,9 @@ perform_backup() {
     local BackupPrefix="${5:-}"
     local BackupSuffix="${6:-}"
     local BackupRetention="${7:-2}"
+    local BackupFileName="${BackupPrefix}_${exec_date}_${BackupSuffix}"
     local return_code=0
-    local HostBackupPath
+    local container_mounts
     local container_id
     local container_name
     local container_status
@@ -186,7 +186,7 @@ perform_backup() {
         container_id=$(echo "$container_info" | jq -r '.ID')
         container_name=$(echo "$container_info" | jq -r '.Names')
         container_status=$(echo "$container_info" | jq -r '.Status')
-        HostBackupPath=$(echo "$container_info" | jq -r '.Mounts' | tr ',' '\n')
+        container_mounts=$(echo "$container_info" | jq -r '.Mounts' | tr ',' '\n')
         get_container_env "$(echo "$container_info" | jq -r '.ID')"
 
         log_info "Container found: ID=$container_id, Name=$container_name, Status=$container_status"
@@ -195,11 +195,13 @@ perform_backup() {
         if [[ -n "${CONTAINER_ENV[POSTGRES_USER]}" ]]; then
             command_to_execute="${CommandToRun/__POSTGRES_USER__/${CONTAINER_ENV[POSTGRES_USER]}}"
         else
-            command_to_execute="$CommandToRun"
+            command_to_execute="${CommandToRun}"
         fi
+        command_to_execute="${command_to_execute/__FILE_NAME__/${BackupFileName}}"
+
         log_info "Executing command: docker exec -t $container_id $command_to_execute"
 
-        # docker exec -t "$container_id" $command_to_execute
+        docker exec -t "$container_id" $command_to_execute
         # Check if backup was successful
         if [ $? -eq 0 ]; then
             log_success "$AppName backup completed successfully"
@@ -208,17 +210,26 @@ perform_backup() {
             return_code=1
         fi
 
-        # Clean up old backup files if backup was successful and HostBackupPath is contains values with '/'
-        if [[ $return_code -eq 0 && -n "$HostBackupPath" && "$HostBackupPath" == */* ]]; then
-            log_info "Checking backup paths: $HostBackupPath"
+        # Clean up old backup files if backup was successful
+        if [ $return_code -eq 0 ]; then
+            # Manage with folder(s) mount
+            if [[ -n "$container_mounts" && "$container_mounts" == */* ]]; then
+                log_info "Checking backup paths: $container_mounts"
 
-            for path in $HostBackupPath; do
-                if ls "$path" | grep -q "$BackupFolderName"; then
-                    delete_old_files "$path/$BackupFolderName" "$BackupPrefix" "$BackupSuffix" "$BackupRetention"
-                fi
-            done
-        else
-            log_info "No valid backup paths found, skipping old backup cleanup."
+                for path in $container_mounts; do
+                    if ls "$path" | grep -q "$BackupFolderName"; then
+                        delete_old_files "$path/$BackupFolderName" "$BackupPrefix" "$BackupSuffix" "$BackupRetention"
+                    fi
+                done
+            # Manage without folder(s) mount
+            else
+                HostContainerBackupPath="$HostBackupPath/$container_name"
+                log_info "No host's mount paths found, copying backup files on host to: $HostContainerBackupPath"
+                mkdir -p "$HostContainerBackupPath"
+                docker cp "$container_id:/${BackupFileName}" "$HostContainerBackupPath/${BackupFileName}"
+                docker exec -t "$container_id" rm /${BackupFileName}
+                delete_old_files "$HostContainerBackupPath" "$BackupPrefix" "$BackupSuffix" "$BackupRetention"
+            fi
         fi
     else
         log_warning "$AppName container not found or not running, skipping ..."
@@ -232,9 +243,11 @@ perform_backup() {
 # INITIALIZATION
 #===============================================================================
 
-# Set execution date for backup naming
+# Recover execution date
 exec_date=$(date "+%Y-%m-%d_%H-%M-%S")
 log_info "Starting backup process at: $exec_date"
+
+HostBackupPath=/${DOCKER_DATA_DIRECTORY:-data}/docker/docker-backup
 
 #===============================================================================
 # MAIN EXECUTION
@@ -250,19 +263,31 @@ APP_CONFIG=(
     "gitlab_backup.tar"
     "2"
 )
-# get_container_env "$(get_container_info "${APP_CONFIG[0]}" "${APP_CONFIG[1]}" | jq -r '.ID')"
 perform_backup "${APP_CONFIG[@]}"
 
 # Postgres
-APP_CONFIG=(
-    'postgres'
-    'endswith'
-    "pg_dumpall -U __POSTGRES_USER__" # > /home/rabbyt/docker/docker-backups/postgres/${AppName}_backup.sql
-    'backups'
-    ''
-    'postgres_backup.sql'
-    '2'
-)
-perform_backup "${APP_CONFIG[@]}"
+log_info "Searching for Postgres containers..."
+Postgres_containers=$(get_container_info 'postgres' 'contains')
+if [ -n "$Postgres_containers" ]; then
+    echo "$Postgres_containers" | while IFS= read -r container_info; do
+        [ -z "$container_info" ] && continue
+        container_name=$(echo "$container_info" | jq -r '.Names')
+        log_info "Found Postgres container: $container_name"
+        APP_CONFIG=(
+            "$container_name"
+            'exact'
+            "pg_dumpall -U __POSTGRES_USER__ -c --if-exist -f __FILE_NAME__"
+            'backups'
+            ''
+            'postgres_backup.sql'
+            '2'
+        )
+        perform_backup "${APP_CONFIG[@]}"
+        echo ""
+        echo "---------------"
+    done
+else
+    log_warning "No Postgres containers found"
+fi
 
 log_success "Script completed successfully"
