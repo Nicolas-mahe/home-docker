@@ -1,6 +1,6 @@
 services:
   gitlab:
-    image: gitlab/gitlab-ee:${GITLAB_TAG:-18.2.1-ee.0}
+    image: gitlab/gitlab-ee:${GITLAB_TAG:-18.3.1-ee.0}
     container_name: gitlab
     restart: unless-stopped
     hostname: 'gitlab.${PERSONAL_DOMAINE_NAME}'
@@ -37,6 +37,7 @@ services:
         gitlab_rails['registry_port'] = "5050"
         gitlab_rails['registry_path'] = "/var/opt/gitlab/gitlab-rails/shared/registry"
         letsencrypt['enable'] = false
+        gitlab_rails['backup_archive_permissions'] = 0644 # Makes the backup archives world-readable
     ports:
       - "444:443"
       - "22:22"
@@ -54,7 +55,7 @@ services:
       - webinternal
 
   gitlab-runner:
-    image: gitlab/gitlab-runner:${RUNNER_TAG:-v18.2.1}
+    image: gitlab/gitlab-runner:${RUNNER_TAG:-v18.3.0}
     container_name: gitlab-runner
     hostname: gitlab-runner
     restart: unless-stopped
