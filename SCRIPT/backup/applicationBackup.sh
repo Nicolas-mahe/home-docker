@@ -18,52 +18,11 @@ NC='\033[0m' # No Color
 #===============================================================================
 
 # Log functions for different message types
+log_debug() { echo -e "${PURPLE}[DEBUG]${NC} $1" >&2; }
 log_info() { echo -e "${BLUE}[INFO]${NC} $1" >&2; }
-
 log_success() { echo -e "${GREEN}[SUCCESS]${NC} $1" >&2; }
-
 log_warning() { echo -e "${YELLOW}[WARNING]${NC} $1" >&2; }
-
 log_error() { echo -e "${RED}[ERROR]${NC} $1" >&2; }
-
-# Generic function to get container information
-# Parameters:
-#   $1 - container name to search for
-#   $2 - search mode (optional, defaults to 'exact')
-# Modes:
-#   - exact: Match the exact container name
-#   - startswith: Match containers whose names start with the given string
-#   - endswith: Match containers whose names end with the given string
-#   - contains: Match containers whose names contain the given string
-# Returns:
-#   JSON formatted container information if found
-get_container_info() {
-    local cname="$1"
-    local mode="${2:-exact}"  # default mode = exact
-    local pattern
-
-    case "$mode" in
-        exact)
-            pattern="^${cname}$"
-            ;;
-        startswith)
-            pattern="^${cname}"
-            ;;
-        endswith)
-            pattern="${cname}$"
-            ;;
-        contains)
-            pattern="${cname}"
-            ;;
-        *)
-            log_error "Unknown mode: $mode"
-            return 1
-            ;;
-    esac
-    
-    log_info "Searching for container ($mode match): $pattern"
-    docker ps -f "name=${pattern}" --format '{{json .}}' --no-trunc
-}
 
 # Delete old files if the number of files exceeds $NbBackups
 # Parameters:
@@ -117,7 +76,7 @@ delete_old_files() {
         do
             local file="${sorted_files[$i]}"
             if [[ -f "$file" ]]; then
-                rm -f "$file"
+                # rm -f "$file"
                 log_success "File deleted: $file"
             else
                 log_warning "Skipping invalid file: $file"
@@ -128,43 +87,107 @@ delete_old_files() {
     fi
 }
 
+get_container_env() {
+    local cid="$1"
+    if [ -z "$cid" ]; then
+        echo "Usage: get_container_env <container_id_or_name>"
+        return 1
+    fi
+
+    # Déclare un tableau associatif global
+    declare -gA CONTAINER_ENV=()
+
+    # Remplit le tableau associatif avec KEY=VALUE
+    while IFS='=' read -r key value; do
+        CONTAINER_ENV["$key"]="$value"
+    done < <(docker exec "$cid" env)
+} # echo "${CONTAINER_ENV[PGDATA]}"
+
+# Generic function to get container information
+# Parameters:
+#   $1 - container name to search for
+#   $2 - search mode (optional, defaults to 'exact')
+# Modes:
+#   - exact: Match the exact container name
+#   - startswith: Match containers whose names start with the given string
+#   - endswith: Match containers whose names end with the given string
+#   - contains: Match containers whose names contain the given string
+# Returns:
+#   JSON formatted container information if found
+get_container_info() {
+    local cname="$1"
+    local mode="${2:-exact}"  # default mode = exact
+    local pattern
+
+    case "$mode" in
+        exact)
+            pattern="^${cname}$"
+            ;;
+        startswith)
+            pattern="^${cname}"
+            ;;
+        endswith)
+            pattern="${cname}$"
+            ;;
+        contains)
+            pattern="${cname}"
+            ;;
+        *)
+            log_error "Unknown mode: $mode"
+            return 1
+            ;;
+    esac
+    
+    log_info "Searching for container ($mode match): $pattern"
+    docker ps -f "name=${pattern}" --format '{{json .}}' --no-trunc
+}
+
 # Function to perform backup of a container application
 # Parameters:
 #   $1 - AppName: Name of the application/container
-#   $2 - CommandToRun: Backup command to execute in the container
-#   $3 - BackupFolderName: Name of the folder containing backups
-#   $4 - BackupPrefix: Prefix for backup files (optional)
-#   $5 - BackupSuffix: Suffix for backup files (optional)
-#   $6 - BackupRetention: Number of backups to retain (default: 2)
+#   $2 - Cpattern: Container name pattern (optional)
+#   $3 - CommandToRun: Backup command to execute in the container
+#   $4 - BackupFolderName: Name of the folder containing backups
+#   $5 - BackupPrefix: Prefix for backup files (optional)
+#   $6 - BackupSuffix: Suffix for backup files (optional)
+#   $7 - BackupRetention: Number of backups to retain (default: 2)
 # Returns:
 #   0 if backup successful, 1 if failed, 2 if container not found
 perform_backup() {
     local AppName="$1"
-    local CommandToRun="$2"
-    local BackupFolderName="$3"
-    local BackupPrefix="${4:-}"
-    local BackupSuffix="${5:-}"
-    local BackupRetention="${6:-2}"
+    local Cpattern="$2"
+    local CommandToRun="$3"
+    local BackupFolderName="$4"
+    local BackupPrefix="${5:-}"
+    local BackupSuffix="${6:-}"
+    local BackupRetention="${7:-2}"
     local return_code=0
 
     log_info "Starting $AppName backup process..."
     local container_info
-    container_info=$(get_container_info "$AppName" endswith)
+    container_info=$(get_container_info "$AppName" "$Cpattern")
 
     if [ -n "$container_info" ]; then
         # Extract container information
         local container_id
         local container_name
         local container_status
+        local evaluated_command
         container_id=$(echo "$container_info" | jq -r '.ID')
         container_name=$(echo "$container_info" | jq -r '.Names')
         container_status=$(echo "$container_info" | jq -r '.Status')
+        get_container_env "$(echo "$container_info" | jq -r '.ID')"
 
         log_info "Container found: ID=$container_id, Name=$container_name, Status=$container_status"
         
         # Execute backup command
         log_info "Initiating $AppName backup process..."
-        if docker exec -t "$container_id" $CommandToRun; then
+
+        # Évaluer la commande pour remplacer les variables
+        evaluated_command="${CommandToRun/__POSTGRES_USER__/${CONTAINER_ENV[POSTGRES_USER]:-postgres}}"
+        log_debug "Executing command: docker exec -t $container_id $evaluated_command"
+
+        if docker exec -t "$container_id" $evaluated_command; then
             log_success "$AppName backup completed successfully"
         else
             log_error "$AppName backup failed"
@@ -203,17 +226,30 @@ log_info "Starting backup process at: $exec_date"
 # MAIN EXECUTION
 #===============================================================================
 
-# GitLab
+# # GitLab
+# APP_CONFIG=(
+#     "gitlab"
+#     "endswith"
+#     "gitlab-backup create"
+#     "backups"
+#     ""
+#     "gitlab_backup.tar"
+#     "2"
+# )
+# perform_backup "${APP_CONFIG[@]}"
+
+# Postgres
 APP_CONFIG=(
-    "gitlab"                # AppName
-    "gitlab-backup create"  # CommandToRun
-    "backups"              # BackupFolderName
-    ""                     # BackupPrefix
-    "gitlab_backup.tar"    # BackupSuffix
-    "2"                    # BackupRetention
+    'postgres'
+    'endswith'
+    "pg_dumpall -U __POSTGRES_USER__" # > /home/rabbyt/docker/docker-backups/postgres/${AppName}_backup.sql
+    'backups'
+    ''
+    'postgres_backup.sql'
+    '2'
 )
 
-# Execute backup with configuration
+# Recover Env Vars from container
 perform_backup "${APP_CONFIG[@]}"
 
 log_success "Script completed successfully"
