@@ -94,14 +94,23 @@ get_container_env() {
         return 1
     fi
 
-    # Déclare un tableau associatif global
     declare -gA CONTAINER_ENV=()
 
-    # Remplit le tableau associatif avec KEY=VALUE
-    while IFS='=' read -r key value; do
+    while IFS= read -r line; do
+        # Ignore lignes vides
+        [ -z "$line" ] && continue
+
+        # Extraire la clé et la valeur séparées par le premier '='
+        local key="${line%%=*}"
+        local value="${line#*=}"
+
+        # Remplacer les caractères invalides dans la clé par des '_'
+        key="${key//[^a-zA-Z0-9_]/_}"
+
         CONTAINER_ENV["$key"]="$value"
     done < <(docker exec "$cid" env)
-} # echo "${CONTAINER_ENV[PGDATA]}"
+} # get_container_env "$(get_container_info "${APP_CONFIG[0]}" "${APP_CONFIG[1]}" | jq -r '.ID')"
+  # echo "${CONTAINER_ENV[PGDATA]}"
 
 # Generic function to get container information
 # Parameters:
@@ -183,10 +192,16 @@ perform_backup() {
         # Execute backup command
         log_info "Initiating $AppName backup process..."
 
-        # Évaluer la commande pour remplacer les variables
-        evaluated_command="${CommandToRun/__POSTGRES_USER__/${CONTAINER_ENV[POSTGRES_USER]:-postgres}}"
-        log_debug "Executing command: docker exec -t $container_id $evaluated_command"
+        # Interpret vars in command
+        if [[ -n "${CONTAINER_ENV[POSTGRES_USER]}" ]]; then
+            evaluated_command="${CommandToRun/__POSTGRES_USER__/${CONTAINER_ENV[POSTGRES_USER]:-postgres}}"
+        else
+            evaluated_command="$CommandToRun"
+        fi
 
+        log_info "Executing command: docker exec -t $container_id $evaluated_command"
+
+        # Execute backup command
         if docker exec -t "$container_id" $evaluated_command; then
             log_success "$AppName backup completed successfully"
         else
@@ -226,17 +241,18 @@ log_info "Starting backup process at: $exec_date"
 # MAIN EXECUTION
 #===============================================================================
 
-# # GitLab
-# APP_CONFIG=(
-#     "gitlab"
-#     "endswith"
-#     "gitlab-backup create"
-#     "backups"
-#     ""
-#     "gitlab_backup.tar"
-#     "2"
-# )
-# perform_backup "${APP_CONFIG[@]}"
+# GitLab
+APP_CONFIG=(
+    "gitlab"
+    "endswith"
+    "gitlab-backup create"
+    "backups"
+    ""
+    "gitlab_backup.tar"
+    "2"
+)
+# get_container_env "$(get_container_info "${APP_CONFIG[0]}" "${APP_CONFIG[1]}" | jq -r '.ID')"
+perform_backup "${APP_CONFIG[@]}"
 
 # Postgres
 APP_CONFIG=(
@@ -248,8 +264,5 @@ APP_CONFIG=(
     'postgres_backup.sql'
     '2'
 )
-
-# Recover Env Vars from container
 perform_backup "${APP_CONFIG[@]}"
-
 log_success "Script completed successfully"
