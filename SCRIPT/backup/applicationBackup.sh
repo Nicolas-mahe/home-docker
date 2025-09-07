@@ -29,14 +29,14 @@ log_error() { echo -e "${RED}[E]${NC} $1" >&2; }
 #   $1 - directory: Working directory path
 #   $2 - prefix: File prefix pattern (optional)
 #   $3 - suffix: File suffix pattern (optional)
-#   $4 - NbBackups: Maximum number of files to keep (default: 2)
+#   $4 - NbBackups: Maximum number of files to keep
 # Returns:
 #   0 if successful, 1 if directory not found
 delete_old_files() {
     local directory="$1"
     local prefix="$2"
     local suffix="$3"
-    local NbBackups="${4:-2}"
+    local NbBackups="${4}"
 
     # Directory validation
     if [[ ! -d "$directory" ]]; then
