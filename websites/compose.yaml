@@ -99,8 +99,8 @@ services:
       - sh
       - -c
       - > 
-        cd /data &&
-        pip install -r requirements.txt && python3 /data/app.py
+        apk add --no-cache sqlite && cd /data &&
+        pip install -r /data/requirements.txt && python3 /data/app.py
     networks:
     - webinternal
 
