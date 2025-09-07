@@ -91,7 +91,7 @@ get_container_env() {
     local cid="$1"
     local envVar="$2"
 
-    if [ -z "$cid" ] || [ -z "$var" ]; then
+    if [ -z "$cid" ] || [ -z "$envVar" ]; then
         echo "Usage: get_container_env <container_id_or_name> <var_name>" >&2
         return 1
     fi
@@ -152,8 +152,6 @@ load_config() {
         "$BackupSuffix"
         "$BackupRetention"
     )
-
-    # Affichage pour debug
     log_debug "=== Configuration chargée depuis $file ==="
     log_debug "AppName         : $AppName"
     log_debug "Cpattern        : $Cpattern"
@@ -162,6 +160,7 @@ load_config() {
     log_debug "BackupPrefix    : $BackupPrefix"
     log_debug "BackupSuffix    : $BackupSuffix"
     log_debug "BackupRetention : $BackupRetention"
+
 }
 
 # Function to perform backup of a container application
@@ -199,31 +198,34 @@ perform_backup() {
     while IFS= read -r container_info; do
         [ -z "$container_info" ] && continue
 
-        local container_id container_name container_status container_mounts BackupFileName
+        local container_id container_name container_status container_mounts BackupFileName UserPostgres command_to_execute
         container_id=$(echo "$container_info" | jq -r '.ID')
         container_name=$(echo "$container_info" | jq -r '.Names')
         container_status=$(echo "$container_info" | jq -r '.Status')
         container_mounts=$(echo "$container_info" | jq -r '.Mounts' | tr ',' '\n')
+        UserPostgres=""
 
         PROCESSED_CONTAINERS+=("$container_name")
 
         log_info "Container found: ID=$container_id, Name=$container_name, Status=$container_status"
 
-        UserPostgres=$(get_container_env "$container_id" "POSTGRES_USER")
         BackupFileName="${BackupPrefix}_${exec_date}_${BackupSuffix}"
 
-        if [[ -n "$UserPostgres" ]]; then
-            CommandToRun="${CommandToRun/__POSTGRES_USER__/$UserPostgres}"
+        if [[ "$CommandToRun" == *"__POSTGRES_USER__"* ]]; then
+            UserPostgres=$(get_container_env "$container_name" "POSTGRES_USER")
+            command_to_execute="${CommandToRun//__POSTGRES_USER__/$UserPostgres}"
+        else
+            command_to_execute="${CommandToRun}"   
         fi
-        CommandToRun="${CommandToRun/__APP_NAME__/${AppName}}"
-        CommandToRun="${CommandToRun/__FILE_NAME__/${BackupFileName}}"
-        CommandToRun="${CommandToRun/__BACKUP_FOLDER_NAME__/${BackupFolderName}}"
-        CommandToRun="${CommandToRun/__SUFFIX_NAME__/${BackupSuffix}}"
-        CommandToRun="${CommandToRun/__PREFIX_NAME__/${BackupPrefix}}"
+        command_to_execute="${command_to_execute//__APP_NAME__/${AppName}}"
+        command_to_execute="${command_to_execute//__FILE_NAME__/${BackupFileName}}"
+        command_to_execute="${command_to_execute//__BACKUP_FOLDER_NAME__/${BackupFolderName}}"
+        command_to_execute="${command_to_execute//__SUFFIX_NAME__/${BackupSuffix}}"
+        command_to_execute="${command_to_execute//__PREFIX_NAME__/${BackupPrefix}}"
 
-        log_info "Executing command: docker exec -t $container_id sh -c \"$CommandToRun\""
+        log_info "Executing command: docker exec -t $container_id sh -c \"$command_to_execute\""
 
-        if docker exec -t "$container_id" sh -c "$CommandToRun"; then
+        if docker exec -t "$container_id" sh -c "$command_to_execute"; then
             log_success "$container_name backup completed successfully"
         else
             log_error "$container_name backup failed"
