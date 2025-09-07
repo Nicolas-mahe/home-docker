@@ -171,7 +171,7 @@ load_config() {
 #   $4 - BackupFolderName: Name of the folder containing backups on host
 #   $5 - BackupPrefix: Prefix for backup files to sort (optional)
 #   $6 - BackupSuffix: Suffix for backup files to sort (optional)
-#   $7 - BackupRetention: Number of backups to retain (default: 2)
+#   $7 - BackupRetention: Number of backups to retain (default: 1)
 # Returns:
 #   0 if backup successful, 1 if failed, 2 if container not found
 perform_backup() {
@@ -181,7 +181,7 @@ perform_backup() {
     local BackupFolderName="$4"
     local BackupPrefix="${5:-}"
     local BackupSuffix="${6:-}"
-    local BackupRetention="${7:-2}"
+    local BackupRetention="${7:-1}"
     local return_code=0
 
     log_info "Starting $AppName backup process..."
