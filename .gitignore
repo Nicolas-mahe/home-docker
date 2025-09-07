@@ -11,3 +11,4 @@ vars_test.yml
 /minecraft/modpacks
 .vscode
 secret.json
+.custom

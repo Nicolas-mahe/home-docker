@@ -277,8 +277,8 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
 # MAIN EXECUTION
 #===============================================================================
 
-# Loop through all .conf files in the script directory
-for conf in $SCRIPT_DIR/*.conf; do
+# Loop through all .conf files in the script directory and sub folders
+for conf in $(find "$SCRIPT_DIR" -name "*.conf"); do
     load_config "$conf"
     perform_backup "${APP_CONFIG[@]}"
 done
