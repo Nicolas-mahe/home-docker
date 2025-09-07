@@ -88,15 +88,14 @@ delete_old_files() {
 }
 
 get_container_env() {
-    local container_id="$1"
-    local var="$2"
+    local cid="$1"
+    local envVar="$2"
 
-    if [ -z "$container_id" ] || [ -z "$var" ]; then
+    if [ -z "$cid" ] || [ -z "$var" ]; then
         echo "Usage: get_container_env <container_id_or_name> <var_name>" >&2
         return 1
     fi
-
-    docker exec "$container_id" env | awk -F= -v v="$var" '$1==v {print substr($0, index($0,"=")+1)}'
+    docker exec "$cid" env | awk -F= -v v="$envVar" '$1==v {print substr($0, index($0,"=")+1)}'
 }
 
 # Generic function to get container information
@@ -200,7 +199,7 @@ perform_backup() {
     while IFS= read -r container_info; do
         [ -z "$container_info" ] && continue
 
-        local container_id container_name container_status container_mounts command_to_execute BackupFileName
+        local container_id container_name container_status container_mounts BackupFileName
         container_id=$(echo "$container_info" | jq -r '.ID')
         container_name=$(echo "$container_info" | jq -r '.Names')
         container_status=$(echo "$container_info" | jq -r '.Status')
@@ -214,15 +213,17 @@ perform_backup() {
         BackupFileName="${BackupPrefix}_${exec_date}_${BackupSuffix}"
 
         if [[ -n "$UserPostgres" ]]; then
-            command_to_execute="${CommandToRun/__POSTGRES_USER__/$UserPostgres}"
-        else
-            command_to_execute="$CommandToRun"
+            CommandToRun="${CommandToRun/__POSTGRES_USER__/$UserPostgres}"
         fi
-        command_to_execute="${command_to_execute/__FILE_NAME__/${BackupFileName}}"
+        CommandToRun="${CommandToRun/__APP_NAME__/${AppName}}"
+        CommandToRun="${CommandToRun/__FILE_NAME__/${BackupFileName}}"
+        CommandToRun="${CommandToRun/__BACKUP_FOLDER_NAME__/${BackupFolderName}}"
+        CommandToRun="${CommandToRun/__SUFFIX_NAME__/${BackupSuffix}}"
+        CommandToRun="${CommandToRun/__PREFIX_NAME__/${BackupPrefix}}"
 
-        log_info "Executing command: docker exec -t $container_id sh -c \"$command_to_execute\""
+        log_info "Executing command: docker exec -t $container_id sh -c \"$CommandToRun\""
 
-        if docker exec -t "$container_id" sh -c "$command_to_execute"; then
+        if docker exec -t "$container_id" sh -c "$CommandToRun"; then
             log_success "$container_name backup completed successfully"
         else
             log_error "$container_name backup failed"
