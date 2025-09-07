@@ -88,29 +88,16 @@ delete_old_files() {
 }
 
 get_container_env() {
-    local cid="$1"
-    if [ -z "$cid" ]; then
-        echo "Usage: get_container_env <container_id_or_name>"
+    local container_id="$1"
+    local var="$2"
+
+    if [ -z "$container_id" ] || [ -z "$var" ]; then
+        echo "Usage: get_container_env <container_id_or_name> <var_name>" >&2
         return 1
     fi
 
-    declare -gA CONTAINER_ENV=()
-
-    while IFS= read -r line; do
-        # Ignore lignes vides
-        [ -z "$line" ] && continue
-
-        # Extraire la clé et la valeur séparées par le premier '='
-        local key="${line%%=*}"
-        local value="${line#*=}"
-
-        # Remplacer les caractères invalides dans la clé par des '_'
-        key="${key//[^a-zA-Z0-9_]/_}"
-
-        CONTAINER_ENV["$key"]="$value"
-    done < <(docker exec "$cid" env)
-} # get_container_env "$(get_container_info "${APP_CONFIG[0]}" "${APP_CONFIG[1]}" | jq -r '.ID')"
-  # echo "${CONTAINER_ENV[PGDATA]}"
+    docker exec "$container_id" env | awk -F= -v v="$var" '$1==v {print substr($0, index($0,"=")+1)}'
+}
 
 # Generic function to get container information
 # Parameters:
@@ -193,14 +180,13 @@ perform_backup() {
 
         PROCESSED_CONTAINERS+=("$container_name")
 
-        get_container_env "$container_id"
-
         log_info "Container found: ID=$container_id, Name=$container_name, Status=$container_status"
 
+        UserPostgres=$(get_container_env "$container_id" "POSTGRES_USER")
         BackupFileName="${BackupPrefix}_${exec_date}_${BackupSuffix}"
 
-        if [[ -n "${CONTAINER_ENV[POSTGRES_USER]}" ]]; then
-            command_to_execute="${CommandToRun/__POSTGRES_USER__/${CONTAINER_ENV[POSTGRES_USER]}}"
+        if [[ -n "$UserPostgres" ]]; then
+            command_to_execute="${CommandToRun/__POSTGRES_USER__/$UserPostgres}"
         else
             command_to_execute="$CommandToRun"
         fi
