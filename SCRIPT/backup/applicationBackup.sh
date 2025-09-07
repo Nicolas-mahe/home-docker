@@ -137,6 +137,34 @@ get_container_info() {
     docker ps -f "name=${pattern}" --format '{{json .}}' --no-trunc
 }
 
+load_config() {
+    local file="$1"
+    # Charger les variables définies en clé=valeur
+    # shellcheck source=/dev/null
+    source "$file"
+
+    # Mapper dans le bon ordre attendu par perform_backup
+    APP_CONFIG=(
+        "$AppName"
+        "$Cpattern"
+        "$CommandToRun"
+        "$BackupFolderName"
+        "$BackupPrefix"
+        "$BackupSuffix"
+        "$BackupRetention"
+    )
+
+    # Affichage pour debug
+    log_debug "=== Configuration chargée depuis $file ==="
+    log_debug "AppName         : $AppName"
+    log_debug "Cpattern        : $Cpattern"
+    log_debug "CommandToRun    : $CommandToRun"
+    log_debug "BackupFolder    : $BackupFolderName"
+    log_debug "BackupPrefix    : $BackupPrefix"
+    log_debug "BackupSuffix    : $BackupSuffix"
+    log_debug "BackupRetention : $BackupRetention"
+}
+
 # Function to perform backup of a container application
 # Parameters:
 #   $1 - AppName: Name of the application/container
@@ -218,7 +246,6 @@ perform_backup() {
             delete_old_files "$HostContainerBackupPath" "$BackupPrefix" "$BackupSuffix" "$BackupRetention"
         fi
 
-        echo -e "\n---------------\n"
     done < <(echo "$containers")
 
     return $return_code
@@ -234,52 +261,26 @@ perform_backup() {
 exec_date=$(date "+%Y-%m-%d_%H-%M-%S")
 log_info "Starting backup process at: $exec_date"
 
+# Array to keep track of processed containers
+declare -a PROCESSED_CONTAINERS=()
+
+# Backup destination path on host
 HostBackupPath=/${DOCKER_DATA_DIRECTORY:-data}/docker/docker-backup
 
-declare -a PROCESSED_CONTAINERS=()
+# Script directory
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
 
 #===============================================================================
 # MAIN EXECUTION
 #===============================================================================
 
-# GitLab
-APP_CONFIG=(
-    "gitlab"
-    "endswith"
-    "gitlab-backup create"
-    "backups"
-    ""
-    "gitlab_backup.tar"
-    "2"
-)
-perform_backup "${APP_CONFIG[@]}"
-
-# Postgres
-APP_CONFIG=(
-    "postgres"
-    "contains"
-    "pg_dumpall -U __POSTGRES_USER__ -c --if-exist -f __FILE_NAME__"
-    "backups"
-    ""
-    "postgres_backup.sql"
-    "2"
-)
-perform_backup "${APP_CONFIG[@]}"
-
-# Pronostic (SQLite)
-APP_CONFIG=(
-    "pronostic"
-    "endswith"
-    "sqlite3 /data/instance/pronostics.db '.backup /data/instance/sqlite.db'"
-    "instance"
-    ""
-    "sqlite.db"
-    "2"
-)
-perform_backup "${APP_CONFIG[@]}"
+# Loop through all .conf files in the script directory
+for conf in $SCRIPT_DIR/*.conf; do
+    load_config "$conf"
+    perform_backup "${APP_CONFIG[@]}"
+done
 
 if [ ${#PROCESSED_CONTAINERS[@]} -gt 0 ]; then
-    echo ""
     log_success "Containers processed during this run:"
     for cname in "${PROCESSED_CONTAINERS[@]}"; do
         log_success "  - $cname"
