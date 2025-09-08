@@ -191,9 +191,9 @@ services:
       SECRET_KEY: ${PLAYIT_SECRET_KEY}
     networks:
       - games
-    depends_on:
-      server:
-        condition: service_healthy
+    # depends_on:
+    #   server:
+    #     condition: service_healthy
 
 networks:
   games:
