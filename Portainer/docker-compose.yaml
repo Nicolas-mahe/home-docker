@@ -18,8 +18,9 @@ services:
       TZ: Europe/Paris
     expose:
       - 9000
+      - 9443
     ports:
-      - ${PERSONAL_PORT_PORTAINER}:9000
+      - ${PERSONAL_PORT_PORTAINER}:9443
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/portainer:/data
