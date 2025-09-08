@@ -54,6 +54,12 @@ services:
     networks:
       - webinternal
       - nextcloud
+    healthcheck:
+      test: 'runuser -s /usr/local/bin/php - www-data /var/www/html/occ status 2>/dev/null | grep -e "installed: true" -e "maintenance: false" -e "needsDbUpgrade: false" | wc -l | [ "`cat`" = "3" ]'
+      interval: 60s
+      retries: 5
+      start_period: 10s
+      timeout: 10s
   postgres:
     restart: unless-stopped
     image: docker.io/postgres:${POSTGRES_TAG:-17.6-bookworm}
@@ -70,10 +76,16 @@ services:
       - nextcloud-postgres:/var/lib/postgresql/data
     networks:
       - nextcloud
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 5s
 
   redis:
     restart: unless-stopped
-    image: docker.io/redis:alpine
+    image: docker.io/library/redis:${REDIS_TAG:-alpine}
     container_name: nextcloud-redis
     hostname: nextcloud-redis
     command: redis-server --requirepass ${REDIS_PASSWORD}
@@ -81,6 +93,12 @@ services:
       - nextcloud-redis:/data
     networks:
       - nextcloud
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a $REDIS_PASSWORD ping | grep PONG"]
+      start_period: 15s
+      interval: 30s
+      retries: 5
+      timeout: 3s
 
 volumes:
   nextcloud-postgres:
