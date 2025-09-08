@@ -22,6 +22,12 @@ services:
       - 80
     networks:
       - webinternal
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   skyblog2:
     restart: unless-stopped
@@ -47,6 +53,12 @@ services:
       - 80
     networks:
       - webinternal
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   candle:
     restart: unless-stopped
@@ -70,6 +82,12 @@ services:
       - 80
     networks:
       - webinternal
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   python-pronostics:
     restart: unless-stopped
@@ -103,6 +121,48 @@ services:
         pip install -r /data/requirements.txt && python3 /data/app.py
     networks:
     - webinternal
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:5000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  python-brainstrom:
+    restart: unless-stopped
+    image: python:3.12-alpine3.21
+    container_name: python-brainstrom
+    hostname: python-brainstrom
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+      traefik.enable: true
+      traefik.http.routers.python-brainstorm.tls: true
+      traefik.http.routers.python-brainstorm.middlewares: authelia@docker
+      traefik.http.routers.python-brainstorm.entrypoints: websecure
+      traefik.http.routers.python-brainstorm.rule: Host(`brainstorm.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.python-brainstorm.service: python-brainstorm
+      traefik.http.services.python-brainstorm.loadBalancer.server.port: 5000
+    environment:
+      TZ: Europe/Paris
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/websites/brainstorm:/data
+    env_file:
+      - stack.env
+    command:
+      - sh
+      - -c
+      - > 
+        cd /data &&
+        pip install -r requirements.txt && python3 /data/app.py
+    networks:
+    - webinternal
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:5000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
 volumes:
   python-pronostics:

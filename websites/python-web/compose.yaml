@@ -1,35 +1,4 @@
-services:
-  python-voiture:
-    restart: unless-stopped
-    image: python:3.12-alpine3.21
-    container_name: python-mathieu
-    hostname: python-mathieu
-    labels:
-      diun.enable: true
-      diun.watch_repos: true
-      traefik.enable: true
-      traefik.http.routers.python-voiture.tls: true
-      traefik.http.routers.python-voiture.middlewares: authelia@docker
-      traefik.http.routers.python-voiture.entrypoints: websecure
-      traefik.http.routers.python-voiture.rule: Host(`voiture.${PERSONAL_DOMAINE_NAME}`)
-      traefik.http.routers.python-voiture.service: python-voiture
-      traefik.http.services.python-voiture.loadBalancer.server.port: 5000
-    environment:  
-      TZ: Europe/Paris
-    volumes:
-      - python-mathieu:/data
-    env_file:
-      - stack.env
-    command:
-      - sh
-      - -c
-      - > 
-        cd /data &&
-        pip install -r requirements.txt && python3 /data/app.py
-    networks:
-    - webinternal
-
-    
+services:   
   python-luna:
     restart: unless-stopped
     image: python:3.12-alpine3.21
@@ -46,6 +15,7 @@ services:
     environment:
       TZ: Europe/Paris
     volumes:
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
       - python-luna:/data
     env_file:
       - stack.env
@@ -54,15 +24,58 @@ services:
       - -c
       - > 
         cd /data &&
-        pip install flask && python3 /data/app.py
+        pip install -r requirements.txt && python3 /data/app.py
     networks:
     - webinternal
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:5000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  python-fleur:
+    restart: unless-stopped
+    image: python:3.12-alpine3.21
+    container_name: python-fleur
+    hostname: python-fleur
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+      traefik.enable: true
+      traefik.http.routers.python-fleur.tls: true
+      traefik.http.routers.python-fleur.entrypoints: websecure
+      traefik.http.routers.python-fleur.rule: Host(`fleur.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.python-fleur.service: python-fleur
+      traefik.http.services.python-fleur.loadBalancer.server.port: 5000
+    environment: 
+      TZ: Europe/Paris
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
+      - python-fleur:/data
+    env_file:
+      - stack.env
+    command:
+    - sh
+    - -c
+    - > 
+      cd /data &&
+      pip install -r requirements.txt && python3 /data/app.py
+    networks:
+    - webinternal
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:5000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
 volumes:
-  python-mathieu:
-    name: python-mathieu
   python-luna:
     name: python-luna
+  python-fleur:
+    name: python-fleur
+
 networks:
   webinternal:
     name: webinternal
