@@ -33,12 +33,12 @@ services:
       - webinternal
     secrets:
       - SETTINGS_ENCRYPTION_KEY
-    healthcheck:
-      test: ["CMD", "/opt/duplicati/duplicati-server-util", "health"]
-      interval: 5m
-      timeout: 3s
-      retries: 3
-      start_period: 30s
+    # healthcheck:
+    #   test: ["CMD", "/opt/duplicati/duplicati-server-util", "health"]
+    #   interval: 5m
+    #   timeout: 3s
+    #   retries: 3
+    #   start_period: 30s
 
 secrets:
   SETTINGS_ENCRYPTION_KEY:
