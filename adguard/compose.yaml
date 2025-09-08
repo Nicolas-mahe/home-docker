@@ -14,3 +14,9 @@ services:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/adguard/data:/opt/adguardhome/work
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/adguard/conf:/opt/adguardhome/conf
     network_mode: "host"
+    healthcheck:
+      test: nslookup www.google.com || exit 1
+      timeout: 5s
+      interval: 60s
+      start_period: 10s
+      retries: 1
