@@ -8,14 +8,14 @@ services:
       diun.enable: true
       diun.watch_repos: true
       traefik.enable: true
-      # Redirection Root Domain
-      traefik.http.routers.redirect.tls: true
-      traefik.http.routers.redirect.middlewares: authelia@docker,redirect-to-www
-      traefik.http.routers.redirect.entrypoints: websecure
-      traefik.http.routers.redirect.rule: Host(`${PERSONAL_DOMAINE_NAME}`)
-      traefik.http.middlewares.redirect-to-www.redirectregex.regex:  "^https?:\\/\\/(${PERSONAL_DOMAINE_NAME})(.*)"
-      traefik.http.middlewares.redirect-to-www.redirectregex.replacement: "https://www.${PERSONAL_DOMAINE_NAME}/$${2}"
-      traefik.http.middlewares.redirect-to-www.redirectregex.permanent: false
+      # # Redirection Root Domain
+      # traefik.http.routers.redirect.tls: true
+      # traefik.http.routers.redirect.middlewares: authelia@docker,redirect-to-www
+      # traefik.http.routers.redirect.entrypoints: websecure
+      # traefik.http.routers.redirect.rule: Host(`${PERSONAL_DOMAINE_NAME}`)
+      # traefik.http.middlewares.redirect-to-www.redirectregex.regex:  "^https?:\\/\\/(${PERSONAL_DOMAINE_NAME})(.*)"
+      # traefik.http.middlewares.redirect-to-www.redirectregex.replacement: "https://www.$${1}/$${2}"
+      # traefik.http.middlewares.redirect-to-www.redirectregex.permanent: false
       # homepage
       traefik.http.routers.homepage.tls: true
       traefik.http.routers.homepage.middlewares: authelia@docker
