@@ -170,11 +170,11 @@ services:
       diun.enable: true
       diun.watch_repos: true
       traefik.enable: true
-      traefik.http.routers.error-pages.tls: true
-      traefik.http.routers.error-pages.entrypoints: websecure
-      traefik.http.routers.error-pages.rule: HostRegexp(`{host:.+}`)
-      traefik.http.routers.error-pages.priority: 1
-      traefik.http.routers.error-pages.service: error-pages
+      # traefik.http.routers.error-pages.tls: true
+      # traefik.http.routers.error-pages.entrypoints: websecure
+      # traefik.http.routers.error-pages.rule: HostRegexp(`{host:.+}`)
+      # traefik.http.routers.error-pages.priority: 1
+      # traefik.http.routers.error-pages.service: error-pages
       traefik.http.services.error-pages.loadBalancer.server.port: 8090
       traefik.http.middlewares.error-pages.errors.status: 400-599
       traefik.http.middlewares.error-pages.errors.service: error-pages
