@@ -1,0 +1,100 @@
+services:
+  postgres:
+    restart: unless-stopped
+    image: docker.io/postgres:${POSTGRES_TAG:-17.6-bookworm}
+    container_name: semaphore-postgres
+    hostname: semaphore-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    networks:
+      - semaphore
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      start_period: 10s
+      interval: 60s
+      retries: 5
+      timeout: 5s
+
+  semaphore:
+    restart: no # unless-stopped
+    image: semaphoreui/semaphore:v2.16.19
+    container_name: semaphore-app
+    hostname: semaphore-app
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+      traefik.enable: true
+      traefik.http.routers.semaphore.tls: true
+      traefik.http.routers.semaphore.entrypoints: websecure
+      traefik.http.routers.semaphore.middlewares: authelia@docker
+      traefik.http.routers.semaphore.rule: Host(`ansible.${PERSONAL_DOMAIN_NAME}`)
+      traefik.http.routers.semaphore.service: semaphore
+      traefik.http.services.semaphore.loadBalancer.server.port: 3000
+    environment:
+      ANSIBLE_HOST_KEY_CHECKING: False
+      SEMAPHORE_ACCESS_KEY_ENCRYPTION: ${SEMAPHORE_ACCESS_KEY_ENCRYPTION}
+      SEMAPHORE_ADMIN: ${SEMAPHORE_ADMIN}
+      SEMAPHORE_ADMIN_EMAIL: ${SEMAPHORE_ADMIN_EMAIL}
+      SEMAPHORE_ADMIN_NAME: ${SEMAPHORE_ADMIN}
+      SEMAPHORE_ADMIN_PASSWORD: ${SEMAPHORE_ADMIN_PASSWORD}
+      SEMAPHORE_COOKIE_ENCRYPTION: ${SEMAPHORE_COOKIE_ENCRYPTION}
+      SEMAPHORE_COOKIE_HASH: ${SEMAPHORE_COOKIE_HASH}
+      SEMAPHORE_DB_DIALECT: postgres
+      SEMAPHORE_DB_HOST: semaphore-postgres
+      SEMAPHORE_DB_NAME: ${POSTGRES_DB}
+      SEMAPHORE_DB_PASS: ${POSTGRES_PASSWORD}
+      SEMAPHORE_DB_USER: ${POSTGRES_USER}
+      SEMAPHORE_EMAIL_HOST: ${SEMAPHORE_EMAIL_HOST}
+      SEMAPHORE_EMAIL_PASSWORD: ${SEMAPHORE_EMAIL_PASSWORD}
+      SEMAPHORE_EMAIL_PORT: 465
+      SEMAPHORE_EMAIL_SECURE: True
+      SEMAPHORE_EMAIL_SENDER: noreply@${PERSONAL_DOMAIN_NAME}
+      SEMAPHORE_EMAIL_TLS: True
+      SEMAPHORE_EMAIL_USERNAME: noreply@${PERSONAL_DOMAIN_NAME}
+      SEMAPHORE_SCHEDULE_TIMEZONE: Europe/Paris
+      SEMAPHORE_WEB_ROOT: https://ansible.${PERSONAL_DOMAIN_NAME}
+      TZ: Europe/Paris
+      SEMAPHORE_OIDC_PROVIDERS: |
+        {
+          "authelia": {
+            "display_name": "Sign in with Authelia",
+            "color": "orange",
+            "provider_url": "https://auth.${PERSONAL_DOMAIN_NAME}",
+            "client_id": "${CLIENT_ID}",
+            "client_secret": "${CLIENT_SECRET}",
+            "redirect_url": "https://ansible.${PERSONAL_DOMAIN_NAME}/api/auth/oidc/authelia/redirect",
+            "scopes": ["openid", "profile", "email"],
+            "username_claim": "preferred_username",
+            "email_claim": "email",
+            "name_claim": "name",
+            "order": 1
+          }
+        }
+
+    volumes:
+      - data:/var/lib/semaphore
+      - config:/etc/semaphore
+      - tmp:/tmp/semaphore
+    networks:
+      - semaphore
+      - webinternal
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  data:
+  config:
+  tmp:
+  postgres:
+
+networks:
+  semaphore:
+    name: semaphore
+    internal: true
+  webinternal:
+    name: webinternal
