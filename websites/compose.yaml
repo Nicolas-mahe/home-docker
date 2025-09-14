@@ -173,10 +173,10 @@ services:
     hostname: python-baby-follow
     labels:
       traefik.enable: true
-      traefik.http.routers.baby-follow-liste.tls: true
-      traefik.http.routers.baby-follow-liste.entrypoints: websecure
-      traefik.http.routers.baby-follow-liste.rule: Host(`baby.${PERSONAL_DOMAINE_NAME}`)
-      traefik.http.routers.baby-follow-liste.middlewares: authelia@docker
+      traefik.http.routers.baby-follow.tls: true
+      traefik.http.routers.baby-follow.entrypoints: websecure
+      traefik.http.routers.baby-follow.rule: Host(`baby.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.baby-follow.middlewares: authelia@docker
       traefik.http.routers.baby-follow.service: baby-follow
       traefik.http.services.baby-follow.loadBalancer.server.port: 5000
     environment:
