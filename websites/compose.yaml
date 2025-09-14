@@ -168,18 +168,18 @@ services:
   python-baby-follow:
     restart: unless-stopped
     image: ghcr.io/nicolas-mahe/baby-follow:${DOCKER_TAG_BABY:-main}
-    container_name: python-baby-follow
-    hostname: python-baby-follow
+    container_name: python-babyfollow
+    hostname: python-babyfollow
     labels:
       diun.enable: true
       diun.watch_repos: true
       traefik.enable: true
-      traefik.http.routers.babyfollow.tls: true
-      traefik.http.routers.babyfollow.entrypoints: websecure
-      traefik.http.routers.babyfollow.middlewares: authelia@docker
-      traefik.http.routers.babyfollow.rule: Host(`baby.${PERSONAL_DOMAIN_NAME}`)
-      traefik.http.routers.babyfollow.service: babyfollow
-      traefik.http.services.babyfollow.loadBalancer.server.port: 5000
+      traefik.http.routers.python-baby.tls: true
+      traefik.http.routers.python-baby.entrypoints: websecure
+      traefik.http.routers.python-baby.middlewares: authelia@docker
+      traefik.http.routers.python-baby.rule: Host(`baby.${PERSONAL_DOMAIN_NAME}`)
+      traefik.http.routers.python-baby.service: python-baby
+      traefik.http.services.python-baby.loadBalancer.server.port: 5000
     environment:
       TZ: Europe/Paris
       SESSION_TOKEN: ${SESSION_TOKEN_BABY}
@@ -188,10 +188,13 @@ services:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/websites/baby-follow:/app/instance
     networks:
     - webinternal
-
-volumes:
-  python-pronostics:
-    name: python-pronostics
+    # To remove after fix in the image
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:5000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
 networks:
   webinternal:

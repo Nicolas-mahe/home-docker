@@ -9,7 +9,7 @@ services:
       traefik.http.routers.python-luna.tls: true
       traefik.http.routers.python-luna.middlewares: authelia@docker
       traefik.http.routers.python-luna.entrypoints: websecure
-      traefik.http.routers.python-luna.rule: Host(`luna.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.python-luna.rule: Host(`luna.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.python-luna.service: python-luna
       traefik.http.services.python-luna.loadBalancer.server.port: 5000
     environment:
@@ -45,7 +45,7 @@ services:
       traefik.enable: true
       traefik.http.routers.python-fleur.tls: true
       traefik.http.routers.python-fleur.entrypoints: websecure
-      traefik.http.routers.python-fleur.rule: Host(`fleur.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.python-fleur.rule: Host(`fleur.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.python-fleur.service: python-fleur
       traefik.http.services.python-fleur.loadBalancer.server.port: 5000
     environment: 
