@@ -9,7 +9,7 @@ services:
       traefik.http.routers.skyblog1.tls: true
       traefik.http.routers.skyblog1.middlewares: authelia@docker
       traefik.http.routers.skyblog1.entrypoints: websecure
-      traefik.http.routers.skyblog1.rule: Host(`${SKYBLOG1}.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.skyblog1.rule: Host(`${SKYBLOG1}.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.skyblog1.service: skyblog1
       traefik.http.services.skyblog1.loadBalancer.server.port: 80
     volumes:
@@ -17,7 +17,7 @@ services:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/websites/${SKYBLOG1}.skyrock.com:/usr/share/nginx/html:ro
     environment:
       TZ: Europe/Paris
-      NGINX_HOST: ${SKYBLOG1}.${PERSONAL_DOMAINE_NAME}
+      NGINX_HOST: ${SKYBLOG1}.${PERSONAL_DOMAIN_NAME}
     expose:
       - 80
     networks:
@@ -39,7 +39,7 @@ services:
       traefik.http.routers.skyblog2.tls: true
       traefik.http.routers.skyblog2.middlewares: authelia@docker
       traefik.http.routers.skyblog2.entrypoints: websecure
-      traefik.http.routers.skyblog2.rule: Host(`${SKYBLOG2}.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.skyblog2.rule: Host(`${SKYBLOG2}.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.skyblog2.service: skyblog2
       traefik.http.services.skyblog2.loadBalancer.server.port: 80
     volumes:
@@ -48,7 +48,7 @@ services:
       PUID: 1000
       PGID: 100
       TZ: Europe/Paris
-      NGINX_HOST: ${SKYBLOG2}.${PERSONAL_DOMAINE_NAME}
+      NGINX_HOST: ${SKYBLOG2}.${PERSONAL_DOMAIN_NAME}
     expose:
       - 80
     networks:
@@ -70,14 +70,14 @@ services:
       traefik.http.routers.candle.tls: true
       traefik.http.routers.candle.middlewares: authelia@docker
       traefik.http.routers.candle.entrypoints: websecure
-      traefik.http.routers.candle.rule: Host(`candle.${PERSONAL_DOMAINE_NAME}`) || Host(`brule-un-cierge.${PERSONAL_DOMAINE_NAME}`) || Host(`bruleuncierge.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.candle.rule: Host(`candle.${PERSONAL_DOMAIN_NAME}`) || Host(`brule-un-cierge.${PERSONAL_DOMAIN_NAME}`) || Host(`bruleuncierge.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.candle.service: candle
       traefik.http.services.candle.loadBalancer.server.port: 80
     volumes:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/websites/candle:/usr/share/nginx/html:ro
     environment:
       TZ: Europe/Paris
-      NGINX_HOST: candle.${PERSONAL_DOMAINE_NAME}
+      NGINX_HOST: candle.${PERSONAL_DOMAIN_NAME}
     expose:
       - 80
     networks:
@@ -98,12 +98,12 @@ services:
       traefik.enable: true
       traefik.http.routers.python-pronostics-liste.tls: true
       traefik.http.routers.python-pronostics-liste.entrypoints: websecure
-      traefik.http.routers.python-pronostics-liste.rule: Host(`pronostic.${PERSONAL_DOMAINE_NAME}`) && PathPrefix(`/liste`)
+      traefik.http.routers.python-pronostics-liste.rule: Host(`pronostic.${PERSONAL_DOMAIN_NAME}`) && PathPrefix(`/liste`)
       traefik.http.routers.python-pronostics-liste.middlewares: authelia@docker
       traefik.http.routers.python-pronostics-liste.service: python-pronostics
       traefik.http.routers.python-pronostics.tls: true
       traefik.http.routers.python-pronostics.entrypoints: websecure
-      traefik.http.routers.python-pronostics.rule: Host(`pronostic.${PERSONAL_DOMAINE_NAME}`) && !PathPrefix(`/liste`)
+      traefik.http.routers.python-pronostics.rule: Host(`pronostic.${PERSONAL_DOMAIN_NAME}`) && !PathPrefix(`/liste`)
       traefik.http.routers.python-pronostics.middlewares: authelia@docker
       traefik.http.routers.python-pronostics.service: python-pronostics
       traefik.http.services.python-pronostics.loadBalancer.server.port: 5000
@@ -140,7 +140,7 @@ services:
       traefik.http.routers.python-brainstorm.tls: true
       traefik.http.routers.python-brainstorm.middlewares: authelia@docker
       traefik.http.routers.python-brainstorm.entrypoints: websecure
-      traefik.http.routers.python-brainstorm.rule: Host(`brainstorm.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.python-brainstorm.rule: Host(`brainstorm.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.python-brainstorm.service: python-brainstorm
       traefik.http.services.python-brainstorm.loadBalancer.server.port: 5000
     environment:
@@ -175,7 +175,7 @@ services:
       traefik.enable: true
       traefik.http.routers.baby-follow.tls: true
       traefik.http.routers.baby-follow.entrypoints: websecure
-      traefik.http.routers.baby-follow.rule: Host(`baby.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.baby-follow.rule: Host(`baby.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.baby-follow.middlewares: authelia@docker
       traefik.http.routers.baby-follow.service: baby-follow
       traefik.http.services.baby-follow.loadBalancer.server.port: 5000
