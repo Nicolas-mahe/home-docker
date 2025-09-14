@@ -166,6 +166,28 @@ services:
       retries: 3
       start_period: 30s
 
+  python-baby-follow:
+    restart: unless-stopped
+    image: ghcr.io/nicolas-mahe/baby-follow:${DOCKER_TAG_BABY:-main}
+    container_name: python-baby-follow
+    hostname: python-baby-follow
+    labels:
+      traefik.enable: true
+      traefik.http.routers.baby-follow-liste.tls: true
+      traefik.http.routers.baby-follow-liste.entrypoints: websecure
+      traefik.http.routers.baby-follow-liste.rule: Host(`pronostic.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.baby-follow-liste.middlewares: authelia@docker
+      traefik.http.routers.baby-follow.service: baby-follow
+      traefik.http.services.baby-follow.loadBalancer.server.port: 5000
+    environment:
+      TZ: Europe/Paris
+      SESSION_TOKEN: ${SESSION_TOKEN_BABY}
+      DEBUG_MODE: ${DEBUG_MODE}
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/websites/baby-follow:/data/instance
+    networks:
+    - webinternal
+
 volumes:
   python-pronostics:
     name: python-pronostics
