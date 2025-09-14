@@ -13,7 +13,6 @@ services:
       traefik.http.routers.skyblog1.service: skyblog1
       traefik.http.services.skyblog1.loadBalancer.server.port: 80
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/websites/${SKYBLOG1}.skyrock.com:/usr/share/nginx/html:ro
     environment:
       TZ: Europe/Paris
@@ -184,7 +183,7 @@ services:
       SESSION_TOKEN: ${SESSION_TOKEN_BABY}
       DEBUG_MODE: ${DEBUG_MODE}
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/websites/baby-follow:/data/instance
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/websites/baby-follow:/app/instance
     networks:
     - webinternal
 
