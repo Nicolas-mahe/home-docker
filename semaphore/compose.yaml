@@ -20,6 +20,7 @@ services:
       timeout: 5s
 
   semaphore:
+    user: "${DOCKER_USER_EXECUTOR:-1000}:${DOCKER_USER_EXECUTOR:-1000}"
     restart: unless-stopped
     image: semaphoreui/semaphore:${SEMAPHORE_TAG:-v2.16.19}
     container_name: semaphore-app
@@ -76,6 +77,7 @@ services:
         }
     volumes:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/semaphore/data:/var/lib/semaphore
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/semaphore/config:/etc/semaphore
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/semaphore/tmp:/tmp/semaphore
     networks:
       - semaphore
