@@ -33,7 +33,7 @@ else
               -d "$payload" "$portainerURL$webhook")
 
             if [ "$answers" -ge 200 ] && [ "$answers" -lt 300 ]; then
-                echo "Posted to $name ($webhook)"
+                echo "🛜 Send request for $name ($webhook)"
 
                 if [ -z "$delay" ] || [ "$delay" = "null" ]; then
                     delay=$default_delay
