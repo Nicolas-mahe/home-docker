@@ -1,13 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Path to *.json (same directory as the script)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 payload='{}' # Optional curl payload
 default_delay=15 # Default delay between 2 service redeploy
 
-# Check arguments
 if [ "$#" -ne 1 ]; then
     echo "Usage: $0 <portainer_host>"
     exit 1
@@ -16,7 +14,6 @@ else
     echo "✅ Using Portainer URL: $portainerURL"
 fi
 
-# Check existence
 if [ -z "$(find "$SCRIPT_DIR" -name '*.json' -print -quit)" ]; then
     echo "❌ *.json not found in $SCRIPT_DIR"
     exit 1
@@ -24,7 +21,6 @@ else
     JsonFile=$(find "$SCRIPT_DIR" -name "*.json" | head -n 1)
     echo "✅ Using $JsonFile"
 
-    # Boucle sur chaque service
     while read -r service; do
         delay=$(echo "$service" | jq -r '.delay')
         name=$(echo "$service" | jq -r '.name')
@@ -45,7 +41,6 @@ else
 
                 if [ -n "$containerToStop" ] && [ "$containerToStop" != "null" ]; then
                     start_time=$(date +%s)
-                    # Stocke la liste des conteneurs dans un tableau
                     readarray -t containers < <(echo "$service" | jq -r '.containerToStop[]')
                     
                     for container in "${containers[@]}"; do
