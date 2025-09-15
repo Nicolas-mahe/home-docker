@@ -20,8 +20,8 @@ services:
       timeout: 5s
 
   semaphore:
-    restart: no # unless-stopped
-    image: semaphoreui/semaphore:v2.16.19
+    restart: unless-stopped
+    image: semaphoreui/semaphore:${SEMAPHORE_TAG:-v2.16.19}
     container_name: semaphore-app
     hostname: semaphore-app
     labels:
