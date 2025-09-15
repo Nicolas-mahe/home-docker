@@ -74,11 +74,9 @@ services:
             "order": 1
           }
         }
-
     volumes:
-      - data:/var/lib/semaphore
-      - config:/etc/semaphore
-      - tmp:/tmp/semaphore
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/semaphore/data:/var/lib/semaphore
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/semaphore/tmp:/tmp/semaphore
     networks:
       - semaphore
       - webinternal
@@ -87,10 +85,8 @@ services:
         condition: service_healthy
 
 volumes:
-  data:
-  config:
-  tmp:
   postgres:
+    name: semaphore_postgres
 
 networks:
   semaphore:
