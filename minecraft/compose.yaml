@@ -5,8 +5,8 @@
 services:
   server:
     image: docker.io/itzg/minecraft-server:java17-jdk
-    container_name: minecraft-server
-    hostname: minecraft-server
+    container_name: minecraft-r7-server
+    hostname: minecraft-r7-server
     labels:
       diun.enable: true
       diun.watch_repos: true
@@ -72,8 +72,8 @@ services:
   # server-creative:
   #   restart: no
   #   image: docker.io/itzg/minecraft-server:java17-jdk
-  #   container_name: minecraft-server-creative
-  #   hostname: minecraft-server-creative
+  #   container_name: minecraft-r7-creative-server
+  #   hostname: minecraft-r7-creative-server
   #   tty: true
   #   stdin_open: true
   #   cap_add:
