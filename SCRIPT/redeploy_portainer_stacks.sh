@@ -19,7 +19,7 @@ if [ -z "$(find "$SCRIPT_DIR" -name '*.json' -print -quit)" ]; then
     exit 1
 else
     JsonFile=$(find "$SCRIPT_DIR" -name "*.json" | head -n 1)
-    echo "✅ Using $JsonFile"
+    echo "🗒️ Using $JsonFile"
 
     while read -r service; do
         delay=$(echo "$service" | jq -r '.delay')
