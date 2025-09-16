@@ -1,16 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-payload='{}' # Optional curl payload
+# Set default values
 default_delay=15 # Default delay between 2 service redeploy
+payload='{}' # Optional curl payload
+portainerWebHookPath="api/stacks/webhooks"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 if [ "$#" -ne 1 ]; then
     echo "Usage: $0 <portainer_host>"
     exit 1
 else
-    portainerURL="${1}/api/stacks/webhooks/"
+    portainerURL="${1}"
     echo "✅ Using Portainer URL: $portainerURL"
 fi
 
@@ -31,7 +32,7 @@ else
             if [ -n "$webhook" ]; then
                 answers=$(curl --insecure -s -o /dev/null -w "%{http_code}" \
                 -X POST -H "Content-Type: application/json" \
-                -d "$payload" "$portainerURL$webhook")
+                -d "$payload" "$portainerURL/$portainerWebHookPath/$webhook")
 
                 if [ "$answers" -ge 200 ] && [ "$answers" -lt 300 ]; then
                     echo "🛜 Send request for $name ($webhook)"
@@ -85,7 +86,7 @@ else
                                 fi
 
                                 echo "⏳ Stopping $container..."
-                                docker ps --filter "name=$container" --format '{{.Names}}' | xargs -r docker stop
+                                docker ps --filter "name=$container" --format '{{.Names}}' | xargs -r docker stop >/dev/null 2>&1
                             else
                                 echo "⚠️  Container $container does not exist."
                             fi
