@@ -18,88 +18,90 @@ if [ -z "$(find "$SCRIPT_DIR" -name '*.json' -print -quit)" ]; then
     echo "❌ *.json not found in $SCRIPT_DIR"
     exit 1
 else
-    JsonFile=$(find "$SCRIPT_DIR" -name "*.json" | head -n 1)
-    echo "🗒️ Using $JsonFile"
+    # Find all JSON files in the directory
+    find "$SCRIPT_DIR" -name "*.json" | while read -r JsonFile; do
+        echo "🗒️ Processing $JsonFile"
 
-    while read -r service; do
-        delay=$(echo "$service" | jq -r '.delay')
-        name=$(echo "$service" | jq -r '.name')
-        containerToStop=$(echo "$service" | jq -r '.containerToStop')
-        webhook=$(echo "$service" | jq -r '.webhook')
+        while read -r service; do
+            delay=$(echo "$service" | jq -r '.delay')
+            name=$(echo "$service" | jq -r '.name')
+            containerToStop=$(echo "$service" | jq -r '.containerToStop')
+            webhook=$(echo "$service" | jq -r '.webhook')
 
-        if [ -n "$webhook" ]; then
-            answers=$(curl --insecure -s -o /dev/null -w "%{http_code}" \
-              -X POST -H "Content-Type: application/json" \
-              -d "$payload" "$portainerURL$webhook")
+            if [ -n "$webhook" ]; then
+                answers=$(curl --insecure -s -o /dev/null -w "%{http_code}" \
+                -X POST -H "Content-Type: application/json" \
+                -d "$payload" "$portainerURL$webhook")
 
-            if [ "$answers" -ge 200 ] && [ "$answers" -lt 300 ]; then
-                echo "🛜 Send request for $name ($webhook)"
+                if [ "$answers" -ge 200 ] && [ "$answers" -lt 300 ]; then
+                    echo "🛜 Send request for $name ($webhook)"
 
-                if [ -z "$delay" ] || [ "$delay" = "null" ]; then
-                    delay=$default_delay
-                fi
+                    if [ -z "$delay" ] || [ "$delay" = "null" ]; then
+                        delay=$default_delay
+                    fi
 
-                if [ -n "$containerToStop" ] && [ "$containerToStop" != "null" ]; then
-                    start_time=$(date +%s)
-                    readarray -t containers < <(echo "$service" | jq -r '.containerToStop[]')
-                    
-                    for container in "${containers[@]}"; do
-                        echo "⏳ Waiting for $container to be healthy or $delay seconds..."
-                        is_healthy=false
-                        previous_state=""
+                    if [ -n "$containerToStop" ] && [ "$containerToStop" != "null" ]; then
                         start_time=$(date +%s)
+                        readarray -t containers < <(echo "$service" | jq -r '.containerToStop[]')
+                        
+                        for container in "${containers[@]}"; do
+                            echo "⏳ Waiting for $container to be healthy or $delay seconds..."
+                            is_healthy=false
+                            previous_state=""
+                            start_time=$(date +%s)
 
-                        if docker inspect "$container" >/dev/null 2>&1; then
+                            if docker inspect "$container" >/dev/null 2>&1; then
 
-                            while [ "$(($(date +%s) - start_time))" -lt "$delay" ]; do
-                                sleep $default_delay
-                                status=$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' "$container" 2>/dev/null)
+                                while [ "$(($(date +%s) - start_time))" -lt "$delay" ]; do
+                                    sleep $default_delay
+                                    status=$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' "$container" 2>/dev/null)
 
-                                if [ -z "$previous_state" ]; then
-                                    previous_state="unknown"
+                                    if [ -z "$previous_state" ]; then
+                                        previous_state="unknown"
+                                    else
+                                        previous_state=$status
+                                    fi
+
+                                    if [ "$status" != "$previous_state" ]; then
+                                        echo "State of $container = $status"
+                                    fi
+
+                                    if [ "$status" = "healthy" ]; then
+                                        is_healthy=true
+                                        break
+                                    fi
+
+                                    if [ "$status" = "running" ]; then
+                                        is_healthy=true
+                                    fi
+                                done
+
+                                if [ "$is_healthy" = true ]; then
+                                    echo "✅ $container is Started and healthy ($status)"
+                                elif [ "$is_healthy" = true && "$status" = "healthy" ]; then
+                                    echo "✅ $container is Started but has no health check ($status)"
                                 else
-                                    previous_state=$status
+                                    echo "⚠️ $container did not become healthy/running after $delay seconds"
                                 fi
 
-                                if [ "$status" != "$previous_state" ]; then
-                                    echo "State of $container = $status"
-                                fi
-
-                                if [ "$status" = "healthy" ]; then
-                                    is_healthy=true
-                                    break
-                                fi
-
-                                if [ "$status" = "running" ]; then
-                                    is_healthy=true
-                                fi
-                            done
-
-                            if [ "$is_healthy" = true ]; then
-                                echo "✅ $container is Started and healthy ($status)"
-                            elif [ "$is_healthy" = true && "$status" = "healthy" ]; then
-                                echo "✅ $container is Started but has no health check ($status)"
+                                echo "⏳ Stopping $container..."
+                                docker ps --filter "name=$container" --format '{{.Names}}' | xargs -r docker stop
                             else
-                                echo "⚠️ $container did not become healthy/running after $delay seconds"
+                                echo "⚠️  Container $container does not exist."
                             fi
-
-                            echo "⏳ Stopping $container..."
-                            docker ps --filter "name=$container" --format '{{.Names}}' | xargs -r docker stop
-                        else
-                            echo "⚠️  Container $container does not exist."
-                        fi
-                    done
+                        done
+                    else
+                        echo "✅ Waiting $delay seconds before continuing..."
+                        sleep "$delay"
+                    fi
                 else
-                    echo "✅ Waiting $delay seconds before continuing..."
-                    sleep "$delay"
+                    echo "❌ Failed: to $name ($webhook) - HTTP status code: $answers"
                 fi
             else
-                echo "❌ Failed: to $name ($webhook) - HTTP status code: $answers"
+                echo "⚠️  No webhook found for service: $name"
             fi
-        else
-            echo "⚠️  No webhook found for service: $name"
-        fi
-    done < <(jq -c '.[]' "$JsonFile")
+        done < <(jq -c '.[]' "$JsonFile")
+    done
 fi
 
-echo "✅ All services have been redeployed."
+echo "✅ All services from all JSON files have been redeployed."
