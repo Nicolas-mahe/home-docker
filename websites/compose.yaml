@@ -154,7 +154,7 @@ services:
       - sh
       - -c
       - > 
-        cd /data &&
+        apk add --no-cache sqlite && cd /data &&
         pip install -r requirements.txt && python3 /data/app.py
     networks:
     - webinternal
