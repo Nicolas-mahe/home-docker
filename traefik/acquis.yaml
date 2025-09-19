@@ -13,6 +13,18 @@ labels:
 ---
 source: docker
 container_name:
+ - immich-server
+labels:
+  type: immich
+---
+source: docker
+container_name:
+ - nextcloud-app
+labels:
+  type: Nextcloud
+---
+source: docker
+container_name:
   - traefik
 labels:
   type: traefik
@@ -22,10 +34,4 @@ container_name:
  - vaultwarden
 labels:
   type: Vaultwarden
----
-source: docker
-container_name:
- - immich_server
-labels:
-  type: immich
 ---
