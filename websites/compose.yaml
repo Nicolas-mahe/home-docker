@@ -171,8 +171,6 @@ services:
     container_name: python-babyfollow
     hostname: python-babyfollow
     labels:
-      diun.enable: true
-      diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.python-baby.tls: true
       traefik.http.routers.python-baby.entrypoints: websecure
