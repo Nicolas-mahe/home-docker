@@ -107,98 +107,98 @@ delete_old_files() {
     fi
 }
 
-# Function to check if path is reachable on remote server
-check_remote_path() {
-    local remote_user="$1"
-    local remote_server="$2"
-    local remote_ssh_port="${3:-22}"
-    local remote_path="$4"
+# # Function to check if path is reachable on remote server
+# check_remote_path() {
+#     local remote_user="$1"
+#     local remote_server="$2"
+#     local remote_ssh_port="${3:-22}"
+#     local remote_path="$4"
 
-    ssh -q -o "StrictHostKeyChecking=no" -p "$remote_ssh_port" "$remote_user@$remote_server" "test -d $remote_path"
-    if [ $? -ne 0 ]; then
-        # Remote path not found
-        return 2
-    else
-        # Remote path found
-        return 0
-    fi
-}
+#     ssh -q -o "StrictHostKeyChecking=no" -p "$remote_ssh_port" "$remote_user@$remote_server" "test -d $remote_path"
+#     if [ $? -ne 0 ]; then
+#         # Remote path not found
+#         return 2
+#     else
+#         # Remote path found
+#         return 0
+#     fi
+# }
 
-# Function to copy files from remote server
-copy_files_from_remote_server() {
-    local remote_user="$1"
-    local remote_server="$2"
-    local remote_ssh_port="$3"
-    local remote_path="$4"
-    local local_path="$5"
-    local file_extension="$6"
-    # Check if remote path is reachable
-    check_remote_path "$remote_user" "$remote_server" "$remote_ssh_port" "$remote_path"
+# # Function to copy files from remote server
+# copy_files_from_remote_server() {
+#     local remote_user="$1"
+#     local remote_server="$2"
+#     local remote_ssh_port="$3"
+#     local remote_path="$4"
+#     local local_path="$5"
+#     local file_extension="$6"
+#     # Check if remote path is reachable
+#     check_remote_path "$remote_user" "$remote_server" "$remote_ssh_port" "$remote_path"
 
-    # If reachable, select newest file to copy
-    local remote_file_path
-    if [ $? -eq 0 ]; then
-        remote_file_path=$(ssh -q -o "StrictHostKeyChecking=no" -p "$remote_ssh_port" "$remote_user@$remote_server" "ls -t $remote_path/*.$file_extension  2>/dev/null | head -n 1")
+#     # If reachable, select newest file to copy
+#     local remote_file_path
+#     if [ $? -eq 0 ]; then
+#         remote_file_path=$(ssh -q -o "StrictHostKeyChecking=no" -p "$remote_ssh_port" "$remote_user@$remote_server" "ls -t $remote_path/*.$file_extension  2>/dev/null | head -n 1")
         
-        if [ -z "$remote_file_path" ]; then
-            # No files found with extension .$file_extension in $remote_path on $remote_server
-            return 5
-        fi
+#         if [ -z "$remote_file_path" ]; then
+#             # No files found with extension .$file_extension in $remote_path on $remote_server
+#             return 5
+#         fi
 
-        # Get the filename from the remote path
-        local filename=$(basename "$remote_file_path")
-        local destination_file="$local_path/$filename"
+#         # Get the filename from the remote path
+#         local filename=$(basename "$remote_file_path")
+#         local destination_file="$local_path/$filename"
 
-        # Check if file already exists at destination
-        if [ -f "$destination_file" ]; then
-            log_warning "File $filename already exists at destination, skipping copy"
-            return 0
-        fi
+#         # Check if file already exists at destination
+#         if [ -f "$destination_file" ]; then
+#             log_warning "File $filename already exists at destination, skipping copy"
+#             return 0
+#         fi
 
-        # Copy file to local
-        log_info "Copying file from $remote_server:$remote_path to $local_path"
-        scp -P "$remote_ssh_port" "$remote_user@$remote_server:$remote_file_path" "$local_path"
-        return $?
-    else
-        log_error "Remote path $remote_path not found on $remote_server"
-        return $?
-    fi
-}
+#         # Copy file to local
+#         log_info "Copying file from $remote_server:$remote_path to $local_path"
+#         scp -P "$remote_ssh_port" "$remote_user@$remote_server:$remote_file_path" "$local_path"
+#         return $?
+#     else
+#         log_error "Remote path $remote_path not found on $remote_server"
+#         return $?
+#     fi
+# }
 
-# Function to copy files from local path
-copy_files_from_local_path() {
-    local source_path="$1"
-    local local_path="$2"
-    local file_extension="$3"    
-    local source_file_path
+# # Function to copy files from local path
+# copy_files_from_local_path() {
+#     local source_path="$1"
+#     local local_path="$2"
+#     local file_extension="$3"    
+#     local source_file_path
 
-    # Check if source path exists
-    if [ ! -d "$source_path" ]; then
-        # Source path $source_path not found"
-        return 3
-    else
-        source_file_path=$(ls -t "$source_path"/*."$file_extension" 2>/dev/null | head -n 1)
-        if [ -z "$source_file_path" ]; then
-            # No files with extension .$file_extension found in $source_path
-            return 4
-        else
-            # Get the filename from the source path
-            local filename=$(basename "$source_file_path")
-            local destination_file="$local_path/$filename"
+#     # Check if source path exists
+#     if [ ! -d "$source_path" ]; then
+#         # Source path $source_path not found"
+#         return 3
+#     else
+#         source_file_path=$(ls -t "$source_path"/*."$file_extension" 2>/dev/null | head -n 1)
+#         if [ -z "$source_file_path" ]; then
+#             # No files with extension .$file_extension found in $source_path
+#             return 4
+#         else
+#             # Get the filename from the source path
+#             local filename=$(basename "$source_file_path")
+#             local destination_file="$local_path/$filename"
 
-            # Check if file already exists at destination
-            if [ -f "$destination_file" ]; then
-                log_warning "File $filename already exists at destination, skipping copy"
-                return 0
-            fi
+#             # Check if file already exists at destination
+#             if [ -f "$destination_file" ]; then
+#                 log_warning "File $filename already exists at destination, skipping copy"
+#                 return 0
+#             fi
 
-            # Copy the file
-            cp "$source_file_path" "$local_path"
-            log_success "File copied successfully: $filename"
-            return 0
-        fi
-    fi
-}
+#             # Copy the file
+#             cp "$source_file_path" "$local_path"
+#             log_success "File copied successfully: $filename"
+#             return 0
+#         fi
+#     fi
+# }
 
 
 #Recover Execution path
@@ -233,7 +233,7 @@ if [ "$TimeToExec" -eq 1 ]; then
     if [ ! -f "$Data_Dir/docker/docker-secret/vaultwarden/VW_CLIENTID.txt" ] || [ ! -f "$Data_Dir/docker/docker-secret/vaultwarden/VW_CLIENTSECRET.txt" ]; then
         log_error "Missing Vaultwarden configuration files. Skipping Vaultwarden backup."
     else
-        $Script_Path/backup/VaultwardenVaultExport.sh "$vaultwarden_filename" "$Backups_Apps_Path"
+        $Script_Path/backup/VaultwardenVaultExport.sh "$vaultwarden_filename" "$Backups_Apps_Path" "$Backups_Apps_Path/scripts"
     fi
 
     log_info "${CYAN}=== Portainer Backup ===${NC}"
@@ -255,117 +255,92 @@ if [ "$TimeToExec" -eq 1 ]; then
         --cipher-algo AES256 "$Backups_Apps_Path/OpenMediaVault/openmediavault_config_backup_$exec_date.tar.gz"
     rm $Backups_Apps_Path/OpenMediaVault/openmediavault_config_backup_$exec_date.tar.gz
 
-    log_info "${CYAN}=== Docker Apps Config Backup ===${NC}"
-    # Important docker config files
-    log_info "Export container configs"
-    Docker_Config=(
-        "adguard/conf"
-        "homepage/config"
-        "traefik/conf"
-        "vaultwarden/config.json"
-        "nextcloud/config/www/nextcloud/config"
-        "nextcloud/config/php"
-        "duplicati/"
-        )
-    tar -czf  "docker_apps_config_backup_$exec_date.tar.gz" -C "$Docker_Path" "${Docker_Config[@]}"
-    gpg --batch --yes --passphrase "$EncryptionKey" --symmetric --cipher-algo AES256 -o "$Backups_Apps_Path/DockerAppConfig/docker_apps_config_backup_$exec_date.tar.gz.gpg" "docker_apps_config_backup_$exec_date.tar.gz"
-    rm docker_apps_config_backup_$exec_date.tar.gz
-
-    log_info "${CYAN}=== Traefik Stack Backup ===${NC}"
-    # Traefik stack data
-    log_info "Export traefik stack volumes"
-    tar -czf  "traefik_stack_backup_$exec_date.tar.gz" -C "$Data_Dir/docker/docker-data/" "traefik"
-    gpg --batch --yes --passphrase "$EncryptionKey" --symmetric --cipher-algo AES256 -o "$Backups_Apps_Path/DockerAppConfig/traefik_stack_backup_$exec_date.tar.gz.gpg" "traefik_stack_backup_$exec_date.tar.gz"
-    rm traefik_stack_backup_$exec_date.tar.gz
-
 fi
 
-# Games managment
-read -r Remote_Games_addr < $Data_Dir/docker/docker-secret/common/Remote_Games_SRV_addr.txt
-read -r Remote_Games_port < $Data_Dir/docker/docker-secret/common/Remote_Games_SRV_port.txt
+# # Games managment
+# read -r Remote_Games_addr < $Data_Dir/docker/docker-secret/common/Remote_Games_SRV_addr.txt
+# read -r Remote_Games_port < $Data_Dir/docker/docker-secret/common/Remote_Games_SRV_port.txt
 
-# Minecraft vars
-Minecraft_Path="$Docker_Path/minecraft/s5/prod/backups"
-Minecraft_Backups_Path="$Backups_Path/games/Minecraft/s5"
-Minecraft_Backups_Extension="zip"
+# # Minecraft vars
+# Minecraft_Path="$Docker_Path/minecraft/s5/prod/backups"
+# Minecraft_Backups_Path="$Backups_Path/games/Minecraft/s5"
+# Minecraft_Backups_Extension="zip"
 
-# PalWorld vars
-PalWorld_Path="$Docker_Path/palworld/games/common/PalServer/Pal/Saved/SaveGames/0/39B9ABFE445430F386A231B68504F49A"
-PalWorld_Backups_Path="$Backups_Path/games/PalWorld/s1"
-PalWorld_Backups_Extension="????"
+# # PalWorld vars
+# PalWorld_Path="$Docker_Path/palworld/games/common/PalServer/Pal/Saved/SaveGames/0/39B9ABFE445430F386A231B68504F49A"
+# PalWorld_Backups_Path="$Backups_Path/games/PalWorld/s1"
+# PalWorld_Backups_Extension="????"
 
-# Satisfactory vars
-Satisfactory_Path="$Docker_Path/satisfactory/backups"
-Satisfactory_Backups_Path="$Backups_Path/games/Satisfactory/s1"
-Satisfactory_Backups_Extension="sav"
+# # Satisfactory vars
+# Satisfactory_Path="$Docker_Path/satisfactory/backups"
+# Satisfactory_Backups_Path="$Backups_Path/games/Satisfactory/s1"
+# Satisfactory_Backups_Extension="sav"
 
-if [ "$TimeToExec" -eq 1 ] || [ "$TimeToExec" -eq 2 ]; then
-    # Minecraft
-    log_info "${CYAN}=== Minecraft Backup ===${NC}"
-    log_info "Attempting to backup Minecraft files..."
-    mkdir -p "$Minecraft_Backups_Path"
-    {
-        # Command to copy Minecraft backup
-        copy_files_from_local_path "$Minecraft_Path" "$Minecraft_Backups_Path" "$Minecraft_Backups_Extension"
-    } || {
-        # This block executes if the previous command failed (returned non-zero)
-        log_warning "Failed to backup Minecraft save from local path. Error code: $? try to backup from remote server"
-        copy_files_from_remote_server "docker" "$Remote_Games_addr" "$Remote_Games_port" "$Minecraft_Path" "$Minecraft_Backups_Path" "$Minecraft_Backups_Extension"
-        # Additional error handling code can go here
-    }|| {
-        # This block executes if the previous command failed (returned non-zero)
-        log_error "Failed to backup Minecraft save from remote server docker@$Remote_Games_addr:$Remote_Games_port. Error code: $?"
-        # Additional error handling code can go here
-    }
+# if [ "$TimeToExec" -eq 1 ] || [ "$TimeToExec" -eq 2 ]; then
+#     # Minecraft
+#     log_info "${CYAN}=== Minecraft Backup ===${NC}"
+#     log_info "Attempting to backup Minecraft files..."
+#     mkdir -p "$Minecraft_Backups_Path"
+#     {
+#         # Command to copy Minecraft backup
+#         copy_files_from_local_path "$Minecraft_Path" "$Minecraft_Backups_Path" "$Minecraft_Backups_Extension"
+#     } || {
+#         # This block executes if the previous command failed (returned non-zero)
+#         log_warning "Failed to backup Minecraft save from local path. Error code: $? try to backup from remote server"
+#         copy_files_from_remote_server "docker" "$Remote_Games_addr" "$Remote_Games_port" "$Minecraft_Path" "$Minecraft_Backups_Path" "$Minecraft_Backups_Extension"
+#         # Additional error handling code can go here
+#     }|| {
+#         # This block executes if the previous command failed (returned non-zero)
+#         log_error "Failed to backup Minecraft save from remote server docker@$Remote_Games_addr:$Remote_Games_port. Error code: $?"
+#         # Additional error handling code can go here
+#     }
 
-    # # PalWorld
-    # log_info "${CYAN}=== PalWorld Backup ===${NC}"
-    # log_info "Attempting to backup PalWorld files..."
-    # mkdir -p "$PalWorld_Backups_Path"
-    # {
-    #     # Command to copy Minecraft backup
-    #     copy_files_from_local_path "$PalWorld_Path" "$PalWorld_Backups_Path" "$PalWorld_Backups_Extension"
-    # } || {
-    #     # This block executes if the previous command failed (returned non-zero)
-    #     log_warning "Failed to backup PalWorld save from local path. Error code: $? try to backup from remote server"
-    #     copy_files_from_remote_server "docker" "$Remote_Games_addr" "$Remote_Games_port" "$PalWorld_Path" "$PalWorld_Backups_Path" "$PalWorld_Backups_Extension"
-    #     # Additional error handling code can go here
-    # }|| {
-    #     # This block executes if the previous command failed (returned non-zero)
-    #     log_error "Failed to backup Satisfactory save from remote server docker@$Remote_Games_addr:$Remote_Games_port. Error code: $?"
-    #     # Additional error handling code can go here
-    # }
+#     # # PalWorld
+#     # log_info "${CYAN}=== PalWorld Backup ===${NC}"
+#     # log_info "Attempting to backup PalWorld files..."
+#     # mkdir -p "$PalWorld_Backups_Path"
+#     # {
+#     #     # Command to copy Minecraft backup
+#     #     copy_files_from_local_path "$PalWorld_Path" "$PalWorld_Backups_Path" "$PalWorld_Backups_Extension"
+#     # } || {
+#     #     # This block executes if the previous command failed (returned non-zero)
+#     #     log_warning "Failed to backup PalWorld save from local path. Error code: $? try to backup from remote server"
+#     #     copy_files_from_remote_server "docker" "$Remote_Games_addr" "$Remote_Games_port" "$PalWorld_Path" "$PalWorld_Backups_Path" "$PalWorld_Backups_Extension"
+#     #     # Additional error handling code can go here
+#     # }|| {
+#     #     # This block executes if the previous command failed (returned non-zero)
+#     #     log_error "Failed to backup Satisfactory save from remote server docker@$Remote_Games_addr:$Remote_Games_port. Error code: $?"
+#     #     # Additional error handling code can go here
+#     # }
 
-    # Satisfactory
-    log_info "${CYAN}=== Satisfactory Backup ===${NC}"
-    log_info "Attempting to backup Satisfactory files..."
-    mkdir -p "$Satisfactory_Backups_Path"
-    {
-        # Command to copy Minecraft backup
-        copy_files_from_local_path "$Satisfactory_Path" "$Satisfactory_Backups_Path" "$Satisfactory_Backups_Extension"
-    } || {
-        # This block executes if the previous command failed (returned non-zero)
-        log_warning "Failed to backup Satisfactory save from local path. Error code: $? try to backup from remote server"
-        copy_files_from_remote_server "docker" "$Remote_Games_addr" "$Remote_Games_port" "$Satisfactory_Path" "$Satisfactory_Backups_Path" "$Satisfactory_Backups_Extension"
-        # Additional error handling code can go here
-    }|| {
-        # This block executes if the previous command failed (returned non-zero)
-        log_error "Failed to backup Satisfactory save from remote server docker@$Remote_Games_addr:$Remote_Games_port. Error code: $?"
-        # Additional error handling code can go here
-    }
+#     # Satisfactory
+#     log_info "${CYAN}=== Satisfactory Backup ===${NC}"
+#     log_info "Attempting to backup Satisfactory files..."
+#     mkdir -p "$Satisfactory_Backups_Path"
+#     {
+#         # Command to copy Minecraft backup
+#         copy_files_from_local_path "$Satisfactory_Path" "$Satisfactory_Backups_Path" "$Satisfactory_Backups_Extension"
+#     } || {
+#         # This block executes if the previous command failed (returned non-zero)
+#         log_warning "Failed to backup Satisfactory save from local path. Error code: $? try to backup from remote server"
+#         copy_files_from_remote_server "docker" "$Remote_Games_addr" "$Remote_Games_port" "$Satisfactory_Path" "$Satisfactory_Backups_Path" "$Satisfactory_Backups_Extension"
+#         # Additional error handling code can go here
+#     }|| {
+#         # This block executes if the previous command failed (returned non-zero)
+#         log_error "Failed to backup Satisfactory save from remote server docker@$Remote_Games_addr:$Remote_Games_port. Error code: $?"
+#         # Additional error handling code can go here
+#     }
 
-fi
+# fi
 
 # Delete older files
 log_info "${PURPLE}=== Cleaning old backup files ===${NC}"
 Games_Retention_Days=5
-delete_old_files "$Backups_Apps_Path/Vaultwarden" "bitwarden_encrypted_export_" ""
-delete_old_files "$Backups_Apps_Path/Portainer" "portainer_config_encrypted_backup_" ""
-delete_old_files "$Backups_Apps_Path/OpenMediaVault" "openmediavault_config_backup_" ""
-delete_old_files "$Backups_Apps_Path/DockerAppConfig" "docker_apps_config_backup_" ""
-delete_old_files "$Backups_Apps_Path/DockerAppConfig" "traefik_stack_backup_" ""
-delete_old_files "$Minecraft_Backups_Path" "20" "$Games_Retention_Days"
-delete_old_files "$Satisfactory_Backups_Path" "Les" "$Games_Retention_Days"
+delete_old_files "$Backups_Apps_Path/Vaultwarden" "bitwarden_encrypted_export_" "2"
+delete_old_files "$Backups_Apps_Path/Portainer" "portainer_config_encrypted_backup_" "2"
+delete_old_files "$Backups_Apps_Path/OpenMediaVault" "openmediavault_config_backup_" "2"
+# delete_old_files "$Minecraft_Backups_Path" "20" "$Games_Retention_Days"
+# delete_old_files "$Satisfactory_Backups_Path" "Les" "$Games_Retention_Days"
 # delete_old_files "$PalWorld_Backups_Path" "Pal" "$Games_Retention_Days"
 
 # Apply owner to directory
