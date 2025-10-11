@@ -8,16 +8,16 @@ DATA_DIR="/$(echo "$SCRIPT_DIR" | cut -d'/' -f2)"
 read -r BW_CLIENTID < "$DATA_DIR/docker/docker-secret/vaultwarden/VW_CLIENTID.txt"
 read -r BW_CLIENTSECRET < "$DATA_DIR/docker/docker-secret/vaultwarden/VW_CLIENTSECRET.txt"
 PASSWORD_FILE="$DATA_DIR/docker/docker-secret/vaultwarden/VW_PASSWORD.txt"
-BW="$DATA_DIR/script/bw"
+BW="$3/bw" # Path to bitwarden CLI
 
 
 # # # 1st use (Config)
 # # alias bw='/data/script/bw'
-# # $BW config server https://vaultwarden.${PERSONAL_DOMAIN_NAME}
+# # bw config server https://vaultwarden.${PERSONAL_DOMAIN_NAME}
 
 # # Init connection
-# $BW logout
-# $BW login --apikey
+# bw logout
+# bw login --apikey
 
 # Recover Session's Token
 OUTPUT=$($BW unlock --passwordfile "$PASSWORD_FILE")
