@@ -64,7 +64,8 @@ services:
       diun.watch_repos: true  
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/runner:/etc/gitlab-runner
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/runner/config:/etc/gitlab-runner
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/runner/home:/home/gitlab-runner
     networks:
       - gitlab
 
