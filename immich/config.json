@@ -190,8 +190,8 @@
     "enabled": true
   },
   "server": {
-    "externalDomain": "https://photos.chou-dou.com",
-    "loginPageMessage": "Bienvenue sur les photos de Laura & Nicolas",
+    "externalDomain": "",
+    "loginPageMessage": "",
     "publicUsers": true
   },
   "storageTemplate": {
@@ -201,8 +201,8 @@
   },
   "templates": {
     "email": {
-      "albumInviteTemplate": "",
-      "albumUpdateTemplate": "",
+      "albumInviteTemplate": "<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Invitation Album</title>\n    <style>\n        body {\n            font-family: Arial, sans-serif;\n            margin: 40px;\n            text-align: center;\n        }\n        .container {\n            max-width: 600px;\n            margin: auto;\n        }\n        .highlight {\n            font-weight: bold;\n        }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <p>Bonjour <span class=\"highlight\">{recipientName}</span>!</p>\n        <p>Vous avez été ajouté à l'album <span class=\"highlight\">{albumName}</span>.</p>\n        <p>Vous pouvez consulter l'album en utilisant le lien suivant :<br>\n            <a href=\"{baseUrl}/albums/{albumId}\">{baseUrl}/albums/{albumId}</a>\n        </p>\n    </div>\n</body>",
+      "albumUpdateTemplate": "<head>\n<meta charset=\"UTF-8\" />\n<title>Nouveau média ajouté</title>\n<style>\n    body {\n    font-family: Arial, sans-serif;\n    background-color: #f9f9f9;\n    color: #333;\n    padding: 20px;\n    }\n    .container {\n    max-width: 600px;\n    margin: auto;\n    background-color: #ffffff;\n    border-radius: 8px;\n    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);\n    padding: 30px;\n    text-align: center;\n    }\n</style>\n</head>\n<body>\n<div class=\"container\">\n    <h2>Bonjour {recipientName} !</h2>\n    <p>De nouveaux médias ont été ajoutés à l’album <strong>{albumName}</strong>.</p>\n    <p>Vous pouvez les consulter dès maintenant en vous rendant sur  le lien suivant :<br>\n            <a href=\"{baseUrl}/albums/{albumId}\">{baseUrl}/albums/{albumId}</a>\n  </p>\n</div>\n</body>",
       "welcomeTemplate": "<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Nouvel Compte</title>\n    <style>\n        body {\n            font-family: Arial, sans-serif;\n            margin: 40px;\n        }\n        .container {\n            max-width: 600px;\n        }\n        .highlight {\n            font-weight: bold;\n        }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <p>Bonjour <span class=\"highlight\">{displayName}</span>!</p>\n        <p>Un nouveau compte a été créé pour vous afin de consulter les photos de Laura & Nicolas.</p>\n        <p>Connectez-vous sur le site web ou l'application mobile avec vos identifiants ci-dessous:</p>\n        <p><span class=\"highlight\">Adresse web:</span> {baseUrl}</p>\n        <p><span class=\"highlight\">Nom d'utilisateur:</span> {username}</p>\n        <p><span class=\"highlight\">Mot de passe:</span> {password}</p>\n    </div>\n</body>\n</html>"
     }
   },
