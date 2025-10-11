@@ -1,0 +1,59 @@
+services:
+  frontend:
+    restart: unless-stopped
+    image: ghcr.io/coldfirel15/gamecontainermanager:${DOCKER_TAG_FRONT:-main}
+    container_name: gamecontainermanager-front
+    hostname: gamecontainermanager-front
+    labels:
+      traefik.enable: true
+      traefik.http.routers.gamecontainermanager.tls: true
+      traefik.http.routers.gamecontainermanager.middlewares: authelia@docker
+      traefik.http.routers.gamecontainermanager.entrypoints: websecure
+      traefik.http.routers.gamecontainermanager.rule: Host(`games-manager.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.gamecontainermanager.service: gamecontainermanager
+      traefik.http.services.gamecontainermanager.loadBalancer.server.port: 5000
+    environment:
+      DOCKERCONTAINERMANAGER_AUTHENTICATION: "True"
+      DOCKERCONTAINERMANAGER_DEBUG: "False"
+      DOCKERCONTAINERMANAGER_SERVICE_TYPE: frontend
+      DOCKERCONTAINERMANAGER_FAVICON_URL: ${DOCKERCONTAINERMANAGER_FAVICON_URL}
+      DOCKERCONTAINERMANAGER_SECRET_KEY: ${DOCKERCONTAINERMANAGER_SECRET_KEY}
+      DOCKERCONTAINERMANAGER_DISCORD_CLIENT_ID: ${DOCKERCONTAINERMANAGER_DISCORD_CLIENT_ID}
+      DOCKERCONTAINERMANAGER_DISCORD_CLIENT_SECRET: ${DOCKERCONTAINERMANAGER_DISCORD_CLIENT_SECRET}
+      DOCKERCONTAINERMANAGER_FRONTEND_URL: ${DOCKERCONTAINERMANAGER_FRONTEND_URL}
+    networks:
+      - webinternal
+
+  backend:
+    restart: unless-stopped
+    image: ghcr.io/coldfirel15/gamecontainermanager:${DOCKER_TAG_BACK:-main}
+    container_name: gamecontainermanager-back
+    hostname: gamecontainermanager-back
+    environment:
+      DOCKERCONTAINERMANAGER_DEBUG: "False"
+      DOCKERCONTAINERMANAGER_SERVICE_TYPE: backend
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - webinternal
+    healthcheck: 
+      disable: true
+
+  bot:
+    restart: no
+    image: ghcr.io/coldfirel15/gamecontainermanager:${DOCKER_TAG_BOT:-main}
+    container_name: gamecontainermanager-bot
+    hostname: gamecontainermanager-bot
+    environment:
+      TZ: Europe/Paris
+      DOCKERCONTAINERMANAGER_FRONTEND_URL: ${DOCKERCONTAINERMANAGER_FRONTEND_URL}
+      DOCKERCONTAINERMANAGER_DISCORD_TOKEN: ${DISCORD_TOKEN} # Need to be set // Can be put in docker secret to avoid exposing the token
+      DOCKERCONTAINERMANAGER_SERVICE_TYPE: bot
+    networks:
+      - webinternal
+    healthcheck:
+      disable: true
+
+networks:
+  webinternal:
+    name: webinternal
