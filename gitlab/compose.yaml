@@ -38,6 +38,7 @@ services:
         gitlab_rails['registry_path'] = "/var/opt/gitlab/gitlab-rails/shared/registry"
         letsencrypt['enable'] = false
         gitlab_rails['backup_archive_permissions'] = 0644 # Makes the backup archives world-readable
+        prometheus_monitoring['enable'] = false
     ports:
       - "444:443"
       - "22:22"
