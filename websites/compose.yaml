@@ -174,10 +174,15 @@ services:
       traefik.enable: true
       traefik.http.routers.python-baby.tls: true
       traefik.http.routers.python-baby.entrypoints: websecure
-      traefik.http.routers.python-baby.middlewares: authelia@docker
-      traefik.http.routers.python-baby.rule: Host(`baby.${PERSONAL_DOMAIN_NAME}`)
-      traefik.http.routers.python-baby.service: python-baby
-      traefik.http.services.python-baby.loadBalancer.server.port: 5000
+      # traefik.http.routers.python-baby.middlewares: authelia@docker
+      traefik.http.routers.python-baby.rule: Host(`baby.${PERSONAL_DOMAIN_NAME}`) && (PathPrefix(`/sw.js`) || PathPrefix(`/static`))
+      traefik.http.routers.python-baby.service: pythonbaby
+      traefik.http.routers.pythonbaby.tls: true
+      traefik.http.routers.pythonbaby.entrypoints: websecure
+      traefik.http.routers.pythonbaby.middlewares: authelia@docker
+      traefik.http.routers.pythonbaby.rule: Host(`baby.${PERSONAL_DOMAIN_NAME}`) && !PathPrefix(`/sw.js`)  && !PathPrefix(`/static`)
+      traefik.http.routers.pythonbaby.service: pythonbaby
+      traefik.http.services.pythonbaby.loadBalancer.server.port: 5000
     environment:
       TZ: Europe/Paris
       SESSION_TOKEN: ${SESSION_TOKEN_BABY}
