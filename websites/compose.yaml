@@ -174,13 +174,12 @@ services:
       traefik.enable: true
       traefik.http.routers.python-baby.tls: true
       traefik.http.routers.python-baby.entrypoints: websecure
-      # traefik.http.routers.python-baby.middlewares: authelia@docker
-      traefik.http.routers.python-baby.rule: Host(`baby.${PERSONAL_DOMAIN_NAME}`) && (PathPrefix(`/sw.js`) || PathPrefix(`/static`))
+      traefik.http.routers.python-baby.rule: Host(`baby.${PERSONAL_DOMAIN_NAME}`) && (PathPrefix(`/sw.js`) || Host(`baby.${PERSONAL_DOMAIN_NAME}`) && PathPrefix(`/static`))
       traefik.http.routers.python-baby.service: pythonbaby
       traefik.http.routers.pythonbaby.tls: true
       traefik.http.routers.pythonbaby.entrypoints: websecure
       traefik.http.routers.pythonbaby.middlewares: authelia@docker
-      traefik.http.routers.pythonbaby.rule: Host(`baby.${PERSONAL_DOMAIN_NAME}`) && !PathPrefix(`/sw.js`)  && !PathPrefix(`/static`)
+      traefik.http.routers.pythonbaby.rule: Host(`baby.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.pythonbaby.service: pythonbaby
       traefik.http.services.pythonbaby.loadBalancer.server.port: 5000
     environment:
@@ -191,13 +190,6 @@ services:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/websites/baby-follow:/app/instance
     networks:
     - webinternal
-    # To remove after fix in the image
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:5000"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
 
 networks:
   webinternal:
