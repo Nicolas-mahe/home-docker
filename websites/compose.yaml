@@ -95,14 +95,9 @@ services:
     hostname: python-pronostics
     labels:
       traefik.enable: true
-      traefik.http.routers.python-pronostics-liste.tls: true
-      traefik.http.routers.python-pronostics-liste.entrypoints: websecure
-      traefik.http.routers.python-pronostics-liste.rule: Host(`pronostic.${PERSONAL_DOMAIN_NAME}`) && PathPrefix(`/liste`)
-      traefik.http.routers.python-pronostics-liste.middlewares: authelia@docker
-      traefik.http.routers.python-pronostics-liste.service: python-pronostics
       traefik.http.routers.python-pronostics.tls: true
       traefik.http.routers.python-pronostics.entrypoints: websecure
-      traefik.http.routers.python-pronostics.rule: Host(`pronostic.${PERSONAL_DOMAIN_NAME}`) && !PathPrefix(`/liste`)
+      traefik.http.routers.python-pronostics.rule: Host(`pronostic.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.python-pronostics.middlewares: authelia@docker
       traefik.http.routers.python-pronostics.service: python-pronostics
       traefik.http.services.python-pronostics.loadBalancer.server.port: 5000
@@ -172,10 +167,6 @@ services:
     hostname: python-babyfollow
     labels:
       traefik.enable: true
-      traefik.http.routers.python-baby.tls: true
-      traefik.http.routers.python-baby.entrypoints: websecure
-      traefik.http.routers.python-baby.rule: Host(`baby.${PERSONAL_DOMAIN_NAME}`) && (PathPrefix(`/sw.js`) || Host(`baby.${PERSONAL_DOMAIN_NAME}`) && PathPrefix(`/static`))
-      traefik.http.routers.python-baby.service: pythonbaby
       traefik.http.routers.pythonbaby.tls: true
       traefik.http.routers.pythonbaby.entrypoints: websecure
       traefik.http.routers.pythonbaby.middlewares: authelia@docker
