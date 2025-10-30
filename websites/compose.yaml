@@ -169,7 +169,7 @@ services:
       traefik.enable: true
       traefik.http.routers.pythonbaby.tls: true
       traefik.http.routers.pythonbaby.entrypoints: websecure
-      # traefik.http.routers.pythonbaby.middlewares: authelia@docker
+      traefik.http.routers.pythonbaby.middlewares: authelia@docker
       traefik.http.routers.pythonbaby.rule: Host(`baby.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.pythonbaby.service: pythonbaby
       traefik.http.services.pythonbaby.loadBalancer.server.port: 5000
