@@ -22,7 +22,7 @@ services:
   semaphore:
     user: "${DOCKER_USER_EXECUTOR:-1000}:${DOCKER_USER_EXECUTOR:-1000}"
     restart: unless-stopped
-    image: semaphoreui/semaphore:${SEMAPHORE_TAG:-v2.16.19}
+    image: docker.io/semaphoreui/semaphore:${SEMAPHORE_TAG:-v2.16.19}
     container_name: semaphore-app
     hostname: semaphore-app
     labels:
