@@ -72,7 +72,7 @@ services:
 
   certbot:
     image: certbot/dns-cloudflare:${CERTBOT_TAG:-v4.1.1}
-    container_name: certbot_gitlab
+    container_name: gitlab-certbot
     restart: no
     labels:
       diun.enable: true
