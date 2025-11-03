@@ -70,42 +70,41 @@ services:
     networks:
       - gitlab
 
-  # certbot:
-  #   image: certbot/dns-cloudflare:v4.1.1
-  #   container_name: certbot_gitlab
-  #   restart: no
-  #   labels:
-  #     diun.enable: true
-  #     diun.watch_repos: true  
-  #   volumes:
-  #     -  /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/certs:/etc/letsencrypt
-  #     -  /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/certbot:/var/lib/letsencrypt
-  #   secrets:
-  #     - source: cloudflare_api_token
-  #       target: cloudflare.ini
-  #   command:
-  #     - certonly
-  #     - --dns-cloudflare
-  #     - --dns-cloudflare-credentials
-  #     - /run/secrets/cloudflare.ini
-  #     - --dns-cloudflare-propagation-seconds
-  #     - "30"
-  #     - --non-interactive
-  #     - --agree-tos
-  #     - --email
-  #     - contact@${PERSONAL_DOMAINE_NAME}
-  #     - -d
-  #     - gitlab.${PERSONAL_DOMAINE_NAME}
-  #     - -d
-  #     - registry.${PERSONAL_DOMAINE_NAME}
-  #     - --cert-name
-  #     - gitlab.${PERSONAL_DOMAINE_NAME}
-  #   networks:
-  #     - gitlab
+  certbot:
+    image: certbot/dns-cloudflare:${CERTBOT_TAG:-v4.1.1}
+    container_name: certbot_gitlab
+    restart: no
+    labels:
+      diun.enable: true
+      diun.watch_repos: true  
+    volumes:
+      -  /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/certs:/etc/letsencrypt
+      -  /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/certbot:/var/lib/letsencrypt
+    secrets:
+      - source: cloudflare_credentials
+        target: cloudflare.ini
+    command:
+      - certonly
+      - --dns-cloudflare
+      - --dns-cloudflare-credentials
+      - /run/secrets/cloudflare.ini
+      - --dns-cloudflare-propagation-seconds
+      - "30"
+      - --non-interactive
+      - --agree-tos
+      - -d
+      - gitlab.${PERSONAL_DOMAINE_NAME}
+      - -d
+      - registry.${PERSONAL_DOMAINE_NAME}
+      - --cert-name
+      - gitlab.${PERSONAL_DOMAINE_NAME}
+      - -v
+    networks:
+      - gitlab
 
 secrets:
-  cloudflare_api_token:
-    file:  /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-secret/cloudflare.ini
+  cloudflare_credentials:
+    file: /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-secret/gitlab/cloudflare.ini
 networks:
   gitlab:
     name: gitlab
