@@ -106,3 +106,6 @@ else
 fi
 
 echo "✅ All services from all JSON files have been redeployed."
+
+echo "🔄 Restarting all certbot containers..."
+docker ps -a --filter "name=-certbot" --format '{{.Names}}' | xargs -r docker restart
