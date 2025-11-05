@@ -40,7 +40,7 @@ services:
       disable: true
 
   bot:
-    restart: no
+    restart: unless-stopped
     image: ghcr.io/coldfirel15/gamecontainermanager:${DOCKER_TAG_BOT:-main}
     container_name: gamecontainermanager-bot
     hostname: gamecontainermanager-bot
