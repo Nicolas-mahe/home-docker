@@ -1,0 +1,35 @@
+services:
+  firefox:
+    restart: unless-stopped
+    image: docker.io/jlesage/firefox:${FIREFOX_TAG:-latest}
+    container_name: browser-firefox
+    hostname: browser-firefox
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+      traefik.enable: true
+      traefik.http.routers.browser.tls: true
+      traefik.http.routers.browser.middlewares: authelia@docker
+      traefik.http.routers.browser.entrypoints: websecure
+      traefik.http.routers.browser.rule: Host(`browser.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.browser.service: browser
+      traefik.http.services.browser.loadBalancer.server.port: 5800
+    environment:
+      TZ: Europe/Paris
+      DARK_MODE: true
+      KEEP_APP_RUNNING: true
+      WEB_LISTENING_PORT: 5800
+    networks:
+      - webinternal
+    expose:
+      - 5800
+    volumes:
+      - browser-firefox:/config
+
+volumes:
+  browser-firefox:
+    name: browser-firefox
+
+networks:
+  webinternal:
+    external: true
