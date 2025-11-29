@@ -1,6 +1,6 @@
 services:
   ################# DNS setting #################
-  ## Without Public IP
+  # Without Public IP
   cloudflared:
     restart: unless-stopped
     image: docker.io/cloudflare/cloudflared:${CLOUDFLARED_TAG:-latest}
@@ -21,26 +21,25 @@ services:
       timeout: 5s
       retries: 3
 
-  ## Throw Public IP
-  # cloudflare-ddns:
-  #   restart: always
-  #   image: oznu/cloudflare-ddns
-  #   container_name: cloudflare-ddns
-  #   hostname: cloudflare-ddns
-  #   labels:
-  #     diun.enable: true
-  #     diun.watch_repos: true
-  #   environment:
-  #     API_KEY: ${DNS_API_KEY}
-  #     ZONE: ${PERSONAL_DOMAINE_NAME}
-  #     PROXIED: true
-  #     TZ: Europe/Paris
-  #     DELETE_ON_STOP: true
-  #   networks:
-  #     - webexpose
+  # Throw Public IP
+  cloudflare-ddns:
+    restart: always
+    image: docker.io/oznu/cloudflare-ddns
+    container_name: cloudflare-ddns
+    hostname: cloudflare-ddns
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+    environment:
+      API_KEY: ${DNS_API_KEY}
+      ZONE: ${PERSONAL_DOMAINE_NAME}
+      PROXIED: true
+      TZ: Europe/Paris
+      DELETE_ON_STOP: true
+    networks:
+      - webexpose
 
   ################# Traefik #################
-
   whoami:
     restart: unless-stopped
     image: docker.io/traefik/whoami:${WHOAMI_TAG:-latest}
@@ -65,7 +64,7 @@ services:
 
   traefik:
     restart: unless-stopped
-    image: docker.io/library/traefik:${TRAEFIK_TAG:-v3.5.1}
+    image: docker.io/library/traefik:${TRAEFIK_TAG:-v3.6.2}
     container_name: traefik
     hostname: traefik
     labels:
@@ -96,6 +95,8 @@ services:
         condition: service_healthy
       crowdsec:
         condition: service_healthy
+      cloudflare-ddns:
+        condition: service_started
       cloudflared:
         condition: service_healthy
       error-pages:
@@ -250,7 +251,7 @@ services:
 
   crowdsec:
     restart: unless-stopped
-    image: ghcr.io/crowdsecurity/crowdsec:${CROWDSEC_TAG:-v1.6.10}
+    image: ghcr.io/crowdsecurity/crowdsec:${CROWDSEC_TAG:-v1.7.3}
     container_name: crowdsec
     hostname: crowdsec
     security_opt:
@@ -321,7 +322,7 @@ services:
   ################# Authelia #################
   authelia:
     restart: unless-stopped
-    image: ghcr.io/authelia/authelia:${AUTHELIA_TAG:-4.39.5}
+    image: ghcr.io/authelia/authelia:${AUTHELIA_TAG:-4.39.14}
     container_name: authelia
     hostname: authelia
     labels:
