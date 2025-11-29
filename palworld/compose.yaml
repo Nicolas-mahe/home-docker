@@ -1,6 +1,6 @@
 services:
   steamcmd:
-    restart: unless-stopped
+    restart: no #unless-stopped
     image: docker.io/cm2network/steamcmd:${STEAMCMD_TAG:-latest}
     container_name: palworld-server
     hostname: palworld-server
