@@ -177,23 +177,23 @@ services:
   #     - games
 
   ### Public VPN ###
-  playit: #https://playit.gg
-    restart: unless-stopped
-    image: ghcr.io/playit-cloud/playit-agent:0.15
-    container_name: minecraft-tunnel
-    hostname: minecraft-tunnel
-    labels:
-      diun.enable: true
-      diun.watch_repos: true
-      gamecontainermanager.enable: true
-    environment:
-      TZ: Europe/Paris
-      SECRET_KEY: ${PLAYIT_SECRET_KEY}
-    networks:
-      - games
-    # depends_on:
-    #   server:
-    #     condition: service_healthy
+  # playit: #https://playit.gg
+  #   restart: unless-stopped
+  #   image: ghcr.io/playit-cloud/playit-agent:0.15
+  #   container_name: minecraft-tunnel
+  #   hostname: minecraft-tunnel
+  #   labels:
+  #     diun.enable: true
+  #     diun.watch_repos: true
+  #     gamecontainermanager.enable: true
+  #   environment:
+  #     TZ: Europe/Paris
+  #     SECRET_KEY: ${PLAYIT_SECRET_KEY}
+  #   networks:
+  #     - games
+  #   # depends_on:
+  #   #   server:
+  #   #     condition: service_healthy
 
 networks:
   games:
