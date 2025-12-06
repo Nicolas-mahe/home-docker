@@ -35,7 +35,7 @@ services:
       ZONE: ${PERSONAL_DOMAINE_NAME}
       PROXIED: true
       TZ: Europe/Paris
-      DELETE_ON_STOP: true
+      DELETE_ON_STOP: false
     networks:
       - webexpose
 
