@@ -39,5 +39,6 @@ services:
 networks:
   crowdsec:
     name: crowdsec
+    external: true
   webinternal:
     name: webinternal
