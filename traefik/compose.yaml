@@ -103,7 +103,7 @@ services:
         condition: service_started
     networks:
       crowdsec:
-        ipv4_address: 172.50.0.2
+        ipv4_address: 172.50.0.254
       monitoring:
       webexpose:
       webinternal:
@@ -146,8 +146,8 @@ services:
       - --entryPoints.websecure.forwardedHeaders.insecure=false
       - --entryPoints.websecure.proxyProtocol.insecure=false # need trusted IPs provided
       # Please see the Forwarded Header Trust section of the Authelia Traefik Integration documentation.
-      - --entryPoints.websecure.forwardedHeaders.trustedIPs=172.18.0.0/16,172.50.0.0/16
-      - --entryPoints.websecure.proxyProtocol.trustedIPs=172.18.0.0/16,172.50.0.0/16
+      - --entryPoints.websecure.forwardedHeaders.trustedIPs=172.18.0.0/16,172.50.0.0/24
+      - --entryPoints.websecure.proxyProtocol.trustedIPs=172.18.0.0/16,172.50.0.0/24
       - --entrypoints.websecure.http.middlewares=crowdsec@docker,error-pages@docker
       - --entrypoints.websecure.http.tls.certResolver=letsencrypt-cloudflare
       # - --entrypoints.minecraft.address=:25565/udp # test for minecraft in udp
@@ -248,7 +248,7 @@ services:
       - crowdsec-redis:/data
     networks:
       crowdsec:
-        ipv4_address: 172.50.0.4
+        ipv4_address: 172.50.0.253
     command: --save 60 1 --loglevel warning
 
   crowdsec:
@@ -309,7 +309,7 @@ services:
       - 8080
     networks:
       crowdsec:
-        ipv4_address: 172.50.0.3
+        ipv4_address: 172.50.0.252
       monitoring:
       webexpose:
     healthcheck:
