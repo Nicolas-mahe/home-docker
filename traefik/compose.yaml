@@ -248,7 +248,6 @@ services:
       - crowdsec-redis:/data
     networks:
       crowdsec:
-        ipv4_address: 172.50.0.253
     command: --save 60 1 --loglevel warning
 
   crowdsec:
@@ -309,7 +308,6 @@ services:
       - 8080
     networks:
       crowdsec:
-        ipv4_address: 172.50.0.252
       monitoring:
       webexpose:
     healthcheck:
