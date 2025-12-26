@@ -1,0 +1,17 @@
+services:
+  homeassistant:
+    restart: unless-stopped
+    image: ghcr.io/home-assistant/home-assistant:stable
+    container_name: homeassistant
+    hostname: homeassistant
+    privileged: true
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/homeassistant/:/config
+      - /etc/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro
+    environment:
+      TZ: Europe/Paris
+    network_mode: host
