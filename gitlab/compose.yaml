@@ -54,6 +54,8 @@ services:
     networks:
       - gitlab
       - webinternal
+    # healthcheck:
+    #   disable: true
 
   gitlab-runner:
     image: gitlab/gitlab-runner:${RUNNER_TAG:-v18.3.0}
