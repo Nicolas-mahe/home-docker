@@ -35,3 +35,9 @@ container_name:
 labels:
   type: Vaultwarden
 ---
+source: docker
+container_name:
+ - gitlab
+labels:
+  type: gitlab
+---
