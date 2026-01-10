@@ -297,6 +297,7 @@ services:
         crowdsecurity/traefik
         Dominic-Wagner/vaultwarden
         gauth-fr/immich
+        timokoessler/gitlab
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro #Can read logs from socket!
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/crowdsec/config:/etc/crowdsec #Config Crowdsec
