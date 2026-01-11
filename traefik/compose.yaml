@@ -135,10 +135,10 @@ services:
       - --entrypoints.websecure.http.tls.domains[0].sans=*.${PERSONAL_DOMAINE_NAME}
 
       # Entrypoint management
-      # - --entrypoints.web.address=:80
-      # - --entrypoints.web.http.redirections.entryPoint.to=websecure
+      - --entrypoints.web.address=:80
+      - --entrypoints.web.http.redirections.entryPoint.to=websecure
       # - --entrypoints.web.http.redirections.entryPoint.scheme=https
-      # - --entrypoints.web.http.middlewares=crowdsec@docker,error-pages@docker
+      - --entrypoints.web.http.middlewares=crowdsec@docker,error-pages@docker
       - --entrypoints.websecure.address=:443
       - --entrypoints.websecure.transport.respondingTimeouts.readTimeout=600s
       - --entrypoints.websecure.transport.respondingTimeouts.idleTimeout=600s
@@ -288,6 +288,7 @@ services:
       COLLECTIONS: |
         crowdsecurity/appsec-generic-rules
         crowdsecurity/appsec-virtual-patching
+        crowdsecurity/home-assistant
         crowdsecurity/linux
         crowdsecurity/linux-lpe
         crowdsecurity/nextcloud
