@@ -1,25 +1,25 @@
 services:
   ################# DNS setting #################
-  # Without Public IP
-  cloudflared:
-    restart: unless-stopped
-    image: docker.io/cloudflare/cloudflared:${CLOUDFLARED_TAG:-latest}
-    container_name: cloudflared
-    hostname: cloudflared
-    labels:
-      diun.enable: true
-      diun.watch_repos: true
-    environment:
-      - TUNNEL_TOKEN=${CF_TUNNEL_TOKEN}
-      - TUNNEL_METRICS=0.0.0.0:60123
-    networks:
-      - webexpose
-    command: tunnel --no-autoupdate run
-    healthcheck:
-      test: ["CMD", "cloudflared", "tunnel", "--metrics", "localhost:60123", "ready"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
+  # # Without Public IP
+  # cloudflared:
+  #   restart: unless-stopped
+  #   image: docker.io/cloudflare/cloudflared:${CLOUDFLARED_TAG:-latest}
+  #   container_name: cloudflared
+  #   hostname: cloudflared
+  #   labels:
+  #     diun.enable: true
+  #     diun.watch_repos: true
+  #   environment:
+  #     - TUNNEL_TOKEN=${CF_TUNNEL_TOKEN}
+  #     - TUNNEL_METRICS=0.0.0.0:60123
+  #   networks:
+  #     - webexpose
+  #   command: tunnel --no-autoupdate run
+  #   healthcheck:
+  #     test: ["CMD", "cloudflared", "tunnel", "--metrics", "localhost:60123", "ready"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 3
 
   # Throw Public IP
   cloudflare-ddns:
