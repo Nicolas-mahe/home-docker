@@ -36,10 +36,10 @@ services:
         gitlab_rails['smtp_tls'] = true
         gitlab_rails['smtp_pool'] = true
         gitlab_rails['gitlab_email_from'] = 'gitlab@${PERSONAL_DOMAINE_NAME}'
-        gitlab_rails['gitlab_email_reply_to = 'gitlab@${PERSONAL_DOMAINE_NAME}'
-        gitlab_rails['gitlab_shell_ssh_port = 6322
+        gitlab_rails['gitlab_email_reply_to'] = 'gitlab@${PERSONAL_DOMAINE_NAME}'
+        gitlab_rails['gitlab_shell_ssh_port'] = 6322
         nginx['listen_port'] = 80
-        nginx['listen_https = false
+        nginx['listen_https'] = false
         nginx['redirect_http_to_https'] = true
         registry_external_url 'https://registry.${PERSONAL_DOMAINE_NAME}'
         registry_nginx['listen_port'] = 5050
@@ -50,7 +50,7 @@ services:
         sidekiq['concurrency'] = 1
         puma['worker_timeout'] = 120
         puma['worker_processes'] = 1
-        letsencrypt['enable = false
+        letsencrypt['enable'] = false
         gitlab_rails['backup_archive_permissions'] = 0644
         prometheus_monitoring['enable'] = false
         gitlab_rails['gitlab_default_theme'] = 2
@@ -82,9 +82,9 @@ services:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/runner/home:/home/gitlab-runner
     networks:
       - gitlab
-    depends_on:
-      gitlab:
-        condition: service_healthy
+    # depends_on:
+    #   gitlab:
+    #     condition: service_healthy
 
 networks:
   gitlab:
