@@ -67,6 +67,8 @@ services:
     image: docker.io/library/traefik:${TRAEFIK_TAG:-v3.6.2}
     container_name: traefik
     hostname: traefik
+    security_opt:
+      - no-new-privileges:true
     labels:
       diun.enable: true
       diun.watch_repos: true
@@ -129,37 +131,38 @@ services:
       - --metrics.prometheus=true
 
       # Certificates management
-      - --certificatesresolvers.letsencrypt-cloudflare.acme.dnschallenge=true
-      - --certificatesresolvers.letsencrypt-cloudflare.acme.dnschallenge.provider=cloudflare
-      - --certificatesResolvers.letsencrypt-cloudflare.acme.dnschallenge.resolvers=1.1.1.1:53,1.0.0.1:53
-      - --certificatesResolvers.letsencrypt-cloudflare.acme.dnschallenge.propagation.delaybeforechecks=0
-      - --certificatesresolvers.letsencrypt-cloudflare.acme.email=${PERSONAL_CF_MAIL}
-      - --certificatesresolvers.letsencrypt-cloudflare.acme.storage=/etc/traefik/certs/acme.json
+      - --certificatesresolvers.cloudflare.acme.dnsChallenge=true
+      - --certificatesresolvers.cloudflare.acme.dnsChallenge.provider=cloudflare
+      - --certificatesresolvers.cloudflare.acme.dnsChallenge.resolvers=1.1.1.1:53,1.0.0.1:53
+      - --certificatesresolvers.cloudflare.acme.email=${PERSONAL_CF_MAIL}
+      - --certificatesresolvers.cloudflare.acme.storage=/etc/traefik/certs/acme.json
       - --entrypoints.websecure.http.tls.domains[0].main=${PERSONAL_DOMAINE_NAME}
       - --entrypoints.websecure.http.tls.domains[0].sans=*.${PERSONAL_DOMAINE_NAME}
 
       # Entrypoint management
       - --entrypoints.ping.address=:8082
       - --entrypoints.web.address=:80
+      - --entrypoints.web.http.encodedCharacters.allowEncodedSlash=true
       - --entrypoints.web.http.redirections.entryPoint.to=websecure
-      # - --entrypoints.web.http.redirections.entryPoint.scheme=https
+      - --entrypoints.web.http.redirections.entryPoint.scheme=https
       - --entrypoints.web.http.middlewares=crowdsec@docker,error-pages@docker
       - --entrypoints.websecure.address=:443
+      - --entrypoints.websecure.http.encodedCharacters.allowEncodedSlash=true
       - --entrypoints.websecure.transport.respondingTimeouts.readTimeout=600s
       - --entrypoints.websecure.transport.respondingTimeouts.idleTimeout=600s
       - --entrypoints.websecure.transport.respondingTimeouts.writeTimeout=600s
       - --entryPoints.websecure.forwardedHeaders.insecure=false
-      - --entryPoints.websecure.proxyProtocol.insecure=false # need trusted IPs provided
-      # Please see the Forwarded Header Trust section of the Authelia Traefik Integration documentation.
-      - --entryPoints.websecure.forwardedHeaders.trustedIPs=172.18.0.0/16,172.50.0.0/24
-      - --entryPoints.websecure.proxyProtocol.trustedIPs=172.18.0.0/16,172.50.0.0/24
-      - --entrypoints.websecure.http.middlewares=crowdsec@docker,error-pages@docker
-      - --entrypoints.websecure.http.tls.certResolver=letsencrypt-cloudflare
+      # # Please see the Forwarded Header Trust section of the Authelia Traefik Integration documentation.
+      # - --entryPoints.websecure.proxyProtocol.insecure=false # need trusted IPs provided
+      # - --entryPoints.websecure.forwardedHeaders.trustedIPs=172.18.0.0/16,172.50.0.0/24
+      # - --entryPoints.websecure.proxyProtocol.trustedIPs=172.18.0.0/16,172.50.0.0/24
+      # - --entrypoints.websecure.http.middlewares=crowdsec@docker,error-pages@docker
+      - --entrypoints.websecure.http.tls.certResolver=cloudflare
       # - --entrypoints.minecraft.address=:25565/udp # test for minecraft in udp
       - --serversTransport.insecureSkipVerify=true  # need to put a validate cert everywhere for delete it
 
       # Provider definition
-      - --providers.docker.exposedbydefault=false
+      - --providers.docker.exposedByDefault=false
       - --providers.docker.network=webinternal
       - --providers.file.directory=/etc/traefik/conf
       - --providers.file.watch=true
