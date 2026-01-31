@@ -85,11 +85,13 @@ services:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/conf/:/etc/traefik/conf/
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/certs/:/etc/traefik/certs/
     ports:
-      - 443:443      # HTTPS
-      # - 25565:25565  # Minecraft
+      - 443:443
+      # - 25565:25565
     expose:
-      - 443
-      - 8080
+      - 80    # HTTP
+      - 443   # HTTPS
+      - 8080  # dashboard
+      - 8082  # ping
     depends_on:
       authelia:
         condition: service_healthy
@@ -121,6 +123,7 @@ services:
       - --api.dashboard=true
       - --api.insecure=true
       - --ping=true
+      - --ping.entryPoint=ping
       - --metrics.addinternals
       - --metrics.prometheus=true
 
@@ -135,6 +138,7 @@ services:
       - --entrypoints.websecure.http.tls.domains[0].sans=*.${PERSONAL_DOMAINE_NAME}
 
       # Entrypoint management
+      - --entrypoints.ping.address=:8082
       - --entrypoints.web.address=:80
       - --entrypoints.web.http.redirections.entryPoint.to=websecure
       # - --entrypoints.web.http.redirections.entryPoint.scheme=https
