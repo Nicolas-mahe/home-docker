@@ -3,7 +3,7 @@ services:
     image: gitlab/gitlab-ee:${GITLAB_TAG:-18.3.1-ee.0}
     container_name: gitlab
     restart: unless-stopped
-    hostname: 'gitlab.${PERSONAL_DOMAINE_NAME}'
+    hostname: gitlab
     shm_size: '256m'
     labels:
       diun.enable: true
