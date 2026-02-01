@@ -87,9 +87,11 @@ services:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/conf/:/etc/traefik/conf/
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/certs/:/etc/traefik/certs/
     ports:
+      - 6322:6322
       - 443:443
       # - 25565:25565
     expose:
+      - 6322  # Gitlab SSH
       - 80    # HTTP
       - 443   # HTTPS
       - 8080  # dashboard
@@ -160,6 +162,7 @@ services:
       - --entrypoints.websecure.http.tls.certResolver=cloudflare
       # - --entrypoints.minecraft.address=:25565/udp # test for minecraft in udp
       - --serversTransport.insecureSkipVerify=true  # need to put a validate cert everywhere for delete it
+      - --entrypoints.gitlab-ssh.address=:6322
 
       # Provider definition
       - --providers.docker.exposedByDefault=false
