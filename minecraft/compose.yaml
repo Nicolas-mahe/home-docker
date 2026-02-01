@@ -5,13 +5,14 @@
 services:
   server:
     image: docker.io/itzg/minecraft-server:java17-jdk
+    restart: no
     container_name: minecraft-r7-server
     hostname: minecraft-r7-server
     labels:
       diun.enable: true
       diun.watch_repos: true
       gamecontainermanager.enable: true
-      gamecontainermanager.customlabel0: "${PERSONAL_MINECRAFT_SERVER1_URL}"
+      gamecontainermanager.customlabel0: "${PERSONAL_DOMAINE_NAME}"
     tty: true
     stdin_open: true
     environment:
@@ -53,21 +54,11 @@ services:
       VIEW_DISTANCE: 10
     volumes:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/minecraft/s5/prod:/data
-      - /${RAID_DATA_DIRECTORY:?raid path is required}/backups/Games/Minecraft/s5:/data/backups
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/minecraft/RaBByT.jpg:/icon.jpg:ro
     ports:
       - ${PERSONAL_PORT_MINECRAFT}:25565
     networks:
       - games
-    deploy:
-      resources:
-        limits:
-          cpus: "8.0"
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 5
-        window: 300s
 
   # server-creative:
   #   restart: no
