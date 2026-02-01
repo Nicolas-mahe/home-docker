@@ -157,15 +157,16 @@ http:
 
 
 
-# udp:
-#   routers:
-#     minecraft:
-#       service: minecraft
-#       entrypoints:
-#         - minecraft
-#   services:
-#     minecraft:
-#       loadBalancer:
-#         servers:
-#           - address: "${PERSONAL_NETWORK}.10:25565"
+tcp:
+  routers:
+    minecraft:
+      rule: "HostSNI(`*`)"
+      entryPoints:
+        - minecraft
+      service: minecraft
 
+  services:
+    minecraft:
+      loadBalancer:
+        servers:
+          - address: "${PERSONAL_NETWORK}.4:25565"
