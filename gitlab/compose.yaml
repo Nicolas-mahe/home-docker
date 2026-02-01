@@ -10,18 +10,22 @@ services:
       diun.watch_repos: true
       traefik.enable: true
       traefik.docker.network: webinternal
-      traefik.http.services.gitlab.loadBalancer.server.port: 80
-      traefik.http.routers.gitlab.service: gitlab
-      traefik.http.routers.gitlab.rule: Host(`gitlab.${PERSONAL_DOMAINE_NAME}`)
-      traefik.http.routers.gitlab.entrypoints: websecure
-      traefik.http.routers.gitlab.tls: true
-      traefik.http.routers.gitlab.tls.certresolver: cloudflare
-      traefik.http.services.registry.loadBalancer.server.port: 5050
-      traefik.http.routers.registry.service: registry
-      traefik.http.routers.registry.rule: Host(`registry.${PERSONAL_DOMAINE_NAME}`)
-      traefik.http.routers.registry.entrypoints: websecure
-      traefik.http.routers.registry.tls: true
-      traefik.http.routers.registry.tls.certresolver: cloudflare
+      traefik.http.services.gitlab-web.loadBalancer.server.port: 80
+      traefik.http.routers.gitlab-web.service: gitlab-web
+      traefik.http.routers.gitlab-web.rule: Host(`gitlab.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.gitlab-web.entrypoints: websecure
+      traefik.http.routers.gitlab-web.tls: true
+      traefik.http.routers.gitlab-web.tls.certresolver: cloudflare
+      traefik.http.services.gitlab-registry.loadBalancer.server.port: 5050
+      traefik.http.routers.gitlab-registry.service: gitlab-registry
+      traefik.http.routers.gitlab-registry.rule: Host(`registry.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.gitlab-registry.entrypoints: websecure
+      traefik.http.routers.gitlab-registry.tls: true
+      traefik.http.routers.gitlab-registry.tls.certresolver: cloudflare
+      traefik.tcp.routers.gitlab-ssh.rule: HostSNI(`*`)
+      traefik.tcp.routers.gitlab-ssh.entrypoints: gitlab-ssh
+      traefik.tcp.routers.gitlab-ssh.service: gitlab-ssh
+      traefik.tcp.services.gitlab-ssh.loadbalancer.server.port: 22
     environment:
       GITLAB_OMNIBUS_CONFIG: |
         external_url 'https://gitlab.${PERSONAL_DOMAINE_NAME}'
@@ -56,8 +60,8 @@ services:
         gitlab_rails['gitlab_default_theme'] = 2
         gitlab_rails['gitlab_default_color_mode'] = 2
         gitlab_rails['initial_gitlab_product_usage_data'] = false
-    ports:
-      - "6322:22"
+    # ports:
+    #   - "6322:22"
     volumes:
       -  /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/config:/etc/gitlab
       -  /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/logs:/var/log/gitlab
