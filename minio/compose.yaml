@@ -9,10 +9,12 @@ services:
       traefik.enable: true
       traefik.http.routers.minio-web.tls: true
       traefik.http.routers.minio-storage.entrypoints: websecure
+      traefik.http.routers.minio-storage.middlewares: authelia@docker
       traefik.http.routers.minio-storage.rule: Host(`s3.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.minio-storage.service: minio-storage
       traefik.http.services.minio-storage.loadbalancer.server.port: 9000
       traefik.http.routers.minio-web.entrypoints: websecure
+      traefik.http.routers.minio-web.middlewares: authelia@docker
       traefik.http.routers.minio-web.rule: Host(`minio.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.minio-web.service: minio-web
       traefik.http.services.minio-web.loadbalancer.server.port: 9001
@@ -22,6 +24,8 @@ services:
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:?root user is required}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?root password is required}
+      MINIO_SERVER_URL: https://s3.${PERSONAL_DOMAIN_NAME}
+      MINIO_BROWSER_REDIRECT_URL: https://minio.${PERSONAL_DOMAIN_NAME}
     volumes:
       - /${RAID_DATA_DIRECTORY:?raid path is required}/backups/s3:/data
     command: server /data --console-address ":9001"
