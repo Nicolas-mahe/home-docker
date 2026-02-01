@@ -2,113 +2,32 @@ services:
   minio:
     image: quay.io/minio/minio:${MINIO_TAG:-latest}
     container_name: minio
+    hostname: minio
     labels:
       diun.enable: true
       diun.watch_repos: true
       traefik.enable: true
-      traefik.http.routers.minio.tls: true
-      traefik.http.routers.minio.entrypoints: websecure
-      traefik.http.routers.minio.rule: Host(`${PERSONAL_DOMAIN_NAME}`) || Host(`test.${PERSONAL_DOMAIN_NAME}`) # HostRegexp(`^.+${PERSONAL_DOMAIN_NAME}$$`)
-      traefik.http.routers.minio.service: minio
-      traefik.http.services.minio.loadbalancer.server.port: 9000
+      traefik.http.routers.minio-web.tls: true
+      traefik.http.routers.minio-storage.entrypoints: websecure
+      traefik.http.routers.minio-storage.rule: Host(`s3.${PERSONAL_DOMAIN_NAME}`)
+      traefik.http.routers.minio-storage.service: minio-storage
+      traefik.http.services.minio-storage.loadbalancer.server.port: 9000
+      traefik.http.routers.minio-web.entrypoints: websecure
+      traefik.http.routers.minio-web.rule: Host(`minio.${PERSONAL_DOMAIN_NAME}`)
+      traefik.http.routers.minio-web.service: minio-web
+      traefik.http.services.minio-web.loadbalancer.server.port: 9001
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "9000:9000" # API S3
+      - "9001:9001" # web console
     environment:
-      MINIO_ROOT_USER: 'AKIAIOSFODNN7EXAMPLE'
-      MINIO_ROOT_PASSWORD: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY'
-      MINIO_DOMAIN: ${PERSONAL_DOMAIN_NAME}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?root user is required}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?root password is required}
     volumes:
-      - data:/data
+      - /${RAID_DATA_DIRECTORY:?raid path is required}/backups/s3:/data
     command: server /data --console-address ":9001"
     networks:
       - webinternal
 
-  ################# DNS setting #################
-  cloudflared:
-    restart: unless-stopped
-    image: docker.io/cloudflare/cloudflared:${CLOUDFLARED_TAG:-latest}
-    container_name: cloudflared
-    hostname: cloudflared
-    labels:
-      diun.enable: true
-      diun.watch_repos: true
-    environment:
-      - TUNNEL_TOKEN=${CF_TUNNEL_TOKEN}
-      - TUNNEL_METRICS=0.0.0.0:60123
-    networks:
-      - webexpose
-    command: tunnel --no-autoupdate run
-    healthcheck:
-      test: ["CMD", "cloudflared", "tunnel", "--metrics", "localhost:60123", "ready"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-
-  ################# Traefik #################
-  traefik:
-    restart: unless-stopped
-    image: docker.io/library/traefik:${TRAEFIK_TAG:-latest}
-    container_name: traefik
-    hostname: traefik
-    labels:
-      diun.enable: true
-      diun.watch_repos: true
-    environment:
-      TZ: Europe/Paris
-      CF_DNS_API_TOKEN: ${PERSONAL_CF_TRAEFIK_API}
-      CF_API_EMAIL: ${PERSONAL_CF_MAIL}
-    volumes:
-      - /run/docker.sock:/run/docker.sock:ro
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/test/traefik/conf/:/etc/traefik/conf/
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/test/traefik/certs/:/etc/traefik/certs/
-    ports:
-      - 8081:8080
-    expose:
-      - 443
-      - 8080
-    networks:
-      - webexpose
-      - webinternal
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/ping"]
-      timeout: 5s
-      retries: 3
-      start_period: 15s
-    command:
-      - --global.sendAnonymousUsage
-      - --log.level=INFO
-      - --log.nocolor=false
-      - --accesslog=true
-      - --api.dashboard=true
-      - --api.insecure=true
-      - --ping=true
-
-      # Entrypoint management
-      - --entrypoints.websecure.address=:443
-      - --serversTransport.insecureSkipVerify=true  # need to put a validate cert everywhere for delete it
-
-      # Certificates management
-      - --certificatesresolvers.letsencrypt-cloudflare.acme.dnschallenge=true
-      - --certificatesresolvers.letsencrypt-cloudflare.acme.dnschallenge.provider=cloudflare
-      - --certificatesResolvers.letsencrypt-cloudflare.acme.dnschallenge.resolvers=1.1.1.1:53,1.0.0.1:53
-      - --certificatesResolvers.letsencrypt-cloudflare.acme.dnschallenge.propagation.delaybeforechecks=0
-      - --certificatesresolvers.letsencrypt-cloudflare.acme.email=${PERSONAL_CF_MAIL}
-      - --certificatesresolvers.letsencrypt-cloudflare.acme.storage=/etc/traefik/certs/acme.json
-      - --entrypoints.websecure.http.tls.domains[0].main=${PERSONAL_DOMAIN_NAME}
-      - --entrypoints.websecure.http.tls.domains[0].sans=*.${PERSONAL_DOMAIN_NAME}
-
-      # Provider definition
-      - --providers.docker.exposedbydefault=false
-      - --providers.docker.network=webinternal
-      - --providers.file.directory=/etc/traefik/conf
-      - --providers.file.watch=true
-
-volumes:
-  data:
-
 networks:
-  webexpose:
-    name: webexpose
   webinternal:
     name: webinternal
