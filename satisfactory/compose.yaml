@@ -1,6 +1,6 @@
 services:
   satisfactory-server:
-    restart: unless-stopped
+    restart: no
     image: wolveix/satisfactory-server:${SATISFACTORY_SERVER_TAG:-latest}
     container_name: satisfactory-server
     hostname: satisfactory-server
