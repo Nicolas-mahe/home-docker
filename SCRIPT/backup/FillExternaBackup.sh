@@ -64,7 +64,7 @@ delete_old_files() {
         log_info "Check backups number in $directory:"
     fi
 
-    # Utiliser un tableau pour stocker les fichiers
+    # Utiliser un tableau pour stocker les fichiers et dossiers
     local -a files=()
     local file_count=0
     
@@ -72,38 +72,35 @@ delete_old_files() {
     while IFS= read -r -d '' file_path; do
         files+=("$file_path")
         ((file_count++))
-    done < <(find "$directory" -type f -name "${prefix}*" -print0)
+    done < <(find "$directory" \( -type f -o -type d \) -name "${prefix}*" -print0)
     
     if (( file_count > NbBackups )); then
-        log_warning "There is $file_count (>$NbBackups) files match with prefix '$prefix', purge older(s)..."
+        log_warning "There is $file_count (>$NbBackups) items match with prefix '$prefix', purge older(s)..."
         
-        # Trier les fichiers par date de modification (du plus récent au plus ancien)
+        # Trier les éléments par date de modification (du plus ancien au plus récent) de manière robuste
         local -a sorted_files=()
-        local sort_command="ls -tr"
-        for file in "${files[@]}"; do
-            sort_command+=" $(printf '%q' "$file")"
-        done
+        # Récupère timestamp et chemin, trie numériquement (oldest first) et conserve les chemins avec caractères spéciaux
+        while IFS= read -r -d '' entry; do
+            # entry a le format: "<timestamp> <path>"
+            local path="${entry#* }"
+            sorted_files+=("$path")
+        done < <(find "$directory" \( -type f -o -type d \) -name "${prefix}*" -printf '%T@ %p\0' | sort -z -n)
         
-        # Exécuter la commande de tri et stocker les résultats
-        while IFS= read -r file_path; do
-            sorted_files+=("$file_path")
-        done < <(eval "$sort_command")
-        
-        # Calculer le nombre de fichiers à supprimer
+        # Calculer le nombre d'éléments à supprimer
         local to_delete=$((file_count - NbBackups))
         
-        # Supprimer les fichiers les plus anciens
+        # Supprimer les fichiers et dossiers les plus anciens
         for ((i=0; i<to_delete; i++)); do
-            local file="${sorted_files[$i]}"
-            if [[ -f "$file" ]]; then  # Vérifie que c'est un fichier valide
-                rm -f "$file"
-                log_success "File deleted: $file"
+            local item="${sorted_files[$i]}"
+            if [[ -e "$item" ]]; then  # Vérifie que le chemin existe (fichier ou dossier)
+                rm -rf -- "$item"
+                log_success "Removed: $item"
             else
-                log_warning "Skipping invalid file: $file"
+                log_warning "Skipping invalid path: $item"
             fi
         done
     else
-        log_success "There is $file_count (=<$NbBackups) files match with prefix '$prefix', no purge needed"
+        log_success "There is $file_count (=<$NbBackups) items match with prefix '$prefix', no purge needed"
     fi
 }
 
@@ -139,7 +136,7 @@ delete_old_files() {
 #     local remote_file_path
 #     if [ $? -eq 0 ]; then
 #         remote_file_path=$(ssh -q -o "StrictHostKeyChecking=no" -p "$remote_ssh_port" "$remote_user@$remote_server" "ls -t $remote_path/*.$file_extension  2>/dev/null | head -n 1")
-        
+
 #         if [ -z "$remote_file_path" ]; then
 #             # No files found with extension .$file_extension in $remote_path on $remote_server
 #             return 5
@@ -236,16 +233,16 @@ if [ "$TimeToExec" -eq 1 ]; then
         $Script_Path/backup/VaultwardenVaultExport.sh "$vaultwarden_filename" "$Backups_Apps_Path" "$Backups_Apps_Path/scripts"
     fi
 
-    log_info "${CYAN}=== Portainer Backup ===${NC}"
-    # Portainer
-    read -r PortainerApiKey < $Data_Dir/docker/docker-secret/portainer/APIKEY.txt
-    read -r PortainerLocalPort < $Data_Dir/docker/docker-secret/portainer/PERSONNAL_PORTAINER_PORT.txt
-    log_info "Export Portainer configuration"
-    curl -X POST "http://localhost:$PortainerLocalPort/api/backup" \
-    -H "X-API-Key: $PortainerApiKey" \
-    -H "Content-Type: application/json" \
-    -d "{\"password\": \"$EncryptionKey\"}" \
-    --output "$Backups_Apps_Path/Portainer/portainer_config_encrypted_backup_$exec_date.tar.gz"
+    # log_info "${CYAN}=== Portainer Backup ===${NC}"
+    # # Portainer
+    # read -r PortainerApiKey < $Data_Dir/docker/docker-secret/portainer/APIKEY.txt
+    # read -r PortainerLocalPort < $Data_Dir/docker/docker-secret/portainer/PERSONNAL_PORTAINER_PORT.txt
+    # log_info "Export Portainer configuration"
+    # curl -X POST "http://localhost:$PortainerLocalPort/api/backup" \
+    # -H "X-API-Key: $PortainerApiKey" \
+    # -H "Content-Type: application/json" \
+    # -d "{\"password\": \"$EncryptionKey\"}" \
+    # --output "$Backups_Apps_Path/Portainer/portainer_config_encrypted_backup_$exec_date.tar.gz"
 
     log_info "${CYAN}=== OpenMediaVault Backup ===${NC}"
     # OpenMediaVault config
@@ -337,8 +334,12 @@ fi
 log_info "${PURPLE}=== Cleaning old backup files ===${NC}"
 Games_Retention_Days=5
 delete_old_files "$Backups_Apps_Path/Vaultwarden" "bitwarden_encrypted_export_" "2"
-delete_old_files "$Backups_Apps_Path/Portainer" "portainer_config_encrypted_backup_" "2"
+# delete_old_files "$Backups_Apps_Path/Portainer" "portainer_config_encrypted_backup_" "2"
 delete_old_files "$Backups_Apps_Path/OpenMediaVault" "openmediavault_config_backup_" "2"
+# Portainer S3 Backups
+delete_old_files "$Backups_Path/s3/portainer" "portainer-backup_" "2"
+delete_old_files "$Backups_Path/s3/volcano-solutions" "portainer-backup_" "2"
+
 # delete_old_files "$Minecraft_Backups_Path" "20" "$Games_Retention_Days"
 # delete_old_files "$Satisfactory_Backups_Path" "Les" "$Games_Retention_Days"
 # delete_old_files "$PalWorld_Backups_Path" "Pal" "$Games_Retention_Days"
