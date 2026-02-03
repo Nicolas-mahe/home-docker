@@ -7,11 +7,11 @@ services:
     labels:
       diun.enable: true
       diun.watch_repos: true
-      # traefik.enable: true
-      # traefik.tcp.routers.minecraft.rule: HostSNI(`*`)
-      # traefik.tcp.routers.minecraft.entrypoints: minecraft
-      # traefik.tcp.routers.minecraft.service: minecraft
-      # traefik.tcp.services.minecraft.loadbalancer.server.port: 25565
+      traefik.enable: true
+      traefik.tcp.routers.minecraft.rule: HostSNI(`*`)
+      traefik.tcp.routers.minecraft.entrypoints: minecraft
+      traefik.tcp.routers.minecraft.service: minecraft
+      traefik.tcp.services.minecraft.loadbalancer.server.port: 25565
     environment:
       MAPPING: |
         ${PERSONAL_DOMAINE_NAME}=${PERSONAL_IP_SERVER}:25565
