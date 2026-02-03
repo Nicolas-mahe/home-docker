@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Set default values
-default_delay=15 # Default delay between 2 service redeploy
+default_delay=5 # Default delay between 2 service redeploy
 payload='{}' # Optional curl payload
 portainerWebHookPath="api/stacks/webhooks"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
