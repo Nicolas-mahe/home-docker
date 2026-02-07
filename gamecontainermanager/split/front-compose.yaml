@@ -1,0 +1,49 @@
+services:
+  frontend:
+    restart: unless-stopped
+    image: ghcr.io/coldfirel15/gamecontainermanager:${DOCKER_TAG_FRONT:-main}
+    container_name: gamecontainermanager-front
+    hostname: gamecontainermanager-front
+    labels:
+      traefik.enable: true
+      traefik.http.routers.gamecontainermanager.tls: true
+      traefik.http.routers.gamecontainermanager.middlewares: authelia@docker
+      traefik.http.routers.gamecontainermanager.entrypoints: websecure
+      traefik.http.routers.gamecontainermanager.rule: Host(`games-manager.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.gamecontainermanager.service: gamecontainermanager
+      traefik.http.services.gamecontainermanager.loadBalancer.server.port: 5000
+    environment:
+      DOCKERCONTAINERMANAGER_AUTHENTICATION: "True"
+      DOCKERCONTAINERMANAGER_DEBUG: "False"
+      DOCKERCONTAINERMANAGER_SERVICE_TYPE: frontend
+      DOCKERCONTAINERMANAGER_FAVICON_URL: ${DOCKERCONTAINERMANAGER_FAVICON_URL}
+      DOCKERCONTAINERMANAGER_SECRET_KEY: ${DOCKERCONTAINERMANAGER_SECRET_KEY}
+      DOCKERCONTAINERMANAGER_DISCORD_CLIENT_ID: ${DOCKERCONTAINERMANAGER_DISCORD_CLIENT_ID}
+      DOCKERCONTAINERMANAGER_DISCORD_CLIENT_SECRET: ${DOCKERCONTAINERMANAGER_DISCORD_CLIENT_SECRET}
+      DOCKERCONTAINERMANAGER_FRONTEND_URL: ${DOCKERCONTAINERMANAGER_FRONTEND_URL}
+      DOCKERCONTAINERMANAGER_BACKEND_URL: http://${PERSONAL_IP_SERVER}:5000
+    networks:
+      - gamecontainermanager
+      - webinternal
+
+  bot:
+    restart: unless-stopped
+    image: ghcr.io/coldfirel15/gamecontainermanager:${DOCKER_TAG_BOT:-main}
+    container_name: gamecontainermanager-bot
+    hostname: gamecontainermanager-bot
+    environment:
+      TZ: Europe/Paris
+      DOCKERCONTAINERMANAGER_FRONTEND_URL: ${DOCKERCONTAINERMANAGER_FRONTEND_URL}
+      DOCKERCONTAINERMANAGER_DISCORD_TOKEN: ${DISCORD_TOKEN}
+      DOCKERCONTAINERMANAGER_SERVICE_TYPE: bot
+      DOCKERCONTAINERMANAGER_BACKEND_URL: http://${PERSONAL_IP_SERVER}:5000
+    networks:
+      - gamecontainermanager
+    healthcheck:
+      disable: true
+
+networks:
+  gamecontainermanager:
+    name: gamecontainermanager
+  webinternal:
+    name: webinternal
