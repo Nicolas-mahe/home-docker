@@ -1,0 +1,21 @@
+services:
+  backend:
+    restart: unless-stopped
+    image: ghcr.io/coldfirel15/gamecontainermanager:${DOCKER_TAG_BACK:-main}
+    container_name: gamecontainermanager-back
+    hostname: gamecontainermanager-back
+    environment:
+      DOCKERCONTAINERMANAGER_DEBUG: "False"
+      DOCKERCONTAINERMANAGER_SERVICE_TYPE: backend
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 5000:5000
+    networks:
+      - games
+    healthcheck: 
+      disable: true
+
+networks:
+  games:
+    name: games
