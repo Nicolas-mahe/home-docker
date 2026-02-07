@@ -13,14 +13,48 @@ services:
       traefik.tcp.routers.minecraft.service: minecraft
       traefik.tcp.services.minecraft.loadbalancer.server.port: 25565
     environment:
+      DEFAULT: minecraft-default:25565
       MAPPING: |
         ${PERSONAL_DOMAINE_NAME}=${PERSONAL_IP_SERVER}:25565
         play.${PERSONAL_DOMAINE_NAME}=${PERSONAL_IP_SERVER}:25566
+      TZ: Europe/Paris
     expose:
       - 25565
     networks:
       - webinternal
+#       - games
+
+#   minecraft-default:
+#     restart: unless-stopped
+#     image: docker.io/itzg/minecraft-server:${MC_SERVER_TAG:-stable}
+#     container_name: minecraft-default
+#     hostname: minecraft-default
+#     labels:
+#       diun.enable: true
+#       diun.watch_repos: true
+#     environment:
+#       ENABLE_AUTOPAUSE: false
+#       EULA: true
+#       OVERRIDE_ICON: true
+#       ICON: https://utils.${PERSONAL_DOMAINE_NAME}/icon_server.webp
+#       MAX_MEMORY: 256M
+#       MOTD: | 
+#         §b§l§oRaBByT: §r§r§r§4§l§o Server Down
+#         §f§nSee games-manager.${PERSONAL_DOMAINE_NAME} to turn it on
+#       MAX_PLAYERS: 0
+#       TZ: Europe/Paris
+#     expose:
+#       - 25565
+#     volumes:
+#       - default:/data
+#     networks:
+#       - games
+
+# volumes:
+#   default: {}
 
 networks:
+#   games:
+#     name: games
   webinternal:
     name: webinternal
