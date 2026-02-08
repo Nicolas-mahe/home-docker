@@ -244,8 +244,10 @@ fi
 
 # Games managment
 read -r Remote_Games_addr < $Data_Dir/docker/docker-secret/common/Remote_Games_SRV_addr.txt
+read -r Remote_Games_mac_addr < $Data_Dir/docker/docker-secret/common/Remote_Games_SRV_mac_addr.txt
 read -r Remote_Games_user < $Data_Dir/docker/docker-secret/common/Remote_Games_SRV_user.txt
 read -r Remote_Games_port < $Data_Dir/docker/docker-secret/common/Remote_Games_SRV_port.txt
+Games_Retention_Days=5
 
 # Minecraft vars
 Minecraft_Path="$Docker_Path/minecraft/s5/prod/backups"
@@ -263,6 +265,51 @@ Satisfactory_Backups_Path="$Backups_Path/Games/Satisfactory/s1"
 Satisfactory_Backups_Extension="sav"
 
 if [ "$TimeToExec" -eq 1 ] || [ "$TimeToExec" -eq 2 ]; then
+    # Power on remote server only on Monday
+    if [ "$TimeToExec" -eq 1 ]; then
+        # Send Wake-on-LAN to remote games server and wait for SSH availability
+        if [[ -z "$Remote_Games_mac_addr" ]]; then
+            log_warning "No MAC for remote games server ($Remote_Games_addr). Skipping WOL."
+        elif ping -c 2 -W 2 "$Remote_Games_addr" >/dev/null 2>&1; then
+            log_info "Remote games server $Remote_Games_addr is already reachable via SSH."
+            Remote_Games_reachable=1
+        else
+            Remote_Games_reachable=0
+            log_info "Sending WOL to $Remote_Games_addr (MAC: $Remote_Games_mac_addr)"
+            if command -v wakeonlan >/dev/null 2>&1; then
+                wakeonlan "$Remote_Games_mac_addr" >/dev/null 2>&1 || log_warning "wakeonlan command failed"
+            elif command -v etherwake >/dev/null 2>&1; then
+                if [[ $EUID -ne 0 && ! -x "$(command -v sudo)" ]]; then
+                    log_warning "etherwake needs root or sudo; cannot send WOL."
+                else
+                    if [[ $EUID -ne 0 ]]; then
+                        sudo -n etherwake -i any "$Remote_Games_mac_addr" >/dev/null 2>&1 || sudo etherwake -i any "$Remote_Games_mac_addr" >/dev/null 2>&1 || log_warning "etherwake command failed"
+                    else
+                        etherwake -i any "$Remote_Games_mac_addr" >/dev/null 2>&1 || log_warning "etherwake command failed"
+                    fi
+                fi
+            else
+                log_error "No WOL utility found (install wakeonlan or etherwake)."
+            fi
+        fi
+
+        log_info "Waiting for SSH on $Remote_Games_addr:$Remote_Games_port ..."
+        timeout=180
+        interval=5
+        waited=0
+        while (( waited < timeout )); do
+            ssh -q -o ConnectTimeout=5 -o StrictHostKeyChecking=no -p "$Remote_Games_port" "$Remote_Games_user@$Remote_Games_addr" "exit" >/dev/null 2>&1
+            if [ $? -eq 0 ]; then
+                log_success "Remote server $Remote_Games_addr reachable via SSH."
+                break
+            fi
+            sleep $interval
+            waited=$((waited + interval))
+        done
+        if (( waited >= timeout )); then
+            log_error "Timeout waiting for $Remote_Games_addr to become available (waited ${timeout}s)."
+        fi
+    fi
     # Minecraft
     log_info "${CYAN}=== Minecraft Backup ===${NC}"
     log_info "Attempting to backup Minecraft files..."
@@ -316,12 +363,15 @@ if [ "$TimeToExec" -eq 1 ] || [ "$TimeToExec" -eq 2 ]; then
     #     log_error "Failed to backup Satisfactory save from remote server docker@$Remote_Games_addr:$Remote_Games_port. Error code: $?"
     #     # Additional error handling code can go here
     # }
-
+    if [ "$Remote_Games_reachable" -eq 1 ]; then
+        log_info "Remote games server $Remote_Games_addr was already powered on, skipping shutdown."
+    else
+        $Script_Path/shutdown-server.sh $Remote_Games_addr $Remote_Games_port $Remote_Games_user
+    fi
 fi
 
 # Delete older files
 log_info "${PURPLE}=== Cleaning old backup files ===${NC}"
-Games_Retention_Days=5
 delete_old_files "$Backups_Apps_Path/Vaultwarden" "bitwarden_encrypted_export_" "2"
 # delete_old_files "$Backups_Apps_Path/Portainer" "portainer_config_encrypted_backup_" "2"
 delete_old_files "$Backups_Apps_Path/OpenMediaVault" "openmediavault_config_backup_" "2"
