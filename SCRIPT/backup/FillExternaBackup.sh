@@ -240,84 +240,84 @@ if [ "$TimeToExec" -eq 1 ]; then
     gpg --batch --yes --passphrase "$EncryptionKey" --symmetric \
         --cipher-algo AES256 "$Backups_Apps_Path/OpenMediaVault/openmediavault_config_backup_$exec_date.tar.gz"
     rm $Backups_Apps_Path/OpenMediaVault/openmediavault_config_backup_$exec_date.tar.gz
-
 fi
 
-# # Games managment
-# read -r Remote_Games_addr < $Data_Dir/docker/docker-secret/common/Remote_Games_SRV_addr.txt
-# read -r Remote_Games_port < $Data_Dir/docker/docker-secret/common/Remote_Games_SRV_port.txt
+# Games managment
+read -r Remote_Games_addr < $Data_Dir/docker/docker-secret/common/Remote_Games_SRV_addr.txt
+read -r Remote_Games_user < $Data_Dir/docker/docker-secret/common/Remote_Games_SRV_user.txt
+read -r Remote_Games_port < $Data_Dir/docker/docker-secret/common/Remote_Games_SRV_port.txt
 
-# # Minecraft vars
-# Minecraft_Path="$Docker_Path/minecraft/s5/prod/backups"
-# Minecraft_Backups_Path="$Backups_Path/games/Minecraft/s5"
-# Minecraft_Backups_Extension="zip"
+# Minecraft vars
+Minecraft_Path="$Docker_Path/minecraft/s5/prod/backups"
+Minecraft_Backups_Path="$Backups_Path/Games/Minecraft/s5"
+Minecraft_Backups_Extension="zip"
 
-# # PalWorld vars
-# PalWorld_Path="$Docker_Path/palworld/games/common/PalServer/Pal/Saved/SaveGames/0/39B9ABFE445430F386A231B68504F49A"
-# PalWorld_Backups_Path="$Backups_Path/games/PalWorld/s1"
-# PalWorld_Backups_Extension="????"
+# PalWorld vars
+PalWorld_Path="$Docker_Path/palworld/Games/common/PalServer/Pal/Saved/SaveGames/0/39B9ABFE445430F386A231B68504F49A"
+PalWorld_Backups_Path="$Backups_Path/Games/PalWorld/s1"
+PalWorld_Backups_Extension="????"
 
-# # Satisfactory vars
-# Satisfactory_Path="$Docker_Path/satisfactory/backups"
-# Satisfactory_Backups_Path="$Backups_Path/games/Satisfactory/s1"
-# Satisfactory_Backups_Extension="sav"
+# Satisfactory vars
+Satisfactory_Path="$Docker_Path/satisfactory/backups"
+Satisfactory_Backups_Path="$Backups_Path/Games/Satisfactory/s1"
+Satisfactory_Backups_Extension="sav"
 
-# if [ "$TimeToExec" -eq 1 ] || [ "$TimeToExec" -eq 2 ]; then
-#     # Minecraft
-#     log_info "${CYAN}=== Minecraft Backup ===${NC}"
-#     log_info "Attempting to backup Minecraft files..."
-#     mkdir -p "$Minecraft_Backups_Path"
-#     {
-#         # Command to copy Minecraft backup
-#         copy_files_from_local_path "$Minecraft_Path" "$Minecraft_Backups_Path" "$Minecraft_Backups_Extension"
-#     } || {
-#         # This block executes if the previous command failed (returned non-zero)
-#         log_warning "Failed to backup Minecraft save from local path. Error code: $? try to backup from remote server"
-#         copy_files_from_remote_server "docker" "$Remote_Games_addr" "$Remote_Games_port" "$Minecraft_Path" "$Minecraft_Backups_Path" "$Minecraft_Backups_Extension"
-#         # Additional error handling code can go here
-#     }|| {
-#         # This block executes if the previous command failed (returned non-zero)
-#         log_error "Failed to backup Minecraft save from remote server docker@$Remote_Games_addr:$Remote_Games_port. Error code: $?"
-#         # Additional error handling code can go here
-#     }
+if [ "$TimeToExec" -eq 1 ] || [ "$TimeToExec" -eq 2 ]; then
+    # Minecraft
+    log_info "${CYAN}=== Minecraft Backup ===${NC}"
+    log_info "Attempting to backup Minecraft files..."
+    mkdir -p "$Minecraft_Backups_Path"
+    {
+        # Command to copy Minecraft backup
+        copy_files_from_local_path "$Minecraft_Path" "$Minecraft_Backups_Path" "$Minecraft_Backups_Extension"
+    } || {
+        # This block executes if the previous command failed (returned non-zero)
+        log_warning "Failed to backup Minecraft save from local path. Error code: $? try to backup from remote server"
+        copy_files_from_remote_server "$Remote_Games_user" "$Remote_Games_addr" "$Remote_Games_port" "$Minecraft_Path" "$Minecraft_Backups_Path" "$Minecraft_Backups_Extension"
+        # Additional error handling code can go here
+    }|| {
+        # This block executes if the previous command failed (returned non-zero)
+        log_error "Failed to backup Minecraft save from remote server docker@$Remote_Games_addr:$Remote_Games_port. Error code: $?"
+        # Additional error handling code can go here
+    }
 
-#     # # PalWorld
-#     # log_info "${CYAN}=== PalWorld Backup ===${NC}"
-#     # log_info "Attempting to backup PalWorld files..."
-#     # mkdir -p "$PalWorld_Backups_Path"
-#     # {
-#     #     # Command to copy Minecraft backup
-#     #     copy_files_from_local_path "$PalWorld_Path" "$PalWorld_Backups_Path" "$PalWorld_Backups_Extension"
-#     # } || {
-#     #     # This block executes if the previous command failed (returned non-zero)
-#     #     log_warning "Failed to backup PalWorld save from local path. Error code: $? try to backup from remote server"
-#     #     copy_files_from_remote_server "docker" "$Remote_Games_addr" "$Remote_Games_port" "$PalWorld_Path" "$PalWorld_Backups_Path" "$PalWorld_Backups_Extension"
-#     #     # Additional error handling code can go here
-#     # }|| {
-#     #     # This block executes if the previous command failed (returned non-zero)
-#     #     log_error "Failed to backup Satisfactory save from remote server docker@$Remote_Games_addr:$Remote_Games_port. Error code: $?"
-#     #     # Additional error handling code can go here
-#     # }
+    # # PalWorld
+    # log_info "${CYAN}=== PalWorld Backup ===${NC}"
+    # log_info "Attempting to backup PalWorld files..."
+    # mkdir -p "$PalWorld_Backups_Path"
+    # {
+    #     # Command to copy Minecraft backup
+    #     copy_files_from_local_path "$PalWorld_Path" "$PalWorld_Backups_Path" "$PalWorld_Backups_Extension"
+    # } || {
+    #     # This block executes if the previous command failed (returned non-zero)
+    #     log_warning "Failed to backup PalWorld save from local path. Error code: $? try to backup from remote server"
+    #     copy_files_from_remote_server "$Remote_Games_user" "$Remote_Games_addr" "$Remote_Games_port" "$PalWorld_Path" "$PalWorld_Backups_Path" "$PalWorld_Backups_Extension"
+    #     # Additional error handling code can go here
+    # }|| {
+    #     # This block executes if the previous command failed (returned non-zero)
+    #     log_error "Failed to backup Satisfactory save from remote server docker@$Remote_Games_addr:$Remote_Games_port. Error code: $?"
+    #     # Additional error handling code can go here
+    # }
 
-#     # Satisfactory
-#     log_info "${CYAN}=== Satisfactory Backup ===${NC}"
-#     log_info "Attempting to backup Satisfactory files..."
-#     mkdir -p "$Satisfactory_Backups_Path"
-#     {
-#         # Command to copy Minecraft backup
-#         copy_files_from_local_path "$Satisfactory_Path" "$Satisfactory_Backups_Path" "$Satisfactory_Backups_Extension"
-#     } || {
-#         # This block executes if the previous command failed (returned non-zero)
-#         log_warning "Failed to backup Satisfactory save from local path. Error code: $? try to backup from remote server"
-#         copy_files_from_remote_server "docker" "$Remote_Games_addr" "$Remote_Games_port" "$Satisfactory_Path" "$Satisfactory_Backups_Path" "$Satisfactory_Backups_Extension"
-#         # Additional error handling code can go here
-#     }|| {
-#         # This block executes if the previous command failed (returned non-zero)
-#         log_error "Failed to backup Satisfactory save from remote server docker@$Remote_Games_addr:$Remote_Games_port. Error code: $?"
-#         # Additional error handling code can go here
-#     }
+    # # Satisfactory
+    # log_info "${CYAN}=== Satisfactory Backup ===${NC}"
+    # log_info "Attempting to backup Satisfactory files..."
+    # mkdir -p "$Satisfactory_Backups_Path"
+    # {
+    #     # Command to copy Minecraft backup
+    #     copy_files_from_local_path "$Satisfactory_Path" "$Satisfactory_Backups_Path" "$Satisfactory_Backups_Extension"
+    # } || {
+    #     # This block executes if the previous command failed (returned non-zero)
+    #     log_warning "Failed to backup Satisfactory save from local path. Error code: $? try to backup from remote server"
+    #     copy_files_from_remote_server "$Remote_Games_user" "$Remote_Games_addr" "$Remote_Games_port" "$Satisfactory_Path" "$Satisfactory_Backups_Path" "$Satisfactory_Backups_Extension"
+    #     # Additional error handling code can go here
+    # }|| {
+    #     # This block executes if the previous command failed (returned non-zero)
+    #     log_error "Failed to backup Satisfactory save from remote server docker@$Remote_Games_addr:$Remote_Games_port. Error code: $?"
+    #     # Additional error handling code can go here
+    # }
 
-# fi
+fi
 
 # Delete older files
 log_info "${PURPLE}=== Cleaning old backup files ===${NC}"
@@ -328,8 +328,8 @@ delete_old_files "$Backups_Apps_Path/OpenMediaVault" "openmediavault_config_back
 # Portainer S3 Backups
 delete_old_files "$Backups_Path/s3/portainer" "portainer-backup_" "2"
 delete_old_files "$Backups_Path/s3/volcano-solutions" "portainer-backup_" "2"
-
-# delete_old_files "$Minecraft_Backups_Path" "20" "$Games_Retention_Days"
+# Games Backups
+delete_old_files "$Minecraft_Backups_Path" "20" "$Games_Retention_Days"
 # delete_old_files "$Satisfactory_Backups_Path" "Les" "$Games_Retention_Days"
 # delete_old_files "$PalWorld_Backups_Path" "Pal" "$Games_Retention_Days"
 
