@@ -248,21 +248,26 @@ read -r Remote_Games_mac_addr < $Data_Dir/docker/docker-secret/common/Remote_Gam
 read -r Remote_Games_user < $Data_Dir/docker/docker-secret/common/Remote_Games_SRV_user.txt
 read -r Remote_Games_port < $Data_Dir/docker/docker-secret/common/Remote_Games_SRV_port.txt
 Games_Retention_Days=5
+Remote_Games_SRV_reachable="0"
 
 # Minecraft vars
-Minecraft_Path="$Docker_Path/minecraft/s5/prod/backups"
-Minecraft_Backups_Path="$Backups_Path/Games/Minecraft/s5"
 Minecraft_Backups_Extension="zip"
 
-# PalWorld vars
-PalWorld_Path="$Docker_Path/palworld/Games/common/PalServer/Pal/Saved/SaveGames/0/39B9ABFE445430F386A231B68504F49A"
-PalWorld_Backups_Path="$Backups_Path/Games/PalWorld/s1"
-PalWorld_Backups_Extension="????"
+Minecraft_Path_1="$Docker_Path/minecraft/s5/prod/backups"
+Minecraft_Backups_Path_1="$Backups_Path/Games/Minecraft/s5"
 
-# Satisfactory vars
-Satisfactory_Path="$Docker_Path/satisfactory/backups"
-Satisfactory_Backups_Path="$Backups_Path/Games/Satisfactory/s1"
-Satisfactory_Backups_Extension="sav"
+Minecraft_Path_2="$Docker_Path/minecraft/s6/prod/simplebackups/world"
+Minecraft_Backups_Path_2="$Backups_Path/Games/Minecraft/s6"
+
+# # PalWorld vars
+# PalWorld_Path="$Docker_Path/palworld/Games/common/PalServer/Pal/Saved/SaveGames/0/39B9ABFE445430F386A231B68504F49A"
+# PalWorld_Backups_Path="$Backups_Path/Games/PalWorld/s1"
+# PalWorld_Backups_Extension="????"
+
+# # Satisfactory vars
+# Satisfactory_Path="$Docker_Path/satisfactory/backups"
+# Satisfactory_Backups_Path="$Backups_Path/Games/Satisfactory/s1"
+# Satisfactory_Backups_Extension="sav"
 
 if [ "$TimeToExec" -eq 1 ] || [ "$TimeToExec" -eq 2 ]; then
     # Power on remote server only on Monday
@@ -272,9 +277,9 @@ if [ "$TimeToExec" -eq 1 ] || [ "$TimeToExec" -eq 2 ]; then
             log_warning "No MAC for remote games server ($Remote_Games_addr). Skipping WOL."
         elif ping -c 2 -W 2 "$Remote_Games_addr" >/dev/null 2>&1; then
             log_info "Remote games server $Remote_Games_addr is already reachable via SSH."
-            Remote_Games_reachable=1
+            Remote_Games_SRV_reachable="1"
         else
-            Remote_Games_reachable=0
+            Remote_Games_SRV_reachable="0"
             log_info "Sending WOL to $Remote_Games_addr (MAC: $Remote_Games_mac_addr)"
             if command -v wakeonlan >/dev/null 2>&1; then
                 wakeonlan "$Remote_Games_mac_addr" >/dev/null 2>&1 || log_warning "wakeonlan command failed"
@@ -311,20 +316,37 @@ if [ "$TimeToExec" -eq 1 ] || [ "$TimeToExec" -eq 2 ]; then
         fi
     fi
     # Minecraft
-    log_info "${CYAN}=== Minecraft Backup ===${NC}"
+    log_info "${CYAN}=== Minecraft 1 Backup ===${NC}"
     log_info "Attempting to backup Minecraft files..."
-    mkdir -p "$Minecraft_Backups_Path"
+    mkdir -p "$Minecraft_Backups_Path_1"
     {
         # Command to copy Minecraft backup
-        copy_files_from_local_path "$Minecraft_Path" "$Minecraft_Backups_Path" "$Minecraft_Backups_Extension"
+        copy_files_from_local_path "$Minecraft_Path_1" "$Minecraft_Backups_Path_1" "$Minecraft_Backups_Extension"
     } || {
         # This block executes if the previous command failed (returned non-zero)
         log_warning "Failed to backup Minecraft save from local path. Error code: $? try to backup from remote server"
-        copy_files_from_remote_server "$Remote_Games_user" "$Remote_Games_addr" "$Remote_Games_port" "$Minecraft_Path" "$Minecraft_Backups_Path" "$Minecraft_Backups_Extension"
+        copy_files_from_remote_server "$Remote_Games_user" "$Remote_Games_addr" "$Remote_Games_port" "$Minecraft_Path_1" "$Minecraft_Backups_Path_1" "$Minecraft_Backups_Extension"
         # Additional error handling code can go here
     }|| {
         # This block executes if the previous command failed (returned non-zero)
-        log_error "Failed to backup Minecraft save from remote server docker@$Remote_Games_addr:$Remote_Games_port. Error code: $?"
+        log_error "Failed to backup Minecraft save from remote server $Remote_Games_user@$Remote_Games_addr:$Remote_Games_port. Error code: $?"
+        # Additional error handling code can go here
+    }
+
+    log_info "${CYAN}=== Minecraft 2 Backup ===${NC}"
+    log_info "Attempting to backup Minecraft files..."
+    mkdir -p "$Minecraft_Backups_Path_2"
+    {
+        # Command to copy Minecraft backup
+        copy_files_from_local_path "$Minecraft_Path_2" "$Minecraft_Backups_Path_2" "$Minecraft_Backups_Extension"
+    } || {
+        # This block executes if the previous command failed (returned non-zero)
+        log_warning "Failed to backup Minecraft save from local path. Error code: $? try to backup from remote server"
+        copy_files_from_remote_server "$Remote_Games_user" "$Remote_Games_addr" "$Remote_Games_port" "$Minecraft_Path_2" "$Minecraft_Backups_Path_2" "$Minecraft_Backups_Extension"
+        # Additional error handling code can go here
+    }|| {
+        # This block executes if the previous command failed (returned non-zero)
+        log_error "Failed to backup Minecraft save from remote server $Remote_Games_user@$Remote_Games_addr:$Remote_Games_port. Error code: $?"
         # Additional error handling code can go here
     }
 
@@ -363,7 +385,7 @@ if [ "$TimeToExec" -eq 1 ] || [ "$TimeToExec" -eq 2 ]; then
     #     log_error "Failed to backup Satisfactory save from remote server docker@$Remote_Games_addr:$Remote_Games_port. Error code: $?"
     #     # Additional error handling code can go here
     # }
-    if [ "$Remote_Games_reachable" -eq 1 ]; then
+    if [ "$Remote_Games_SRV_reachable" -eq 1 ]; then
         log_info "Remote games server $Remote_Games_addr was already powered on, skipping shutdown."
     else
         $Script_Path/shutdown-server.sh $Remote_Games_addr $Remote_Games_port $Remote_Games_user
@@ -379,7 +401,8 @@ delete_old_files "$Backups_Apps_Path/OpenMediaVault" "openmediavault_config_back
 delete_old_files "$Backups_Path/s3/portainer" "portainer-backup_" "2"
 delete_old_files "$Backups_Path/s3/volcano-solutions" "portainer-backup_" "2"
 # Games Backups
-delete_old_files "$Minecraft_Backups_Path" "20" "$Games_Retention_Days"
+delete_old_files "$Minecraft_Backups_Path_1" "20" "$Games_Retention_Days"
+delete_old_files "$Minecraft_Backups_Path_2" "world" "$Games_Retention_Days"
 # delete_old_files "$Satisfactory_Backups_Path" "Les" "$Games_Retention_Days"
 # delete_old_files "$PalWorld_Backups_Path" "Pal" "$Games_Retention_Days"
 
