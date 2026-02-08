@@ -12,6 +12,7 @@ services:
       diun.enable: true
       diun.watch_repos: true
       gamecontainermanager.enable: true
+      gamecontainermanager.group: "minecraft"
       gamecontainermanager.customlabel0: "r7.${PERSONAL_DOMAINE_NAME}"
     tty: true
     stdin_open: true
@@ -62,75 +63,6 @@ services:
     networks:
       - games
 
-  # server-creative:
-  #   restart: no
-  #   image: docker.io/itzg/minecraft-server:java17-jdk
-  #   container_name: minecraft-r7-creative-server
-  #   hostname: minecraft-r7-creative-server
-  #   tty: true
-  #   stdin_open: true
-  #   cap_add:
-  #     - NET_RAW # Auto pause
-  #   labels:
-  #     gamecontainermanager.enable: true
-  #     gamecontainermanager.customlabel0: "${PERSONAL_MINECRAFT_SERVER2_URL}"
-  #   environment:
-  #     TZ: Europe/Paris
-  #     AUTOPAUSE_TIMEOUT_EST: "1200"
-  #     ENABLE_AUTOPAUSE: TRUE
-  #     ALLOW_FLIGHT: TRUE
-  #     BROADCAST_CONSOLE_TO_OPS: TRUE
-  #     BROADCAST_RCON_TO_OPS: TRUE
-  #     CF_API_KEY: ${CF_API_KEY}
-  #     CF_BASE_DIR: "/data"
-  #     CF_FILE_ID: 5353015 #Ragnamod-VII-7.1.7
-  #     CF_SLUG: ragnamod-vii
-  #     DIFFICULTY: normal
-  #     EULA: TRUE
-  #     ENABLE_STATUS: TRUE
-  #     ENABLE_QUERY: TRUE
-  #     ENABLE_RCON: TRUE
-  #     ENABLE_WHITELIST: TRUE
-  #     FORCE_GAMEMODE: TRUE
-  #     FORGEVERSION: "40.2.21"
-  #     ICON: /icon.jpg
-  #     MAX_PLAYERS: 5
-  #     MAX_TICK_TIME: "-1"
-  #     MEMORY: "16G"
-  #     MODE: creative # 0=survival, 1=creative, 2=adventure, 3=spectator
-  #     MOTD: "§b§l§oRaBByT Season 5:§r§r§r§l§o §r§r§r§4§l§oCREATIVE Ragnamod-7.1.7§r§r§r\n§6§kC'est rigolo cette ligne qui bouge tout le temps"
-  #     ONLINE_MODE: TRUE
-  #     OVERRIDE_ICON: TRUE
-  #     PVP: TRUE
-  #     RCON_CMDS_STARTUP: |-
-  #       gamerule playersSleepingPercentage 1
-  #       time set day
-  #       gamerule doDaylightCycle false
-  #       kill @e[type=item]
-  #     RCON_PASSWORD: ${PERSONAL_RCON_PWD}
-  #     RCON_PORT: ${PERSONAL_PORT_MINECRAFT_RCON}
-  #     SIMULATION_DISTANCE: 3
-  #     SKIP_SUDO: TRUE # Auto pause
-  #     SNOOPER_ENABLED: FALSE
-  #     SPAWN_PROTECTION: 0
-  #     TYPE: AUTO_CURSEFORGE
-  #     VERSION: "1.18.2"
-  #     VIEW_DISTANCE: 7
-  #   volumes:
-  #     - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/minecraft/s5/creative:/data
-  #     - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/minecraft/RaBByT-Creative.jpg:/icon.jpg:ro
-  #   ports:
-  #     - ${PERSONAL_PORT_MINECRAFT2}:25565
-  #   networks:
-  #     - games
-  #   depends_on:
-  #     server:
-  #       condition: service_healthy
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         cpus: "6.0"
-
   # backups: # Not needed to due a backup mod in stack
   #   restart: unless-stopped
   #   image: docker.io/itzg/mc-backup
@@ -168,25 +100,6 @@ services:
   #       condition: service_healthy
   #   networks:
   #     - games
-
-  ### Public VPN ###
-  # playit: #https://playit.gg
-  #   restart: unless-stopped
-  #   image: ghcr.io/playit-cloud/playit-agent:0.15
-  #   container_name: minecraft-tunnel
-  #   hostname: minecraft-tunnel
-  #   labels:
-  #     diun.enable: true
-  #     diun.watch_repos: true
-  #     gamecontainermanager.enable: true
-  #   environment:
-  #     TZ: Europe/Paris
-  #     SECRET_KEY: ${PLAYIT_SECRET_KEY}
-  #   networks:
-  #     - games
-  #   # depends_on:
-  #   #   server:
-  #   #     condition: service_healthy
 
 networks:
   games:
