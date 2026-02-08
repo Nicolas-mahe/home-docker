@@ -13,10 +13,10 @@ services:
       traefik.tcp.routers.minecraft.service: minecraft
       traefik.tcp.services.minecraft.loadbalancer.server.port: 25565
     environment:
-      DEFAULT: minecraft-default:25565
+      # DEFAULT: minecraft-default:25565
       MAPPING: |
-        ${PERSONAL_DOMAINE_NAME}=${PERSONAL_IP_SERVER}:25565
-        play.${PERSONAL_DOMAINE_NAME}=${PERSONAL_IP_SERVER}:25566
+        r7.${PERSONAL_DOMAINE_NAME}=${PERSONAL_IP_SERVER}:25565
+        atm.${PERSONAL_DOMAINE_NAME}=${PERSONAL_IP_SERVER}:25566
       TZ: Europe/Paris
     expose:
       - 25565
