@@ -12,7 +12,7 @@ services:
       diun.enable: true
       diun.watch_repos: true
       gamecontainermanager.enable: true
-      gamecontainermanager.group: "minecraft"
+      gamecontainermanager.group: "Minecraft"
       gamecontainermanager.customlabel0: "r7.${PERSONAL_DOMAINE_NAME}"
     tty: true
     stdin_open: true

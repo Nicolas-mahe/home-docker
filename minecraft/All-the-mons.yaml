@@ -8,8 +8,8 @@ services:
     stdin_open: true
     labels:
       gamecontainermanager.enable: true
-      gamecontainermanager.group: "minecraft"
-      gamecontainermanager.customlabel0: "alm.${PERSONAL_DOMAINE_NAME}"
+      gamecontainermanager.group: "Minecraft"
+      gamecontainermanager.customlabel0: "atm.${PERSONAL_DOMAINE_NAME}"
     environment:
       TZ: Europe/Paris
       ALLOW_FLIGHT: "true"
