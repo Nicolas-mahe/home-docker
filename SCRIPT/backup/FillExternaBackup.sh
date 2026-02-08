@@ -104,98 +104,98 @@ delete_old_files() {
     fi
 }
 
-# # Function to check if path is reachable on remote server
-# check_remote_path() {
-#     local remote_user="$1"
-#     local remote_server="$2"
-#     local remote_ssh_port="${3:-22}"
-#     local remote_path="$4"
+# Function to check if path is reachable on remote server
+check_remote_path() {
+    local remote_user="$1"
+    local remote_server="$2"
+    local remote_ssh_port="${3:-22}"
+    local remote_path="$4"
 
-#     ssh -q -o "StrictHostKeyChecking=no" -p "$remote_ssh_port" "$remote_user@$remote_server" "test -d $remote_path"
-#     if [ $? -ne 0 ]; then
-#         # Remote path not found
-#         return 2
-#     else
-#         # Remote path found
-#         return 0
-#     fi
-# }
+    ssh -q -o "StrictHostKeyChecking=no" -p "$remote_ssh_port" "$remote_user@$remote_server" "test -d $remote_path"
+    if [ $? -ne 0 ]; then
+        # Remote path not found
+        return 2
+    else
+        # Remote path found
+        return 0
+    fi
+}
 
-# # Function to copy files from remote server
-# copy_files_from_remote_server() {
-#     local remote_user="$1"
-#     local remote_server="$2"
-#     local remote_ssh_port="$3"
-#     local remote_path="$4"
-#     local local_path="$5"
-#     local file_extension="$6"
-#     # Check if remote path is reachable
-#     check_remote_path "$remote_user" "$remote_server" "$remote_ssh_port" "$remote_path"
+# Function to copy files from remote server
+copy_files_from_remote_server() {
+    local remote_user="$1"
+    local remote_server="$2"
+    local remote_ssh_port="$3"
+    local remote_path="$4"
+    local local_path="$5"
+    local file_extension="$6"
+    # Check if remote path is reachable
+    check_remote_path "$remote_user" "$remote_server" "$remote_ssh_port" "$remote_path"
 
-#     # If reachable, select newest file to copy
-#     local remote_file_path
-#     if [ $? -eq 0 ]; then
-#         remote_file_path=$(ssh -q -o "StrictHostKeyChecking=no" -p "$remote_ssh_port" "$remote_user@$remote_server" "ls -t $remote_path/*.$file_extension  2>/dev/null | head -n 1")
+    # If reachable, select newest file to copy
+    local remote_file_path
+    if [ $? -eq 0 ]; then
+        remote_file_path=$(ssh -q -o "StrictHostKeyChecking=no" -p "$remote_ssh_port" "$remote_user@$remote_server" "ls -t $remote_path/*.$file_extension  2>/dev/null | head -n 1")
 
-#         if [ -z "$remote_file_path" ]; then
-#             # No files found with extension .$file_extension in $remote_path on $remote_server
-#             return 5
-#         fi
+        if [ -z "$remote_file_path" ]; then
+            # No files found with extension .$file_extension in $remote_path on $remote_server
+            return 5
+        fi
 
-#         # Get the filename from the remote path
-#         local filename=$(basename "$remote_file_path")
-#         local destination_file="$local_path/$filename"
+        # Get the filename from the remote path
+        local filename=$(basename "$remote_file_path")
+        local destination_file="$local_path/$filename"
 
-#         # Check if file already exists at destination
-#         if [ -f "$destination_file" ]; then
-#             log_warning "File $filename already exists at destination, skipping copy"
-#             return 0
-#         fi
+        # Check if file already exists at destination
+        if [ -f "$destination_file" ]; then
+            log_warning "File $filename already exists at destination, skipping copy"
+            return 0
+        fi
 
-#         # Copy file to local
-#         log_info "Copying file from $remote_server:$remote_path to $local_path"
-#         scp -P "$remote_ssh_port" "$remote_user@$remote_server:$remote_file_path" "$local_path"
-#         return $?
-#     else
-#         log_error "Remote path $remote_path not found on $remote_server"
-#         return $?
-#     fi
-# }
+        # Copy file to local
+        log_info "Copying file from $remote_server:$remote_path to $local_path"
+        scp -P "$remote_ssh_port" "$remote_user@$remote_server:$remote_file_path" "$local_path"
+        return $?
+    else
+        log_error "Remote path $remote_path not found on $remote_server"
+        return $?
+    fi
+}
 
-# # Function to copy files from local path
-# copy_files_from_local_path() {
-#     local source_path="$1"
-#     local local_path="$2"
-#     local file_extension="$3"    
-#     local source_file_path
+# Function to copy files from local path
+copy_files_from_local_path() {
+    local source_path="$1"
+    local local_path="$2"
+    local file_extension="$3"    
+    local source_file_path
 
-#     # Check if source path exists
-#     if [ ! -d "$source_path" ]; then
-#         # Source path $source_path not found"
-#         return 3
-#     else
-#         source_file_path=$(ls -t "$source_path"/*."$file_extension" 2>/dev/null | head -n 1)
-#         if [ -z "$source_file_path" ]; then
-#             # No files with extension .$file_extension found in $source_path
-#             return 4
-#         else
-#             # Get the filename from the source path
-#             local filename=$(basename "$source_file_path")
-#             local destination_file="$local_path/$filename"
+    # Check if source path exists
+    if [ ! -d "$source_path" ]; then
+        # Source path $source_path not found"
+        return 3
+    else
+        source_file_path=$(ls -t "$source_path"/*."$file_extension" 2>/dev/null | head -n 1)
+        if [ -z "$source_file_path" ]; then
+            # No files with extension .$file_extension found in $source_path
+            return 4
+        else
+            # Get the filename from the source path
+            local filename=$(basename "$source_file_path")
+            local destination_file="$local_path/$filename"
 
-#             # Check if file already exists at destination
-#             if [ -f "$destination_file" ]; then
-#                 log_warning "File $filename already exists at destination, skipping copy"
-#                 return 0
-#             fi
+            # Check if file already exists at destination
+            if [ -f "$destination_file" ]; then
+                log_warning "File $filename already exists at destination, skipping copy"
+                return 0
+            fi
 
-#             # Copy the file
-#             cp "$source_file_path" "$local_path"
-#             log_success "File copied successfully: $filename"
-#             return 0
-#         fi
-#     fi
-# }
+            # Copy the file
+            cp "$source_file_path" "$local_path"
+            log_success "File copied successfully: $filename"
+            return 0
+        fi
+    fi
+}
 
 
 #Recover Execution path
@@ -232,17 +232,6 @@ if [ "$TimeToExec" -eq 1 ]; then
     else
         $Script_Path/backup/VaultwardenVaultExport.sh "$vaultwarden_filename" "$Backups_Apps_Path" "$Backups_Apps_Path/scripts"
     fi
-
-    # log_info "${CYAN}=== Portainer Backup ===${NC}"
-    # # Portainer
-    # read -r PortainerApiKey < $Data_Dir/docker/docker-secret/portainer/APIKEY.txt
-    # read -r PortainerLocalPort < $Data_Dir/docker/docker-secret/portainer/PERSONNAL_PORTAINER_PORT.txt
-    # log_info "Export Portainer configuration"
-    # curl -X POST "http://localhost:$PortainerLocalPort/api/backup" \
-    # -H "X-API-Key: $PortainerApiKey" \
-    # -H "Content-Type: application/json" \
-    # -d "{\"password\": \"$EncryptionKey\"}" \
-    # --output "$Backups_Apps_Path/Portainer/portainer_config_encrypted_backup_$exec_date.tar.gz"
 
     log_info "${CYAN}=== OpenMediaVault Backup ===${NC}"
     # OpenMediaVault config
