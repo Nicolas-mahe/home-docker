@@ -1,0 +1,133 @@
+services:
+  mariadb:
+    image: mariadb:latest
+    container_name: pterodactyl_mariadb
+    restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - ./pterodactyl/mariadb:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: 'panel'
+      MYSQL_USER: 'pterodactyl'
+      MYSQL_PASSWORD: 'pterodactyl!'
+      MYSQL_ROOT_PASSWORD: 'pterodactyl!!'
+    networks:
+      - pterodactyl
+
+  redis:
+    image: redis:alpine
+    container_name: pterodactyl_redis
+    restart: unless-stopped
+    volumes:
+      - ./pterodactyl/redis:/data
+    networks:
+      - pterodactyl
+
+  panel:
+    image: ghcr.io/pterodactyl/panel:v1.11.11
+    container_name: pterodactyl_panel
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    ports:
+      - 8081:80
+    volumes:
+      - "./pterodactyl/panel/var/:/app/var/"
+      - "./pterodactyl/panel/logs/:/app/storage/logs"
+      - "./pterodactyl/panel/nginx/:/etc/nginx/conf.d/"
+    environment:
+      RECAPTCHA_ENABLED: false
+      TZ: Europe/Paris
+      APP_TIMEZONE: Europe/Paris
+      APP_ENV: production
+      APP_ENVIRONMENT_ONLY: false
+      APP_URL: https://panel.example.com
+      APP_SERVICE_AUTHOR: noreply@example.com
+      MAIL_FROM: noreply@example.com
+      MAIL_DRIVER: smtp
+      MAIL_HOST: mail.volcano-solutions.com
+      MAIL_PORT: 587
+      MAIL_USERNAME: noreply@example.com
+      MAIL_PASSWORD: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+      MAIL_ENCRYPTION: false
+      TRUSTED_PROXIES: "*"
+      PTERODACTYL_TELEMETRY_ENABLED: false
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_USERNAME: 'pterodactyl'
+      DB_PASSWORD: 'pterodactyl!'
+      CACHE_DRIVER: redis
+      SESSION_DRIVER: redis
+      QUEUE_DRIVER: redis
+      REDIS_HOST: redis
+#      LE_EMAIL: "" # Uncomment if you want to use Let's Encrypt to generate an SSL certificate for the Panel.
+    networks:
+      - proxy
+      - pterodactyl
+    # labels:
+    #   - "traefik.enable=true"
+    #   - "traefik.docker.network=proxy"
+    #   - "traefik.http.routers.panel.entrypoints=http"
+    #   - "traefik.http.routers.panel.rule=Host(`panel.example.com`)"
+    #   - "traefik.http.middlewares.panel-https-redirect.redirectscheme.scheme=https"
+    #   - "traefik.http.routers.panel.middlewares=panel-https-redirect"
+    #   - "traefik.http.routers.panel-secure.entrypoints=https"
+    #   - "traefik.http.routers.panel-secure.rule=Host(`panel.example.com`)"
+    #   - "traefik.http.routers.panel-secure.tls=true"
+    #   - "traefik.http.routers.panel-secure.tls.certresolver=cloudflare"
+    #   - "traefik.http.routers.panel-secure.service=panel"
+    #   - "traefik.http.services.panel.loadbalancer.server.port=80" # make sure the loadbalancer is the last line!!!
+
+  wings:
+    image: ghcr.io/pterodactyl/wings:v1.11.11
+    container_name: pterodactyl_wings
+    restart: unless-stopped
+    ports:
+      - 443:443
+      - 2022:2022 # SFTP
+    stdin_open: true
+    tty: true
+    environment:
+      TZ: Europe/Paris
+      APP_TIMEZONE: Europe/Paris
+      WINGS_UID: 0
+      WINGS_GID: 0
+      WINGS_USERNAME: pterodactyl
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "/var/lib/docker/containers/:/var/lib/docker/containers/"
+      - "./pterodactyl/wings/conf:/etc/pterodactyl/"
+      - "./pterodactyl/wings/lib:/var/lib/pterodactyl/"
+      - "./pterodactyl/wings/log:/var/log/pterodactyl/"
+      - "./pterodactyl/wings/tmp:/tmp/pterodactyl/"
+      - "./pterodactyl/wings/certs:/etc/ssl/certs:ro"
+    networks:
+      - proxy
+      - wings0
+    # labels:
+    #   - "traefik.enable=true"
+    #   - "traefik.docker.network=proxy"
+    #   - "traefik.http.routers.wings0.entrypoints=http"
+    #   - "traefik.http.routers.wings0.rule=Host(`wings0.example.com`)"
+    #   - "traefik.http.middlewares.wings0-https-redirect.redirectscheme.scheme=https"
+    #   - "traefik.http.routers.wings0.middlewares=wings0-https-redirect"
+    #   - "traefik.http.routers.wings0-secure.entrypoints=https"
+    #   - "traefik.http.routers.wings0-secure.rule=Host(`wings0.example.com`)"
+    #   - "traefik.http.routers.wings0-secure.tls=true"
+    #   - "traefik.http.routers.wings0-secure.tls.certresolver=cloudflare"
+    #   - "traefik.http.routers.wings0-secure.service=wings0"
+    #   - "traefik.http.services.wings0.loadbalancer.server.port=8443" # make sure the loadbalancer is the last line!!!
+
+networks:
+  pterodactyl:
+    name: pterodactyl
+  proxy:
+    name: proxy
+  wings0:
+    name: wings0
+    driver: bridge
+    ipam:
+      config:
+        - subnet: "172.50.0.0/16" # make sure this doesn't conflict with existing networks
+    driver_opts:
+      com.docker.network.bridge.name: wings0

@@ -1,0 +1,41 @@
+debug: false
+uuid: 5300c30e-532c-476f-94c6-59e7f0df3633
+token_id: Tfr2U01wkfT1bEmy
+token: mX5hvxASRBOQlm9ZNxDhpq9SOopqJsPJBcNT49bnxYp5aWk3lK64NgHM11hEAn6E
+api:
+  host: 0.0.0.0
+  port: 443
+  ssl:
+    enabled: false
+    cert: /etc/letsencrypt/live/wings0.example.com/fullchain.pem
+    key: /etc/letsencrypt/live/wings0.example.com/privkey.pem
+  upload_limit: 100
+system:
+  data: /var/lib/pterodactyl/volumes
+  sftp:
+    bind_port: 2022
+allowed_mounts: []
+remote: 'https://panel.example.com'
+docker:
+  network:
+    interface: 172.50.0.1
+    dns:
+    - xx.xxx.x.251
+    - xx.xxx.x.1
+    name: wings0
+    ispn: false
+    driver: bridge
+    network_mode: wings0
+    is_internal: false
+    enable_icc: true
+    network_mtu: 1500
+    interfaces:
+      v4:
+        subnet: 172.50.0.0/16
+        gateway: 172.50.0.1
+      v6:
+        subnet: fdba:17c8:6c94::/64
+        gateway: fdba:17c8:6c94::1011
+allowed_origins: []
+allow_cors_private_network: false
+ignore_panel_config_updates: false
