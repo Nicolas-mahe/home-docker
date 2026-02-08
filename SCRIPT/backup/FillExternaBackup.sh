@@ -273,9 +273,7 @@ if [ "$TimeToExec" -eq 1 ] || [ "$TimeToExec" -eq 2 ]; then
     # Power on remote server only on Monday
     if [ "$TimeToExec" -eq 1 ]; then
         # Send Wake-on-LAN to remote games server and wait for SSH availability
-        if [[ -z "$Remote_Games_mac_addr" ]]; then
-            log_warning "No MAC for remote games server ($Remote_Games_addr). Skipping WOL."
-        elif ping -c 2 -W 2 "$Remote_Games_addr" >/dev/null 2>&1; then
+        if ping -c 2 -W 2 "$Remote_Games_addr" >/dev/null 2>&1; then
             log_info "Remote games server $Remote_Games_addr is already reachable via SSH."
             Remote_Games_SRV_reachable="1"
         else
