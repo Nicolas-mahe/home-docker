@@ -19,8 +19,8 @@ if [ -z "$(find "$SCRIPT_DIR" -name '*.json' -print -quit)" ]; then
     echo "❌ *.json not found in $SCRIPT_DIR"
     exit 1
 else
-    # Find all JSON files in the directory
-    find "$SCRIPT_DIR" -name "*.json" | while read -r JsonFile; do
+    # Find all JSON files in the directory, sorted by filename (reverse order)
+    find "$SCRIPT_DIR" -name "*.json" -print0 | sort -zr | while IFS= read -r -d '' JsonFile; do
         echo "🗒️ Processing $JsonFile"
 
         while read -r service; do
