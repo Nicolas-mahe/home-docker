@@ -4,8 +4,6 @@ services:
     image: itzg/minecraft-server:java21
     container_name: minecraft-atm
     hostname: minecraft-atm
-    tty: true
-    stdin_open: true
     labels:
       gamecontainermanager.enable: true
       gamecontainermanager.group: "Minecraft"
@@ -25,7 +23,8 @@ services:
       MAX_PLAYERS: 6
       MOD_PLATFORM: AUTO_CURSEFORGE
       MEMORY: "20G"
-      MOTD: "§b§l§oRaBByT Season 6:§r§l§o§2 All The Mons\n§6§kC'est rigolo cette ligne qui bouge tout le temps"
+      MOTD: "§b§l§oRaBByT Season 6:§r§l§o§2 All The Mons\n§6§kCest rigolo cette ligne qui bouge tout le temps"
+      PAUSE_WHEN_EMPTY_SECONDS: -1
       RCON_CMDS_STARTUP: |-
         gamerule playersSleepingPercentage 1
         kill @e[type=item]
@@ -37,41 +36,6 @@ services:
       - 25566:25565
     networks:
       - games
-
-  # backups:
-  #   restart: unless-stopped
-  #   image: docker.io/itzg/mc-backup
-  #   container_name: minecraft-atm-backups
-  #   hostname: minecraft-atm-backups
-  #   labels:
-  #     diun.enable: true
-  #     diun.watch_repos: true
-  #     gamecontainermanager.enable: true
-  #   environment:
-  #     TZ: Europe/Paris
-  #     INITIAL_DELAY: 0 # since this service waits for mc to be healthy, no initial delay is needed
-  #     BACKUP_INTERVAL: ${PERSONAL_INTERVAL_SAVE}
-  #     BACKUP_NAME: RaBByT-S6
-  #     PRUNE_BACKUPS_DAYS: 5
-  #     PRUNE_RESTIC_RETENTION: --keep-within 5d
-  #     RCON_HOST: minecraft-atm
-  #     RCON_PASSWORD: ${PERSONAL_RCON_PWD}
-  #     RCON_PORT: ${PERSONAL_PORT_MINECRAFT_RCON}
-  #     PAUSE_IF_NO_PLAYERS: TRUE
-  #     DEST_DIR: /backups
-  #     SRC_DIR: /data
-  #     LINK_LATEST: FALSE
-  #     BACKUP_METHOD: tar
-  #     TAR_COMPRESS_METHOD: gzip
-  #     ZSTD_PARAMETERS: -3 --long=25 --single-thread
-  #   volumes:
-  #     - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/minecraft/s6/prod:/data
-  #     - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/minecraft/s6/backups:/backups
-  #   depends_on:
-  #     server:
-  #       condition: service_healthy
-  #   networks:
-  #     - games
 
 networks:
   games:
