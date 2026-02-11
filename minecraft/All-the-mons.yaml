@@ -4,7 +4,11 @@ services:
     image: itzg/minecraft-server:java21
     container_name: minecraft-atm
     hostname: minecraft-atm
+    tty: true
+    stdin_open: true
     labels:
+      diun.enable: true
+      diun.watch_repos: true
       gamecontainermanager.enable: true
       gamecontainermanager.group: "Minecraft"
       gamecontainermanager.customlabel0: "atm.${PERSONAL_DOMAINE_NAME}"
