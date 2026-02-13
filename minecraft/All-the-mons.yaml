@@ -19,12 +19,14 @@ services:
       BROADCAST_RCON_TO_OPS: TRUE
       CF_SLUG: all-the-mons
       CF_API_KEY: ${CF_API_KEY}
-      EULA: TRUE
+      ENABLE_AUTOPAUSE: FALSE
       ENFORCE_WHITELIST: TRUE
+      EULA: TRUE
       ENABLE_STATUS: TRUE
       ENABLE_QUERY: TRUE
       ICON: https://media.forgecdn.net/avatars/thumbnails/1567/555/64/64/639016249214580144.png
       MAX_PLAYERS: 6
+      MAX_TICK_TIME : -1
       MOD_PLATFORM: AUTO_CURSEFORGE
       MEMORY: "20G"
       MOTD: "§b§l§oRaBByT Season 6:§r§l§o§2 All The Mons\n§6§kCest rigolo cette ligne qui bouge tout le temps"
