@@ -30,7 +30,7 @@ services:
       MOD_PLATFORM: AUTO_CURSEFORGE
       MEMORY: "20G"
       MOTD: "§b§l§oRaBByT Season 6:§r§l§o§2 All The Mons\n§6§kCest rigolo cette ligne qui bouge tout le temps"
-      PAUSE_WHEN_EMPTY_SECONDS: -1
+      PAUSE_WHEN_EMPTY_SECONDS: 345600 # 96h - 4d
       RCON_CMDS_STARTUP: |-
         gamerule playersSleepingPercentage 1
         kill @e[type=item]
