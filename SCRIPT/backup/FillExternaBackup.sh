@@ -248,7 +248,6 @@ read -r Remote_Games_mac_addr < $Data_Dir/docker/docker-secret/common/Remote_Gam
 read -r Remote_Games_user < $Data_Dir/docker/docker-secret/common/Remote_Games_SRV_user.txt
 read -r Remote_Games_port < $Data_Dir/docker/docker-secret/common/Remote_Games_SRV_port.txt
 Games_Retention_Days=5
-Remote_Games_SRV_reachable="0"
 
 # Minecraft vars
 Minecraft_Backups_Extension="zip"
@@ -270,49 +269,51 @@ Minecraft_Backups_Path_2="$Backups_Path/Games/Minecraft/s6"
 # Satisfactory_Backups_Extension="sav"
 
 if [ "$TimeToExec" -eq 1 ] || [ "$TimeToExec" -eq 2 ]; then
+    # recover server state
+    if ping -c 2 -W 2 "$Remote_Games_addr" >/dev/null 2>&1; then
+        log_info "Remote games server $Remote_Games_addr is already reachable via SSH."
+        Remote_Games_SRV_reachable="1"
+    else
+        Remote_Games_SRV_reachable="0"
+    fi
     # Power on remote server only on Monday
-    if [ "$TimeToExec" -eq 1 ]; then
+    if [ "$TimeToExec" -eq 1 ] && [ "$Remote_Games_SRV_reachable" -eq 0 ]; then
         # Send Wake-on-LAN to remote games server and wait for SSH availability
-        if ping -c 2 -W 2 "$Remote_Games_addr" >/dev/null 2>&1; then
-            log_info "Remote games server $Remote_Games_addr is already reachable via SSH."
-            Remote_Games_SRV_reachable="1"
-        else
-            Remote_Games_SRV_reachable="0"
-            log_info "Sending WOL to $Remote_Games_addr (MAC: $Remote_Games_mac_addr)"
-            if command -v wakeonlan >/dev/null 2>&1; then
-                wakeonlan "$Remote_Games_mac_addr" >/dev/null 2>&1 || log_warning "wakeonlan command failed"
-            elif command -v etherwake >/dev/null 2>&1; then
-                if [[ $EUID -ne 0 && ! -x "$(command -v sudo)" ]]; then
-                    log_warning "etherwake needs root or sudo; cannot send WOL."
-                else
-                    if [[ $EUID -ne 0 ]]; then
-                        sudo -n etherwake -i any "$Remote_Games_mac_addr" >/dev/null 2>&1 || sudo etherwake -i any "$Remote_Games_mac_addr" >/dev/null 2>&1 || log_warning "etherwake command failed"
-                    else
-                        etherwake -i any "$Remote_Games_mac_addr" >/dev/null 2>&1 || log_warning "etherwake command failed"
-                    fi
-                fi
+        log_info "Sending WOL to $Remote_Games_addr (MAC: $Remote_Games_mac_addr)"
+        if command -v wakeonlan >/dev/null 2>&1; then
+            wakeonlan "$Remote_Games_mac_addr" >/dev/null 2>&1 || log_warning "wakeonlan command failed"
+        elif command -v etherwake >/dev/null 2>&1; then
+            if [[ $EUID -ne 0 && ! -x "$(command -v sudo)" ]]; then
+                log_warning "etherwake needs root or sudo; cannot send WOL."
             else
-                log_error "No WOL utility found (install wakeonlan or etherwake)."
+                if [[ $EUID -ne 0 ]]; then
+                    sudo -n etherwake -i any "$Remote_Games_mac_addr" >/dev/null 2>&1 || sudo etherwake -i any "$Remote_Games_mac_addr" >/dev/null 2>&1 || log_warning "etherwake command failed"
+                else
+                    etherwake -i any "$Remote_Games_mac_addr" >/dev/null 2>&1 || log_warning "etherwake command failed"
+                fi
             fi
-        fi
-
-        log_info "Waiting for SSH on $Remote_Games_addr:$Remote_Games_port ..."
-        timeout=180
-        interval=5
-        waited=0
-        while (( waited < timeout )); do
-            ssh -q -o ConnectTimeout=5 -o StrictHostKeyChecking=no -p "$Remote_Games_port" "$Remote_Games_user@$Remote_Games_addr" "exit" >/dev/null 2>&1
-            if [ $? -eq 0 ]; then
-                log_success "Remote server $Remote_Games_addr reachable via SSH."
-                break
-            fi
-            sleep $interval
-            waited=$((waited + interval))
-        done
-        if (( waited >= timeout )); then
-            log_error "Timeout waiting for $Remote_Games_addr to become available (waited ${timeout}s)."
+        else
+            log_error "No WOL utility found (install wakeonlan or etherwake)."
         fi
     fi
+
+    log_info "Waiting for SSH on $Remote_Games_addr:$Remote_Games_port ..."
+    timeout=180
+    interval=5
+    waited=0
+    while (( waited < timeout )); do
+        ssh -q -o ConnectTimeout=5 -o StrictHostKeyChecking=no -p "$Remote_Games_port" "$Remote_Games_user@$Remote_Games_addr" "exit" >/dev/null 2>&1
+        if [ $? -eq 0 ]; then
+            log_success "Remote server $Remote_Games_addr reachable via SSH."
+            break
+        fi
+        sleep $interval
+        waited=$((waited + interval))
+    done
+    if (( waited >= timeout )); then
+        log_error "Timeout waiting for $Remote_Games_addr to become available (waited ${timeout}s)."
+    fi
+
     # Minecraft
     log_info "${CYAN}=== Minecraft 1 Backup ===${NC}"
     log_info "Attempting to backup Minecraft files..."
@@ -386,6 +387,7 @@ if [ "$TimeToExec" -eq 1 ] || [ "$TimeToExec" -eq 2 ]; then
     if [ "$Remote_Games_SRV_reachable" -eq 1 ]; then
         log_info "Remote games server $Remote_Games_addr was already powered on, skipping shutdown."
     else
+        log_info "Remote games server $Remote_Games_addr was powered off, initiate shutdown."
         $Script_Path/shutdown-server.sh $Remote_Games_addr $Remote_Games_port $Remote_Games_user
     fi
 fi
