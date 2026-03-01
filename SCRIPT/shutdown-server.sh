@@ -23,5 +23,5 @@ if ping -c 2 -W 2 "$REMOTE_HOST" > /dev/null 2>&1; then
         echo "Error during SSH connection."
     fi
 else
-    echo "Host unreachable by ping, allready powered off or network issue."
+    echo "Host unreachable by ping, already powered off or there is a network issue."
 fi
