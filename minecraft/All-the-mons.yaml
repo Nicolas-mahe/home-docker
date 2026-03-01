@@ -1,6 +1,6 @@
 services:
   minecraft:
-    restart: no
+    restart: ${RESTART_POLICY:-unless-stopped}
     image: itzg/minecraft-server:java21
     container_name: minecraft-atm
     hostname: minecraft-atm

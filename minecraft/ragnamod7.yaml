@@ -4,8 +4,8 @@
 
 services:
   server:
+    restart: ${RESTART_POLICY:-unless-stopped}
     image: docker.io/itzg/minecraft-server:java17-jdk
-    restart: no
     container_name: minecraft-r7-server
     hostname: minecraft-r7-server
     labels:
