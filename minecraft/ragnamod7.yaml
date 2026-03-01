@@ -25,6 +25,7 @@ services:
       # CF_BASE_DIR: "/data"
       # CF_FILE_ID: 5353015 #Ragnamod-VII-7.1.7
       # CF_SLUG: ragnamod-vii
+      CREATE_CONSOLE_IN_PIPE: TRUE
       DIFFICULTY: normal
       EULA: TRUE
       ENABLE_STATUS: TRUE
