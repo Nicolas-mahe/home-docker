@@ -29,7 +29,7 @@ services:
       MAX_PLAYERS: 6
       MAX_TICK_TIME : -1
       MOD_PLATFORM: AUTO_CURSEFORGE
-      MEMORY: "20G"
+      MEMORY: "15G" #20G
       MOTD: "§b§l§oRaBByT Season 6:§r§l§o§2 All The Mons\n§6§kCest rigolo cette ligne qui bouge tout le temps"
       PAUSE_WHEN_EMPTY_SECONDS: -1
       RCON_CMDS_STARTUP: |-
