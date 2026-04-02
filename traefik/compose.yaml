@@ -141,6 +141,8 @@ services:
       - --certificatesresolvers.cloudflare.acme.storage=/etc/traefik/certs/acme.json
       - --entrypoints.websecure.http.tls.domains[0].main=${PERSONAL_DOMAINE_NAME}
       - --entrypoints.websecure.http.tls.domains[0].sans=*.${PERSONAL_DOMAINE_NAME}
+      - --entrypoints.websecure.http.tls.domains[1].main=s3.${PERSONAL_DOMAINE_NAME}
+      - --entrypoints.websecure.http.tls.domains[1].sans=*.s3.${PERSONAL_DOMAINE_NAME}
 
       # Entrypoint management
       - --entrypoints.ping.address=:8082
