@@ -8,15 +8,17 @@ services:
       diun.enable: true
       diun.watch_repos: true
     environment:
+      PUID: ${PUID}
+      GUID: ${PGID}
       ADGUARDHOME_INTERFACE: ${ADGUARDHOME_INTERFACE:-eth0}
       TZ: Europe/Paris
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/adguard/data:/opt/adguardhome/work
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/adguard/conf:/opt/adguardhome/conf
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/adguard/data:/opt/adguardhome/work
+      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/adguard/conf:/opt/adguardhome/conf
     network_mode: "host"
     healthcheck:
       test: nslookup www.google.com || exit 1
       timeout: 5s
       interval: 60s
       start_period: 10s
-      retries: 1
+      retries: 2

@@ -73,3 +73,24 @@ and run *update-grub* or *proxmox-boot-tool refresh* on Proxmox v9
 
     example:
     `root@pdcpd1004sindri:~# qm set 101 -scsi1 /dev/disk/by-id/ata-Samsung_SSD_860_EVO_500GB_S3Z2NB0M478767D`
+
+## Activate Wake On Lan (WOL)
+Check if WOL is supported with `ethtool <interface>` and look for *Supports Wake-on: pumdb* and *Wake-on: g*.
+If it is supported you can enable it with `ethtool -s <interface> wol g` and check if it is enabled with `ethtool <interface>` and look for *Wake-on: g*
+
+create a script to enable WOL at startup:
+
+Path: /etc/systemd/system/wol.service
+```ini
+[Unit]
+Description=Enable Wake On LAN
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/ethtool -s <interface> wol g
+
+[Install]
+WantedBy=multi-user.target
+```
+Active the service with `systemctl enable wol.service` and start it with `systemctl start wol.service`

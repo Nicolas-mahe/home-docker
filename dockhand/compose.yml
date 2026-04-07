@@ -1,0 +1,35 @@
+services:
+  dockhand:
+    restart: unless-stopped
+    image: docker.io/fnsys/dockhand:latest
+    container_name: dockhand
+    hostname: dockhand
+    labels:
+      diun.enable: true
+      diun.watch_repos: true
+      traefik.enable: true
+      traefik.http.routers.dockhand.tls: true
+      traefik.http.routers.dockhand.middlewares: authelia@docker
+      traefik.http.routers.dockhand.entrypoints: websecure
+      traefik.http.routers.dockhand.rule: Host(`docker.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.dockhand.service: dockhand
+      traefik.http.services.dockhand.loadBalancer.server.port: 3000
+    environment:
+      TZ: Europe/Paris
+      # PUID: 3001
+      # PGID: 1000
+      DATA_DIR: /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/dockerhand
+      ENCRYPTION_KEY: ${PERSONAL_DOCKHAND_ENCRYPTION_KEY:?encryption key is required}
+    ports:
+      - "${PERSONAL_PORT_DOCKHAND:-3000}:3000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/dockhand:/${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/dockhand
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-secret:/${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-secret:ro
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos:/${DOCKER_DATA_DIRECTORY:?data path is required}/repos
+    networks:
+      - webinternal
+
+networks:
+  webinternal:
+    name: webinternal
