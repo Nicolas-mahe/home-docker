@@ -55,17 +55,16 @@ services:
         puma['worker_timeout'] = 120
         puma['worker_processes'] = 1
         letsencrypt['enable'] = false
-        gitlab_rails['backup_archive_permissions'] = 0644
+        gitlab_rails['backup_archive_permissions'] = 0655
         prometheus_monitoring['enable'] = false
         gitlab_rails['gitlab_default_theme'] = 2
         gitlab_rails['gitlab_default_color_mode'] = 2
         gitlab_rails['initial_gitlab_product_usage_data'] = false
-    # ports:
-    #   - "6322:22"
     volumes:
+      -  data:/var/opt/gitlab
+      -  logs:/var/log/gitlab
       -  /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/config:/etc/gitlab
-      -  /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/logs:/var/log/gitlab
-      -  /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/data:/var/opt/gitlab
+      -  /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/backups:/var/opt/gitlab/backups
     networks:
       - gitlab
       - webinternal
@@ -82,14 +81,17 @@ services:
       diun.watch_repos: true  
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/runner/config:/etc/gitlab-runner
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/runner/home:/home/gitlab-runner
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/runner-config:/etc/gitlab-runner
+      - runner-home:/home/gitlab-runner
     networks:
       - gitlab
     # depends_on:
     #   gitlab:
     #     condition: service_healthy
-
+volumes:
+  data:
+  logs:
+  runner-home:
 networks:
   gitlab:
     name: gitlab
