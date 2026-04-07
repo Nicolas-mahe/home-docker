@@ -2,7 +2,7 @@ services:
   ################# DNS setting #################
   # # Without Public IP
   # cloudflared:
-  #   restart: unless-stopped
+  #   restart: ${RESTART:-unless-stopped}
   #   image: docker.io/cloudflare/cloudflared:${CLOUDFLARED_TAG:-latest}
   #   container_name: cloudflared
   #   hostname: cloudflared
@@ -23,7 +23,7 @@ services:
 
   # Throw Public IP
   cloudflare-ddns:
-    restart: always
+    restart: ${RESTART:-unless-stopped}
     image: docker.io/oznu/cloudflare-ddns
     container_name: cloudflare-ddns
     hostname: cloudflare-ddns
@@ -41,7 +41,7 @@ services:
 
   ################# Traefik #################
   whoami:
-    restart: unless-stopped
+    restart: ${RESTART:-unless-stopped}
     image: docker.io/traefik/whoami:${WHOAMI_TAG:-latest}
     container_name: whoami
     hostname: whoami
@@ -63,7 +63,7 @@ services:
       - webinternal
 
   traefik:
-    restart: unless-stopped
+    restart: ${RESTART:-unless-stopped}
     image: docker.io/library/traefik:${TRAEFIK_TAG:-v3.6.2}
     container_name: traefik
     hostname: traefik
@@ -87,8 +87,9 @@ services:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/conf/:/etc/traefik/conf/
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/certs/:/etc/traefik/certs/
     ports:
-      - 6322:6322
       - 443:443
+      - 6322:6322
+      - 8080:80
       - 25565:25565
     expose:
       - 6322  # Gitlab SSH
@@ -147,12 +148,12 @@ services:
       # Entrypoint management
       - --entrypoints.ping.address=:8082
       - --entrypoints.web.address=:80
-      - --entrypoints.web.http.encodedCharacters.allowEncodedSlash=true
+      # - --entrypoints.web.http.encodedCharacters.allowEncodedSlash=true
       - --entrypoints.web.http.redirections.entryPoint.to=websecure
       - --entrypoints.web.http.redirections.entryPoint.scheme=https
       - --entrypoints.web.http.middlewares=crowdsec@docker,error-pages@docker
       - --entrypoints.websecure.address=:443
-      - --entrypoints.websecure.http.encodedCharacters.allowEncodedSlash=true
+      # - --entrypoints.websecure.http.encodedCharacters.allowEncodedSlash=true
       - --entrypoints.websecure.transport.respondingTimeouts.readTimeout=600s
       - --entrypoints.websecure.transport.respondingTimeouts.idleTimeout=600s
       - --entrypoints.websecure.transport.respondingTimeouts.writeTimeout=600s
@@ -178,7 +179,7 @@ services:
       - --experimental.plugins.bouncer.version=${CROWDSEC_PLUGIN_VERSION:?bouncer version required}
 
   error-pages:
-    restart: unless-stopped
+    restart: ${RESTART:-unless-stopped}
     image: ghcr.io/patbec/traefik-error-pages:${ERROR_PAGES_TAG:-latest}
     container_name: error-pages
     hostname: error-pages
@@ -212,7 +213,7 @@ services:
       - webinternal
 
   nginx-utils:
-    restart: unless-stopped
+    restart: ${RESTART:-unless-stopped}
     image: docker.io/nginx:${NGINX_TAG:-alpine}
     container_name: web-utils
     hostname: web-utils
@@ -243,7 +244,7 @@ services:
 
   ################# Crowdsec #################
   redis-bouncer:
-    restart: unless-stopped
+    restart: ${RESTART:-unless-stopped}
     image: docker.io/library/redis:${REDIS_TAG:-alpine}
     container_name: redis-bouncer
     hostname: redis-bouncer
@@ -265,7 +266,7 @@ services:
     command: --save 60 1 --loglevel warning
 
   crowdsec:
-    restart: unless-stopped
+    restart: ${RESTART:-unless-stopped}
     image: ghcr.io/crowdsecurity/crowdsec:${CROWDSEC_TAG:-v1.7.3}
     container_name: crowdsec
     hostname: crowdsec
@@ -338,7 +339,7 @@ services:
 
   ################# Authelia #################
   authelia:
-    restart: unless-stopped
+    restart: ${RESTART:-unless-stopped}
     image: ghcr.io/authelia/authelia:${AUTHELIA_TAG:-4.39.14}
     container_name: authelia
     hostname: authelia
@@ -381,7 +382,7 @@ services:
         condition: service_healthy
 
   redis-authelia:
-    restart: unless-stopped
+    restart: ${RESTART:-unless-stopped}
     image: docker.io/library/redis:${REDIS_TAG:-alpine}
     container_name: redis-authelia
     hostname: redis-authelia
