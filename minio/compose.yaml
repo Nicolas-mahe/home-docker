@@ -28,7 +28,7 @@ services:
       MINIO_SERVER_URL: https://s3.${PERSONAL_DOMAIN_NAME}
       # MINIO_BROWSER_REDIRECT_URL: https://minio.${PERSONAL_DOMAIN_NAME}
     volumes:
-      - /${RAID_DATA_DIRECTORY:?raid path is required}/backups/s3:/data
+      - /${RAID_DATA_DIRECTORY:?raid path is required}/backup/s3:/data
     command: server /data --console-address ":9001"
     networks:
       - webinternal
