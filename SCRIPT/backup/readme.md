@@ -5,4 +5,4 @@ Decryt file (Encryption key will be ask):
 
 Explore archive `tar -tzvf <filename>`
 
-extarct archive `tar -xf <filename>`
+extract archive `tar -xf <filename>`
