@@ -4,9 +4,6 @@ services:
     image: wordpress:${WORDPRESS_TAG:-latest}
     container_name: wordpress
     hostname: wordpress
-    labels:
-      diun.enable: true
-      diun.watch_repos: true
     ports:
       - 80:80
     environment:
@@ -25,9 +22,6 @@ services:
     image: lscr.io/linuxserver/mariadb:${MARIADB_TAG:-latest}
     container_name: wordpress_db
     hostname: wordpress_db
-    labels:
-      diun.enable: true
-      diun.watch_repos: true
     environment:
       TZ: Europe/Paris
       MYSQL_DATABASE: ${DB_NAME}

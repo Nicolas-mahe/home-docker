@@ -26,8 +26,6 @@ services:
     container_name: semaphore-app
     hostname: semaphore-app
     labels:
-      diun.enable: true
-      diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.semaphore.tls: true
       traefik.http.routers.semaphore.entrypoints: websecure

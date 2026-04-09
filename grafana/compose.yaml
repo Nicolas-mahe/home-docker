@@ -6,8 +6,6 @@ services:
     hostname: grafana
     user: "${PERSONAL_GRAFANA_UID:-0}:${PERSONAL_GRAFANA_GID:-0}"
     labels:
-      diun.enable: true
-      diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.gafana.tls: true
       traefik.http.routers.gafana.middlewares: authelia@docker
@@ -58,8 +56,6 @@ services:
     hostname: prometheus
     user: "${PERSONAL_GRAFANA_UID:-0}:${PERSONAL_GRAFANA_GID:-0}"
     labels:
-      diun.enable: true
-      diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.prometheusdb.tls: true
       traefik.http.routers.prometheusdb.middlewares: authelia@docker
@@ -97,8 +93,6 @@ services:
     hostname: cadvisor
     privileged: true
     labels:
-      diun.enable: true
-      diun.watch_repos: true
     environment:
       TZ: Europe/Paris
     volumes:
@@ -127,8 +121,6 @@ services:
     hostname: node_exporter
     pid: host
     labels:
-      diun.enable: true
-      diun.watch_repos: true
     environment:
       TZ: Europe/Paris
     volumes:
@@ -145,8 +137,6 @@ services:
     container_name: influxdb2
     hostname: influxdb2
     labels:
-      diun.enable: true
-      diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.influxdb2.tls: true
       traefik.http.routers.influxdb2.middlewares: authelia@docker

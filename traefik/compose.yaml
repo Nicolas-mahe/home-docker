@@ -27,9 +27,6 @@ services:
     image: docker.io/oznu/cloudflare-ddns
     container_name: cloudflare-ddns
     hostname: cloudflare-ddns
-    labels:
-      diun.enable: true
-      diun.watch_repos: true
     environment:
       API_KEY: ${DNS_API_KEY}
       ZONE: ${PERSONAL_DOMAINE_NAME}
@@ -46,8 +43,6 @@ services:
     container_name: whoami
     hostname: whoami
     labels:
-      diun.enable: true
-      diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.whoami.tls: true
       traefik.http.routers.whoami.middlewares: authelia@docker
@@ -70,8 +65,6 @@ services:
     security_opt:
       - no-new-privileges:true
     labels:
-      diun.enable: true
-      diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.dashboard.tls: true
       traefik.http.routers.dashboard.middlewares: authelia@docker
@@ -184,8 +177,6 @@ services:
     container_name: error-pages
     hostname: error-pages
     labels:
-      diun.enable: true
-      diun.watch_repos: true
       traefik.enable: true
       # traefik.http.routers.error-pages.tls: true
       # traefik.http.routers.error-pages.entrypoints: websecure
@@ -218,8 +209,6 @@ services:
     container_name: web-utils
     hostname: web-utils
     labels:
-      diun.enable: true
-      diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.web-utils.tls: true
       traefik.http.routers.web-utils.middlewares: authelia@docker
@@ -248,9 +237,6 @@ services:
     image: docker.io/library/redis:${REDIS_TAG:-alpine}
     container_name: redis-bouncer
     hostname: redis-bouncer
-    labels:
-      diun.enable: true
-      diun.watch_repos: true
     healthcheck:
       test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
       start_period: 15s
@@ -273,8 +259,6 @@ services:
     security_opt:
       - no-new-privileges=true
     labels:
-      diun.enable: true
-      diun.watch_repos: true
       traefik.enable: true
       traefik.docker.network: crowdsec
       traefik.http.middlewares.crowdsec.plugin.bouncer.enabled: true
@@ -344,8 +328,6 @@ services:
     container_name: authelia
     hostname: authelia
     labels:
-      diun.enable: true
-      diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.authelia.tls: true
       traefik.http.routers.authelia.entrypoints: websecure

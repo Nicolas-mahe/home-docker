@@ -5,8 +5,6 @@ services:
     hostname: immich-server
     image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
     labels:
-      diun.enable: true
-      diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.immich.tls: true
       traefik.http.routers.immich.middlewares: authelia@docker
@@ -45,8 +43,6 @@ services:
     #   file: hwaccel.ml.yml
     #   service: cpu # set to one of [armnn, cuda, rocm, openvino, openvino-wsl, rknn] for accelerated inference - use the `-wsl` version for WSL2 where applicable
     labels:
-      diun.enable: true
-      diun.watch_repos: true
     environment:
       TZ: Europe/Paris
     env_file:
@@ -62,8 +58,6 @@ services:
     container_name: immich-redis
     hostname: immich-redis
     labels:
-      diun.enable: true
-      diun.watch_repos: true
     environment:
       TZ: Europe/Paris
     volumes:
@@ -80,8 +74,6 @@ services:
     hostname: immich-postgres
     shm_size: 128mb
     labels:
-      diun.enable: true
-      diun.watch_repos: true
     environment:
       TZ: Europe/Paris
       POSTGRES_PASSWORD: ${DB_PASSWORD}

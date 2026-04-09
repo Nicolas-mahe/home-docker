@@ -9,9 +9,6 @@ services:
       - SYS_MODULE
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
-    labels:
-      diun.enable: true
-      diun.watch_repos: true
     environment:
       TZ: Europe/Paris
       ALLOWEDIPS: 0.0.0.0/0

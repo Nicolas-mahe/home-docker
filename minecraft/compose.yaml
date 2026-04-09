@@ -9,8 +9,6 @@ services:
     container_name: minecraft-r7-server
     hostname: minecraft-r7-server
     labels:
-      diun.enable: true
-      diun.watch_repos: true
       gamecontainermanager.enable: true
       gamecontainermanager.group: "minecraft"
       gamecontainermanager.customlabel0: "r7.${PERSONAL_DOMAINE_NAME}"

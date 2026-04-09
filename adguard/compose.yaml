@@ -5,8 +5,6 @@ services:
     container_name: adguardhome
     hostname: adguardhome
     labels:
-      diun.enable: true
-      diun.watch_repos: true
     environment:
       PUID: ${PUID}
       GUID: ${PGID}

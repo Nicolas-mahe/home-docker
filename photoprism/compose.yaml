@@ -32,8 +32,6 @@ services:
     container_name: photoprism
     hostname: photoprism
     labels:
-      diun.enable: true
-      diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.photoprism.tls: true
       traefik.http.routers.photoprism.middlewares: authelia@docker

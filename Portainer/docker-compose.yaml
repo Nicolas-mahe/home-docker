@@ -5,8 +5,6 @@ services:
     container_name: portainer-ee
     hostname: portainer-ee
     labels:
-      diun.enable: true
-      diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.portainer.tls: true
       traefik.http.routers.portainer.middlewares: authelia@docker
@@ -34,9 +32,6 @@ services:
     image: docker.io/portainer/agent:${PERSONAL_PORTAINER_VERSION:-lts}
     container_name: portainer_agent
     hostname: portainer_agent
-    labels:
-      diun.enable: true
-      diun.watch_repos: true
     environment:
       TZ: Europe/Paris
     expose:
