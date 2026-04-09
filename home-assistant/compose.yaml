@@ -6,8 +6,6 @@ services:
     hostname: homeassistant
     privileged: true
     labels:
-      diun.enable: true
-      diun.watch_repos: true
     volumes:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/homeassistant/:/config
       - /etc/localtime:/etc/localtime:ro

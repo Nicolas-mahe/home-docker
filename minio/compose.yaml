@@ -5,8 +5,6 @@ services:
     container_name: minio
     hostname: minio
     labels:
-      diun.enable: true
-      diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.minio-web.tls: true
       traefik.http.routers.minio-storage.entrypoints: websecure

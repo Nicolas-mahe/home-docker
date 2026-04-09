@@ -5,8 +5,6 @@ services:
     container_name: dockhand
     hostname: dockhand
     labels:
-      diun.enable: true
-      diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.dockhand.tls: true
       traefik.http.routers.dockhand.middlewares: authelia@docker

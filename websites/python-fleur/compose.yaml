@@ -5,8 +5,6 @@ services:
     container_name: python-fleur
     hostname: python-fleur
     labels:
-      diun.enable: true
-      diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.python-fleur.tls: true
       traefik.http.routers.python-fleur.entrypoints: websecure

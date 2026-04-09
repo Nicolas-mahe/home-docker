@@ -5,8 +5,6 @@ services:
     container_name: duplicati
     hostname: duplicati
     labels:
-      diun.enable: true
-      diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.duplicati.tls: true
       traefik.http.routers.duplicati.middlewares: authelia@docker

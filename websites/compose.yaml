@@ -128,8 +128,6 @@ services:
     container_name: python-brainstorm
     hostname: python-brainstorm
     labels:
-      diun.enable: true
-      diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.python-brainstorm.tls: true
       traefik.http.routers.python-brainstorm.middlewares: authelia@docker

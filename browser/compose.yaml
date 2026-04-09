@@ -5,8 +5,6 @@ services:
     container_name: browser-firefox
     hostname: browser-firefox
     labels:
-      diun.enable: true
-      diun.watch_repos: true
       traefik.enable: true
       traefik.http.routers.browser.tls: true
       traefik.http.routers.browser.middlewares: authelia@docker

@@ -6,8 +6,6 @@ services:
     hostname: cadvisor
     privileged: true
     labels:
-      diun.enable: true
-      diun.watch_repos: true
     environment:
       TZ: Europe/Paris
     volumes:
@@ -31,8 +29,6 @@ services:
     hostname: node_exporter
     pid: host
     labels:
-      diun.enable: true
-      diun.watch_repos: true
     environment:
       TZ: Europe/Paris
     volumes:

@@ -31,9 +31,6 @@ services:
     image: docker.io/itzg/minecraft-server:java17-jdk
     container_name: mc-prod-server
     hostname: mc-prod-server
-    labels:
-      diun.enable: true
-      diun.watch_repos: true
     environment:
       TZ: Europe/Paris
       PGID: 1000

@@ -5,8 +5,6 @@ services:
     container_name: palworld-server
     hostname: palworld-server
     labels:
-      diun.enable: true
-      diun.watch_repos: true
       gamecontainermanager.enable: true
       gamecontainermanager.group: Palworld
     environment:

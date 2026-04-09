@@ -5,8 +5,6 @@ services:
     container_name: swag
     hostname: swag
     labels:
-      diun.enable: true
-      diun.watch_repos: true
     cap_add:
       - NET_ADMIN
     security_opt:
@@ -58,8 +56,6 @@ services:
     security_opt:
       - no-new-privileges=true
     labels:
-      diun.enable: true
-      diun.watch_repos: true
     depends_on:
       - authelia
     environment:
@@ -87,8 +83,6 @@ services:
     security_opt:
       - no-new-privileges=true
     labels:
-      diun.enable: true
-      diun.watch_repos: true
     environment:
       TZ: Europe/Paris
     volumes:

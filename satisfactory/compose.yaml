@@ -5,8 +5,6 @@ services:
     container_name: satisfactory-server
     hostname: satisfactory-server
     labels:
-      diun.enable: true
-      diun.watch_repos: true
       gamecontainermanager.enable: true
     ports:
       - 7777:7777/udp

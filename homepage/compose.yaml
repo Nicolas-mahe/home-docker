@@ -5,8 +5,6 @@ services:
     container_name: homepage
     hostname: homepage
     labels:
-      diun.enable: true
-      diun.watch_repos: true
       traefik.enable: true
       # Redirection Root Domain
       traefik.http.routers.redirect.tls: true

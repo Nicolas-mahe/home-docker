@@ -5,8 +5,6 @@ services:
     container_name: minecraft-router
     hostname: minecraft-router
     labels:
-      diun.enable: true
-      diun.watch_repos: true
       traefik.enable: true
       traefik.tcp.routers.minecraft.rule: HostSNI(`*`)
       traefik.tcp.routers.minecraft.entrypoints: minecraft

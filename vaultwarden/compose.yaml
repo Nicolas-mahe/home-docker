@@ -5,8 +5,6 @@ services:
     container_name: vaultwarden
     hostname: vaultwarden
     labels:
-      diun.enable: true
-      diun.watch_repos: true
       traefik.enable: true
       # admin interface
       traefik.http.routers.vaultwarden-admin.tls: true
