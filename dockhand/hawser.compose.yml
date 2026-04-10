@@ -1,0 +1,14 @@
+services:
+  hawser:
+    restart: always
+    image: ghcr.io/finsys/hawser:${DOCKER_TAG:-latest}
+    container_name: hawser
+    hostname: hawser
+    ports:
+      - "${PERSONAL_HAWSER_PORT:-2376}:2376"
+    environment:
+      STACKS_DIR: /data/stacks
+      TOKEN: ${TOKEN}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /${DOCKER_REPOS_DIRECTORY:?repositories path is required}/repos:/data/stacks
