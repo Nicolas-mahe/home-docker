@@ -203,7 +203,7 @@ services:
     networks:
       - webinternal
 
-  nginx-utils:
+  web-utils:
     restart: ${RESTART:-unless-stopped}
     image: docker.io/nginx:${NGINX_TAG:-alpine}
     container_name: web-utils
@@ -224,7 +224,7 @@ services:
     expose:
       - 80
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:80/index.html"]
+      test: ["CMD", "curl", "-f", "http://localhost:80/"]
       timeout: 5s
       retries: 3
       start_period: 1s
