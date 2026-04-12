@@ -1,9 +1,10 @@
 services:
-  app:
-    restart: unless-stopped
+  nextcloud:
+    restart: ${RESTART:-unless-stopped}
     image: docker.io/nextcloud:${NEXTCLOUD_TAG:-latest}
     container_name: nextcloud-app
     hostname: nextcloud-app
+    user: ${UID:-0}:${GUID:-0} #"root"
     labels:
       traefik.enable: true
       traefik.http.routers.nextcloud.tls: true
@@ -12,7 +13,6 @@ services:
       traefik.http.routers.nextcloud.rule: Host(`cloud.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.nextcloud.service: nextcloud
       traefik.http.services.nextcloud.loadBalancer.server.port: 80
-      # Middleware HSTS
       traefik.http.middlewares.nextcloud-headers.headers.customResponseHeaders.Strict-Transport-Security: 'max-age=15552000; includeSubDomains; preload'
     environment:
       MAIL_DOMAIN: ${PERSONAL_DOMAIN_NAME}
@@ -48,10 +48,15 @@ services:
       - /${RAID_DATA_DIRECTORY:?raid path is required}/nextcloud:/var/www/html/data
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/Nextcloud/hooks:/docker-entrypoint-hooks.d
       - /${RAID_DATA_DIRECTORY:?raid path is required}/partage:/mnt/partage
-      - /${RAID_DATA_DIRECTORY:?raid path is required}/backups:/mnt/backups
+      - /${RAID_DATA_DIRECTORY:?raid path is required}/backup:/mnt/backup
     networks:
       - webinternal
       - nextcloud
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     healthcheck:
       test: 'runuser -s /usr/local/bin/php - www-data /var/www/html/occ status 2>/dev/null | grep -e "installed: true" -e "maintenance: false" -e "needsDbUpgrade: false" | wc -l | [ "`cat`" = "3" ]'
       interval: 60s
@@ -59,11 +64,10 @@ services:
       start_period: 10s
       timeout: 10s
   postgres:
-    restart: unless-stopped
+    restart: ${RESTART:-unless-stopped}
     image: docker.io/postgres:${POSTGRES_TAG:-17.6-bookworm}
     container_name: nextcloud-postgres
     hostname: nextcloud-postgres
-    labels:
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -80,7 +84,7 @@ services:
       timeout: 5s
 
   redis:
-    restart: unless-stopped
+    restart: ${RESTART:-unless-stopped}
     image: docker.io/library/redis:${REDIS_TAG:-alpine}
     container_name: nextcloud-redis
     hostname: nextcloud-redis
