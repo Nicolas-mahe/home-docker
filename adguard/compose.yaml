@@ -10,7 +10,7 @@ services:
       ADGUARDHOME_INTERFACE: ${ADGUARDHOME_INTERFACE:-eth0}
       TZ: Europe/Paris
     volumes:
-      - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/adguard/data:/opt/adguardhome/work
+      - data:/opt/adguardhome/work
       - /${DOCKER_DATA_DIRECTORY}/docker/docker-data/adguard/conf:/opt/adguardhome/conf
     network_mode: "host"
     healthcheck:
@@ -19,3 +19,6 @@ services:
       interval: 60s
       start_period: 10s
       retries: 2
+volumes:
+  data:
+    name: adguardhome-data
