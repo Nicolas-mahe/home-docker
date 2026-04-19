@@ -16,6 +16,7 @@ services:
       TZ: Europe/Paris
       # PUID: 3001
       # PGID: 1000
+      DISABLE_LOCAL_LOGIN: True #https://dockhand.pro/manual/#emergency
       DATA_DIR: /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/dockerhand
       ENCRYPTION_KEY: ${PERSONAL_DOCKHAND_ENCRYPTION_KEY:?encryption key is required}
     ports:
