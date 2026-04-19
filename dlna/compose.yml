@@ -1,0 +1,35 @@
+services:
+  dlna:
+    restart: unless-stopped
+    image: docker.io/vladgh/minidlna:${DLNA_TAG:-main}
+    container_name: minidlna
+    hostname: minidlna
+    labels:
+      traefik.enable: true
+      traefik.http.routers.minidlna.tls: true
+      traefik.http.routers.minidlna.middlewares: authelia@docker
+      traefik.http.routers.minidlna.entrypoints: websecure
+      traefik.http.routers.minidlna.rule: Host(`dlna.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.minidlna.service: minidlna
+      traefik.http.services.minidlna.loadBalancer.server.port: 8200
+    environment:
+      TZ: Europe/Paris
+      MINIDLNA_FRIENDLY_NAME: "miniDLNA"
+      MINIDLNA_PORT: 8200
+      MINIDLNA_ENABLE_TIVO: "no"
+      MINIDLNA_MEDIA_DIR_1: V,/media/films
+      MINIDLNA_MEDIA_DIR_2: A,/media/musiques
+      MINIDLNA_MEDIA_DIR_3: P,/media/photos
+      MINIDLNA_MEDIA_DIR_4: V,/media/videos
+    volumes:
+      - data:/minidlna/cache
+      - /${RAID_DATA_DIRECTORY:?raid path is required}/partage/films:/media/films
+      - /${RAID_DATA_DIRECTORY:?raid path is required}/partage/musiques:/media/musiques
+      - /${RAID_DATA_DIRECTORY:?raid path is required}/partage/photos:/media/photos
+      - /${RAID_DATA_DIRECTORY:?raid path is required}/partage/videos:/media/videos
+    ports:
+      - 8200:8200
+      - 1900:1900/udp
+
+volumes:
+  data:
