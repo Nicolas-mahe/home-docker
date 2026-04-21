@@ -1,7 +1,8 @@
 services:
+  # systemctl enable systemd-networkd-wait-online , systemctl edit systemd-networkd-wait-online , ExecStart=/lib/systemd/systemd-networkd-wait-online --interface=XXX , systemctl daemon-reload
   minecraft:
     restart: ${RESTART_POLICY:-unless-stopped}
-    image: itzg/minecraft-server:java21
+    image: docker.io/itzg/minecraft-server:java21
     container_name: minecraft-atm
     hostname: minecraft-atm
     tty: true
@@ -27,7 +28,7 @@ services:
       MAX_PLAYERS: 6
       MAX_TICK_TIME : -1
       MOD_PLATFORM: AUTO_CURSEFORGE
-      MEMORY: "20G"
+      MEMORY: "28G"
       MOTD: "§b§l§oRaBByT Season 6:§r§l§o§2 All The Mons\n§6§kCest rigolo cette ligne qui bouge tout le temps"
       PAUSE_WHEN_EMPTY_SECONDS: -1
       RCON_CMDS_STARTUP: |-
@@ -39,7 +40,7 @@ services:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/minecraft/s6/prod:/data
       - nfs_backups:/data/simplebackups
     ports:
-      - 25566:25565
+      - ${PERSONAL_PORT_MINECRAFT}:25565
     networks:
       - games
 
@@ -49,7 +50,7 @@ volumes:
     name: minecraft_atm_nfs_backups
     driver_opts:
       type: nfs
-      o: addr=${PERSONAL_NETWORK}.2,nolock,soft,rw
+      o: addr=${PERSONAL_NETWORK}.2,nolock,rw,soft,timeo=600,retrans=15
       device: ":/mnt/hdd/backup/Games/Minecraft/s6"
 
 networks:
