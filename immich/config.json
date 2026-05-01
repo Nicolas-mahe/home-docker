@@ -159,6 +159,7 @@
         "ignoreCert": false,
         "password": "",
         "port": 465,
+        "secure": true,
         "username": ""
       }
     }
