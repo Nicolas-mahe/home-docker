@@ -17,6 +17,8 @@ services:
       BROADCAST_CONSOLE_TO_OPS: TRUE
       BROADCAST_RCON_TO_OPS: TRUE
       CF_SLUG: all-the-mons
+      CF_FILENAME_MATCHER: ${CF_FILENAME_MATCHER}
+      CURSEFORGE_FILES: "@/extras/cf-mods.txt"
       CF_API_KEY: ${CF_API_KEY}
       CREATE_CONSOLE_IN_PIPE: TRUE
       ENABLE_AUTOPAUSE: FALSE
@@ -38,6 +40,7 @@ services:
       RCON_PORT: ${PERSONAL_PORT_MINECRAFT_RCON}
     volumes:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/minecraft/s6/prod:/data
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/minecraft/All-the-mons_extra.txt:/extras/cf-mods.txt:ro
       - nfs_backups:/data/simplebackups
     ports:
       - ${PERSONAL_PORT_MINECRAFT}:25565
@@ -45,7 +48,7 @@ services:
       - games
 
 volumes:
-  nfs_backups: ## Le nom de mon volume en montage NFS
+  nfs_backups:
     driver: local
     name: minecraft_atm_nfs_backups
     driver_opts:
