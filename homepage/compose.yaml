@@ -32,11 +32,15 @@ services:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/homepage/icons:/app/public/icons:ro
     networks:
       - webinternal
+      - docker-proxy-ro
       - crowdsec
 
 networks:
   crowdsec:
     name: crowdsec
+    external: true
+  docker-proxy-ro:
+    name: docker-proxy-ro
     external: true
   webinternal:
     name: webinternal

@@ -4,40 +4,47 @@ container_name:
  - authelia
 labels:
   type: authelia
+docker_host: tcp://docker-proxy-ro:2375
 ---
 source: docker
 container_name:
  - grafana
 labels:
   type: grafana
+docker_host: tcp://docker-proxy-ro:2375
 ---
 source: docker
 container_name:
  - immich-server
 labels:
   type: immich
+docker_host: tcp://docker-proxy-ro:2375
 ---
 source: docker
 container_name:
  - nextcloud-app
 labels:
   type: Nextcloud
+docker_host: tcp://docker-proxy-ro:2375
 ---
 source: docker
 container_name:
   - traefik
 labels:
   type: traefik
+docker_host: tcp://docker-proxy-ro:2375
 ---
 source: docker
 container_name:
  - vaultwarden
 labels:
   type: Vaultwarden
+docker_host: tcp://docker-proxy-ro:2375
 ---
 source: docker
 container_name:
  - gitlab
 labels:
   type: gitlab
+docker_host: tcp://docker-proxy-ro:2375
 ---

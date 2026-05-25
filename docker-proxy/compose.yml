@@ -1,0 +1,48 @@
+services:
+  docker-proxy-ro:
+    restart: always
+    image: tecnativa/docker-socket-proxy:${TAG_DOCKERPROXY:-latest}
+    container_name: docker-proxy-ro
+    hostname: docker-proxy-ro
+    environment:
+      CONTAINERS: 1
+      SERVICES: 1
+      TASKS: 1
+      POST: 0 
+      INFO: 1
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    # ports:
+    #   - 2375:2375
+    networks:
+      - docker-proxy-ro
+
+  # docker-proxy-rw:
+  #   restart: always
+  #   image: tecnativa/docker-socket-proxy:${TAG_DOCKERPROXY:-latest}
+  #   container_name: docker-proxy-rw
+  #   hostname: docker-proxy-rw
+  #   environment:
+  #     LOG_LEVEL: info
+  #     CONTAINERS: 1
+  #     INFO: 1
+  #     TASKS: 1
+  #     SERVICES: 1
+  #     NETWORKS: 1
+  #     VOLUMES: 1
+  #     IMAGES: 1
+  #     SYSTEM: 0
+  #     EXEC: 0
+  #     POST: 1
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro
+  #   ports:
+  #     - 2376:2375
+  #   networks:
+  #     - docker-proxy-rw
+
+networks:
+  docker-proxy-ro:
+     name: docker-proxy-ro
+  # docker-proxy-rw:
+  #    name: docker-proxy-rw
