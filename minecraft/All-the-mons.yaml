@@ -53,7 +53,7 @@ volumes:
     name: minecraft_atm_nfs_backups
     driver_opts:
       type: nfs
-      o: addr=${PERSONAL_NETWORK}.2,nolock,rw,soft,timeo=600,retrans=15
+      o: addr=${PERSONAL_NETWORK}.2,nolock,rw,bg,soft,timeo=600,retrans=15
       device: ":/mnt/hdd/backup/Games/Minecraft/s6"
 
 networks:
