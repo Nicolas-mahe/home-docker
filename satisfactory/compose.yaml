@@ -1,7 +1,8 @@
+# remove send games data to avoid error on copnnection
 services:
   satisfactory-server:
-    restart: no
-    image: wolveix/satisfactory-server:${SATISFACTORY_SERVER_TAG:-latest}
+    restart: ${RESTART:-unless-stopped}
+    image: docker.io/wolveix/satisfactory-server:${SATISFACTORY_SERVER_TAG:-latest}
     container_name: satisfactory-server
     hostname: satisfactory-server
     labels:
@@ -9,23 +10,44 @@ services:
     ports:
       - 7777:7777/udp
       - 7777:7777/tcp
+      - 8888:8888/tcp
     volumes:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/satisfactory:/config
-      - /${RAID_DATA_DIRECTORY:?raid path is required}/backups/Games/Satisfactory/:/config/backups
+      - nfs_backups:/config/backups
+      - nfs_saved:/config/saved
     environment:
-      name: value
+      AUTOSAVENUM: 3
       MAXPLAYERS: 4
       TZ: Europe/Paris
       ROOTLESS: false
       STEAMBETA: false
-    # deploy:
-    #   resources:
-    #     limits:
-    #       memory: 12G
-    #     reservations:
-    #       memory: 8G
+      PUID: ${PUID}
+      GUID: ${GUID}
+      TIMEOUT: 60
+    deploy:
+      resources:
+        limits:
+          memory: 15G
+        reservations:
+          memory: 8G
     networks:
       - games
+
+volumes:
+  nfs_backups:
+    driver: local
+    name: satisfactory_nfs_backups
+    driver_opts:
+      type: nfs
+      o: addr=${PERSONAL_NETWORK}.2,nolock,rw,bg,soft,timeo=600,retrans=15
+      device: ":/mnt/hdd/backup/Games/Satisfactory/s2/backups"
+  nfs_saved:
+    driver: local
+    name: satisfactory_nfs_saved
+    driver_opts:
+      type: nfs
+      o: addr=${PERSONAL_NETWORK}.2,nolock,rw,bg,soft,timeo=600,retrans=15
+      device: ":/mnt/hdd/backup/Games/Satisfactory/s2/saved"
 
 networks:
   games:
