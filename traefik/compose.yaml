@@ -79,10 +79,13 @@ services:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/conf/:/etc/traefik/conf/
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/certs/:/etc/traefik/certs/
     ports:
-      - 443:443
-      - 6322:6322
-      - 8080:80
-      - 25565:25565
+      - 443:443/tcp
+      - 6322:6322/tcp
+      - 8080:80/tcp
+      - 25565:25565/tcp
+      - 7777:7777/tcp
+      - 7777:7777/udp
+      - 8888:8888/tcp
     expose:
       - 6322  # Gitlab SSH
       - 80    # HTTP
@@ -90,6 +93,7 @@ services:
       - 8080  # dashboard
       - 8082  # ping
       - 25565 # Minecraft
+      - 7777  # Satisfactory
     depends_on:
       authelia:
         condition: service_healthy
@@ -160,6 +164,11 @@ services:
       - --serversTransport.insecureSkipVerify=true  # need to put a validate cert everywhere for delete it
       - --entrypoints.gitlab-ssh.address=:6322
       - --entrypoints.minecraft.address=:25565
+      - --entryPoints.satisfactory-tcp.address=:7777/tcp
+      - --entryPoints.satisfactory-tcp.http.redirections.entryPoint.to=satisfactory-tcp
+      - --entryPoints.satisfactory-tcp.http.redirections.entryPoint.scheme=https
+      - --entryPoints.satisfactory-udp.address=:7777/udp
+      - --entryPoints.satisfactory-tcp-reliable.address=:8888/tcp
 
       # Provider definition
       - --providers.docker.endpoint=tcp://docker-proxy-ro:2375

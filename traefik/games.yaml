@@ -1,0 +1,47 @@
+---
+http:
+  routers:
+    satisfactory:
+      entryPoints:
+        - satisfactory-tcp
+      rule: "Host(`satisfactory.${PERSONAL_DOMAINE_NAME}`)"
+      service: satisfactory
+      tls: true
+
+  services:
+    satisfactory:
+      loadBalancer:
+        servers:
+          - url: "https://${PERSONAL_NETWORK}.3:7777"
+        serversTransport: satisfactory
+
+  serversTransports:
+    satisfactory:
+      insecureSkipVerify: true
+
+tcp:
+  routers:
+    satisfactory:
+      entryPoints:
+        - satisfactory-tcp-reliable
+      rule: "HostSNI(`*`)"
+      service: satisfactory
+
+  services:
+    satisfactory:
+      loadBalancer:
+        servers:
+          - address: "${PERSONAL_NETWORK}:8888"
+
+udp:
+  routers:
+    satisfactory:
+      entryPoints:
+        - satisfactory-udp
+      service: satisfactory
+
+  services:
+    satisfactory:
+      loadBalancer:
+        servers:
+          - address: "${PERSONAL_NETWORK}:7777"
