@@ -28,8 +28,6 @@ services:
       resources:
         limits:
           memory: 15G
-        reservations:
-          memory: 8G
     networks:
       - games
 
