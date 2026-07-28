@@ -9,6 +9,7 @@ http:
         - websecure
       middlewares:
         - authelia@docker
+        - web-utils@docker
     dns:
       rule: "Host(`dns.${PERSONAL_DOMAINE_NAME}`)"
       service: dns
@@ -17,6 +18,7 @@ http:
         - websecure
       middlewares:
         - authelia@docker
+        - web-utils@docker
     gamescontainermanager:
       rule: "Host(`games-manager.${PERSONAL_DOMAINE_NAME}`)"
       service: gamescontainermanager
@@ -30,7 +32,8 @@ http:
       entrypoints:
         - websecure
       middlewares:
-        - authelia@docker   
+        - authelia@docker
+        - web-utils@docker   
     # mailcow:
     #   rule: "Host(`mail.${PERSONAL_DOMAINE_NAME}`)"
     #   service: mailcow
@@ -39,6 +42,7 @@ http:
     #     - websecure
     #   middlewares:
     #     - authelia@docker
+    #     - web-utils@docker
     pterodactyl:
       rule: "Host(`pterodactyl.${PERSONAL_DOMAINE_NAME}`)"
       service: pterodactyl
@@ -47,6 +51,7 @@ http:
         - websecure
       middlewares:
         - authelia@docker
+        - web-utils@docker
     pve:
       rule: "Host(`pve.${PERSONAL_DOMAINE_NAME}`)"
       service: pve
@@ -55,6 +60,7 @@ http:
         - websecure
       middlewares:
         - authelia@docker
+        - web-utils@docker
     pve-1:
       rule: "Host(`pve-1.${PERSONAL_DOMAINE_NAME}`)"
       service: pve-1
@@ -63,6 +69,7 @@ http:
         - websecure
       middlewares:
         - authelia@docker
+        - web-utils@docker
     # pve-test:
     #   rule: "Host(`pve-test.${PERSONAL_DOMAINE_NAME}`)"
     #   service: pve-test
@@ -71,6 +78,7 @@ http:
     #     - websecure
     #   middlewares:
     #     - authelia@docker
+    #     - web-utils@docker
     python-test:
       rule: "Host(`python-test.${PERSONAL_DOMAINE_NAME}`)"
       service: python-test
@@ -85,6 +93,7 @@ http:
         - websecure
       middlewares:
         - authelia@docker
+        - web-utils@docker
     zyxel-wifi:
       rule: "Host(`zyxel-wifi.${PERSONAL_DOMAINE_NAME}`)"
       service: zyxel-wifi
@@ -93,6 +102,7 @@ http:
         - websecure
       middlewares:
         - authelia@docker
+        - web-utils@docker
 
   services:
     box:
