@@ -198,14 +198,7 @@ copy_files_from_local_path() {
 }
 
 
-#Recover Execution path
-Script_Dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-Data_Dir="/$(echo "$Script_Dir" | cut -d'/' -f2)"
-
-#Test is path is in root directory
-if [[ "$Data_Dir" == "//" ]]; then
-    Data_Dir="/"
-fi
+read -r Data_Dir < 
 log_info "Folder container data is : $Data_Dir"
 # log_info "Script path is : $Script_Dir"
 
@@ -409,5 +402,5 @@ delete_old_files "$Minecraft_Backups_Path_2" "world" "$Games_Retention_Days"
 # Apply owner to directory
 log_info "${GREEN}=== Setting permissions ===${NC}"
 log_info "Apply owner to backups files"
-chown -R docker:maison $Backups_Path
-chmod -R 775 $Backups_Path
+# chown -R docker:maison $Backups_Path
+# chmod -R 775 $Backups_Path

@@ -95,7 +95,7 @@ get_container_env() {
         echo "Usage: get_container_env <container_id_or_name> <var_name>" >&2
         return 1
     fi
-    docker exec "$cid" env | awk -F= -v v="$envVar" '$1==v {print substr($0, index($0,"=")+1)}'
+    sudo docker exec "$cid" env | awk -F= -v v="$envVar" '$1==v {print substr($0, index($0,"=")+1)}'
 }
 
 # Generic function to get container information
@@ -133,7 +133,7 @@ get_container_info() {
             ;;
     esac
     
-    docker ps -f "name=${pattern}" --format '{{json .}}' --no-trunc
+    sudo docker ps -f "name=${pattern}" --format '{{json .}}' --no-trunc
 }
 
 load_config() {
@@ -223,9 +223,9 @@ perform_backup() {
         command_to_execute="${command_to_execute//__SUFFIX_NAME__/${BackupSuffix}}"
         command_to_execute="${command_to_execute//__PREFIX_NAME__/${BackupPrefix}}"
 
-        log_info "Executing command: docker exec -t $container_id sh -c \"$command_to_execute\""
+        log_info "Executing command: sudo docker exec -t $container_id sh -c \"$command_to_execute\""
 
-        if docker exec -t "$container_id" sh -c "$command_to_execute"; then
+        if sudo docker exec -t "$container_id" sh -c "$command_to_execute"; then
             log_success "$container_name backup completed successfully"
         else
             log_error "$container_name backup failed"
@@ -244,8 +244,8 @@ perform_backup() {
             HostContainerBackupPath="$HostBackupPath/$container_name"
             log_info "No host's mount paths found, copying backup files on host to: $HostContainerBackupPath"
             mkdir -p "$HostContainerBackupPath"
-            docker cp "$container_id:/${BackupFileName}" "$HostContainerBackupPath/${BackupFileName}"
-            docker exec -t "$container_id" rm "/${BackupFileName}"
+            sudo docker cp "$container_id:/${BackupFileName}" "$HostContainerBackupPath/${BackupFileName}"
+            sudo docker exec -t "$container_id" rm "/${BackupFileName}"
             delete_old_files "$HostContainerBackupPath" "$BackupPrefix" "$BackupSuffix" "$BackupRetention"
         fi
 
