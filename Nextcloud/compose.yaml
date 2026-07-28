@@ -4,7 +4,7 @@ services:
     image: docker.io/nextcloud:${NEXTCLOUD_TAG:-latest}
     container_name: nextcloud-app
     hostname: nextcloud-app
-    user: ${UID:-0}:${GUID:-0} #"root"
+    user: ${UID:-0}:${GUID:-0}
     labels:
       traefik.enable: true
       traefik.http.routers.nextcloud.tls: true
