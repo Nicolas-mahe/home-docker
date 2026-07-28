@@ -29,7 +29,7 @@ services:
     hostname: cloudflare-ddns
     environment:
       API_KEY: ${DNS_API_KEY}
-      ZONE: ${PERSONAL_DOMAINE_NAME}
+      ZONE: ${PERSONAL_DOMAIN_NAME}
       PROXIED: true
       TZ: Europe/Paris
       DELETE_ON_STOP: false
@@ -47,7 +47,7 @@ services:
       traefik.http.routers.whoami.tls: true
       traefik.http.routers.whoami.middlewares: authelia@docker
       traefik.http.routers.whoami.entrypoints: websecure
-      traefik.http.routers.whoami.rule: Host(`whoami.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.whoami.rule: Host(`whoami.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.whoami.service: whoami
       traefik.http.services.whoami.loadBalancer.server.port: 80
     environment:
@@ -69,7 +69,7 @@ services:
       traefik.http.routers.dashboard.tls: true
       traefik.http.routers.dashboard.middlewares: authelia@docker
       traefik.http.routers.dashboard.entrypoints: websecure
-      traefik.http.routers.dashboard.rule: Host(`traefik.${PERSONAL_DOMAINE_NAME}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      traefik.http.routers.dashboard.rule: Host(`traefik.${PERSONAL_DOMAIN_NAME}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
       traefik.http.routers.dashboard.service: api@internal
     environment:
       TZ: Europe/Paris
@@ -81,14 +81,12 @@ services:
     ports:
       - 443:443/tcp
       - 6322:6322/tcp
-      - 8080:80/tcp
       - 25565:25565/tcp
       - 7777:7777/tcp
       - 7777:7777/udp
       - 8888:8888/tcp
     expose:
       - 6322  # Gitlab SSH
-      - 80    # HTTP
       - 443   # HTTPS
       - 8080  # dashboard
       - 8082  # ping
@@ -103,8 +101,6 @@ services:
         condition: service_started
       # cloudflared:
       #   condition: service_healthy
-      error-pages:
-        condition: service_started
     networks:
       crowdsec:
         ipv4_address: 172.50.0.254
@@ -137,18 +133,13 @@ services:
       - --certificatesresolvers.cloudflare.acme.dnsChallenge.resolvers=1.1.1.1:53,1.0.0.1:53
       - --certificatesresolvers.cloudflare.acme.email=${PERSONAL_CF_MAIL}
       - --certificatesresolvers.cloudflare.acme.storage=/etc/traefik/certs/acme.json
-      - --entrypoints.websecure.http.tls.domains[0].main=${PERSONAL_DOMAINE_NAME}
-      - --entrypoints.websecure.http.tls.domains[0].sans=*.${PERSONAL_DOMAINE_NAME}
-      - --entrypoints.websecure.http.tls.domains[1].main=s3.${PERSONAL_DOMAINE_NAME}
-      - --entrypoints.websecure.http.tls.domains[1].sans=*.s3.${PERSONAL_DOMAINE_NAME}
+      - --entrypoints.websecure.http.tls.domains[0].main=${PERSONAL_DOMAIN_NAME}
+      - --entrypoints.websecure.http.tls.domains[0].sans=*.${PERSONAL_DOMAIN_NAME}
+      - --entrypoints.websecure.http.tls.domains[1].main=s3.${PERSONAL_DOMAIN_NAME}
+      - --entrypoints.websecure.http.tls.domains[1].sans=*.s3.${PERSONAL_DOMAIN_NAME}
 
       # Entrypoint management
       - --entrypoints.ping.address=:8082
-      - --entrypoints.web.address=:80
-      # - --entrypoints.web.http.encodedCharacters.allowEncodedSlash=true
-      - --entrypoints.web.http.redirections.entryPoint.to=websecure
-      - --entrypoints.web.http.redirections.entryPoint.scheme=https
-      - --entrypoints.web.http.middlewares=crowdsec@docker,error-pages@docker
       - --entrypoints.websecure.address=:443
       # - --entrypoints.websecure.http.encodedCharacters.allowEncodedSlash=true
       - --entrypoints.websecure.transport.respondingTimeouts.readTimeout=600s
@@ -159,7 +150,7 @@ services:
       # - --entryPoints.websecure.proxyProtocol.insecure=false # need trusted IPs provided
       # - --entryPoints.websecure.forwardedHeaders.trustedIPs=172.18.0.0/16,172.50.0.0/24
       # - --entryPoints.websecure.proxyProtocol.trustedIPs=172.18.0.0/16,172.50.0.0/24
-      # - --entrypoints.websecure.http.middlewares=crowdsec@docker,error-pages@docker
+      - --entrypoints.websecure.http.middlewares=crowdsec@docker
       - --entrypoints.websecure.http.tls.certResolver=cloudflare
       - --serversTransport.insecureSkipVerify=true  # need to put a validate cert everywhere for delete it
       - --entrypoints.gitlab-ssh.address=:6322
@@ -175,69 +166,34 @@ services:
       - --providers.docker.exposedByDefault=false
       - --providers.docker.network=webinternal
       - --providers.file.directory=/etc/traefik/conf
-      - --providers.file.watch=true
+      - --providers.file.watch=false
 
       # Crowdsec definition
       - --experimental.plugins.bouncer.moduleName=github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
       - --experimental.plugins.bouncer.version=${CROWDSEC_PLUGIN_VERSION:?bouncer version required}
 
-  error-pages:
-    restart: ${RESTART:-unless-stopped}
-    image: ghcr.io/patbec/traefik-error-pages:${ERROR_PAGES_TAG:-latest}
-    container_name: error-pages
-    hostname: error-pages
+  python-utils:
+    restart: unless-stopped
+    image: registry.${PERSONAL_DOMAIN_NAME}/${UTILS_PROJECT_PATH}:${UTILS_DOCKER_TAG:-main}
+    container_name: python-utils
+    hostname: python-utils
     labels:
       traefik.enable: true
-      # traefik.http.routers.error-pages.tls: true
-      # traefik.http.routers.error-pages.entrypoints: websecure
-      # traefik.http.routers.error-pages.rule: HostRegexp(`{host:.+}`)
-      # traefik.http.routers.error-pages.priority: 1
-      # traefik.http.routers.error-pages.service: error-pages
-      traefik.http.services.error-pages.loadBalancer.server.port: 8090
-      traefik.http.middlewares.error-pages.errors.status: 400-599
-      traefik.http.middlewares.error-pages.errors.service: error-pages
-      traefik.http.middlewares.error-pages.errors.query: /{status}.html
+      traefik.http.routers.python-utils.tls: true
+      traefik.http.routers.python-utils.entrypoints: websecure
+      traefik.http.routers.python-utils.rule: Host(`utils.${PERSONAL_DOMAIN_NAME}`)
+      traefik.http.routers.python-utils.service: python-utils
+      traefik.http.middlewares.python-utils.errors.status: 400-404
+      traefik.http.middlewares.python-utils.errors.service: python-utils
+      traefik.http.middlewares.python-utils.errors.query: /error?e={status}&u={url}
+      traefik.http.services.python-utils.loadBalancer.server.port: 5000
     environment:
       TZ: Europe/Paris
-      PROXY_NAME: traefik
-      PROXY_LOCATION: ${PROXY_LOCATION:-France}
-      PROXY_SUPPORT_MESSAGE: ${PROXY_SUPPORT_MESSAGE:-Retry in few minutes or send mail at:}
-      PROXY_SUPPORT_MAIL: ${PROXY_SUPPORT_MAIL:-contact@${PERSONAL_DOMAINE_NAME}}
+      SESSION_TOKEN: ${UTILS_SESSION_TOKEN}
+      DEBUG_MODE: ${DEBUG_MODE:-False}
+      ROOT_DOMAIN: https://utils.${PERSONAL_DOMAIN_NAME}
     expose:
-      - 8090
-    # healthcheck:
-    #   test: ["CMD-SHELL", "wget", "--spider", "-q", "http://localhost:8090/404.html"]
-    #   timeout: 5s
-    #   retries: 3
-    #   start_period: 15s
-    networks:
-      - webinternal
-
-  web-utils:
-    restart: ${RESTART:-unless-stopped}
-    image: docker.io/nginx:${NGINX_TAG:-alpine}
-    container_name: web-utils
-    hostname: web-utils
-    labels:
-      traefik.enable: true
-      traefik.http.routers.web-utils.tls: true
-      traefik.http.routers.web-utils.middlewares: authelia@docker
-      traefik.http.routers.web-utils.entrypoints: websecure
-      traefik.http.routers.web-utils.rule: Host(`utils.${PERSONAL_DOMAINE_NAME}`)
-      traefik.http.routers.web-utils.service: web-utils
-      traefik.http.services.web-utils.loadBalancer.server.port: 80
-    volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/web-utils:/usr/share/nginx/html:ro
-    environment:
-      TZ: Europe/Paris
-      NGINX_HOST: utils.${PERSONAL_DOMAINE_NAME}
-    expose:
-      - 80
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/"]
-      timeout: 5s
-      retries: 3
-      start_period: 1s
+      - 5000
     networks:
       - webinternal
 
@@ -341,7 +297,7 @@ services:
       traefik.enable: true
       traefik.http.routers.authelia.tls: true
       traefik.http.routers.authelia.entrypoints: websecure
-      traefik.http.routers.authelia.rule: Host(`auth.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.authelia.rule: Host(`auth.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.authelia.service: authelia
       traefik.http.services.authelia.loadBalancer.server.port: 9091
       traefik.http.middlewares.authelia.forwardAuth.address: 'http://authelia:9091/api/authz/forward-auth'
