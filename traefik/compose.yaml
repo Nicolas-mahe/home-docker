@@ -45,7 +45,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.whoami.tls: true
-      traefik.http.routers.whoami.middlewares: authelia@docker
+      traefik.http.routers.whoami.middlewares: authelia@docker,web-utils@docker
       traefik.http.routers.whoami.entrypoints: websecure
       traefik.http.routers.whoami.rule: Host(`whoami.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.whoami.service: whoami
@@ -67,7 +67,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.dashboard.tls: true
-      traefik.http.routers.dashboard.middlewares: authelia@docker
+      traefik.http.routers.dashboard.middlewares: authelia@docker,web-utils@docker
       traefik.http.routers.dashboard.entrypoints: websecure
       traefik.http.routers.dashboard.rule: Host(`traefik.${PERSONAL_DOMAIN_NAME}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
       traefik.http.routers.dashboard.service: api@internal
@@ -172,21 +172,22 @@ services:
       - --experimental.plugins.bouncer.moduleName=github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
       - --experimental.plugins.bouncer.version=${CROWDSEC_PLUGIN_VERSION:?bouncer version required}
 
-  python-utils:
+  web-utils:
     restart: unless-stopped
     image: registry.${PERSONAL_DOMAIN_NAME}/${UTILS_PROJECT_PATH}:${UTILS_DOCKER_TAG:-main}
-    container_name: python-utils
-    hostname: python-utils
+    container_name: web-utils
+    hostname: web-utils
     labels:
       traefik.enable: true
-      traefik.http.routers.python-utils.tls: true
-      traefik.http.routers.python-utils.entrypoints: websecure
-      traefik.http.routers.python-utils.rule: Host(`utils.${PERSONAL_DOMAIN_NAME}`)
-      traefik.http.routers.python-utils.service: python-utils
-      traefik.http.middlewares.python-utils.errors.status: 400-404
-      traefik.http.middlewares.python-utils.errors.service: python-utils
-      traefik.http.middlewares.python-utils.errors.query: /error?e={status}&u={url}
-      traefik.http.services.python-utils.loadBalancer.server.port: 5000
+      traefik.http.routers.web-utils.tls: true
+      traefik.http.routers.web-utils.entrypoints: websecure
+      traefik.http.routers.web-utils.middlewares: web-utils@docker
+      traefik.http.routers.web-utils.rule: Host(`utils.${PERSONAL_DOMAIN_NAME}`)
+      traefik.http.routers.web-utils.service: web-utils
+      traefik.http.middlewares.web-utils.errors.status: 400-404
+      traefik.http.middlewares.web-utils.errors.service: web-utils
+      traefik.http.middlewares.web-utils.errors.query: /error?e={status}&u={url}
+      traefik.http.services.web-utils.loadBalancer.server.port: 5000
     environment:
       TZ: Europe/Paris
       SESSION_TOKEN: ${UTILS_SESSION_TOKEN}

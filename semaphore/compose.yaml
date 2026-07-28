@@ -29,7 +29,7 @@ services:
       traefik.enable: true
       traefik.http.routers.semaphore.tls: true
       traefik.http.routers.semaphore.entrypoints: websecure
-      traefik.http.routers.semaphore.middlewares: authelia@docker
+      traefik.http.routers.semaphore.middlewares: authelia@docker,web-utils@docker
       traefik.http.routers.semaphore.rule: Host(`ansible.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.semaphore.service: semaphore
       traefik.http.services.semaphore.loadBalancer.server.port: 3000

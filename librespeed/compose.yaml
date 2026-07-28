@@ -7,7 +7,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.librespeed.tls: true
-      traefik.http.routers.librespeed.middlewares: authelia@docker
+      traefik.http.routers.librespeed.middlewares: authelia@docker,web-utils@docker
       traefik.http.routers.librespeed.entrypoints: websecure
       traefik.http.routers.librespeed.rule: Host(`librespeed.${PERSONAL_DOMAINE_NAME}`)
       traefik.http.routers.librespeed.service: librespeed

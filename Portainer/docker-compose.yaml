@@ -7,7 +7,7 @@ services:
     # labels:
       # traefik.enable: true
       # traefik.http.routers.portainer.tls: true
-      # traefik.http.routers.portainer.middlewares: authelia@docker
+      # traefik.http.routers.portainer.middlewares: authelia@docker,web-utils@docker
       # traefik.http.routers.portainer.entrypoints: websecure
       # traefik.http.routers.portainer.rule: Host(`management.${PERSONAL_DOMAINE_NAME}`)
       # traefik.http.routers.portainer.service: portainer

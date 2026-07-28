@@ -7,7 +7,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.dockhand.tls: true
-      traefik.http.routers.dockhand.middlewares: authelia@docker
+      traefik.http.routers.dockhand.middlewares: authelia@docker,web-utils@docker
       traefik.http.routers.dockhand.entrypoints: websecure
       traefik.http.routers.dockhand.rule: Host(`docker.${PERSONAL_DOMAINE_NAME}`)
       traefik.http.routers.dockhand.service: dockhand

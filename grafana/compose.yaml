@@ -8,7 +8,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.gafana.tls: true
-      traefik.http.routers.gafana.middlewares: authelia@docker
+      traefik.http.routers.gafana.middlewares: authelia@docker,web-utils@docker
       traefik.http.routers.gafana.entrypoints: websecure
       traefik.http.routers.gafana.rule: Host(`monitoring.${PERSONAL_DOMAINE_NAME}`)
       traefik.http.routers.gafana.service: gafana
@@ -58,7 +58,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.prometheusdb.tls: true
-      traefik.http.routers.prometheusdb.middlewares: authelia@docker
+      traefik.http.routers.prometheusdb.middlewares: authelia@docker,web-utils@docker
       traefik.http.routers.prometheusdb.entrypoints: websecure
       traefik.http.routers.prometheusdb.rule: Host(`prometheus.${PERSONAL_DOMAINE_NAME}`)
       traefik.http.routers.prometheusdb.service: prometheusdb
@@ -139,7 +139,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.influxdb2.tls: true
-      traefik.http.routers.influxdb2.middlewares: authelia@docker
+      traefik.http.routers.influxdb2.middlewares: authelia@docker,web-utils@docker
       traefik.http.routers.influxdb2.entrypoints: websecure
       traefik.http.routers.influxdb2.rule: Host(`influxdb2.${PERSONAL_DOMAINE_NAME}`)
       traefik.http.routers.influxdb2.service: influxdb2

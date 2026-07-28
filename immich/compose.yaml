@@ -7,7 +7,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.immich.tls: true
-      traefik.http.routers.immich.middlewares: authelia@docker
+      traefik.http.routers.immich.middlewares: authelia@docker,web-utils@docker
       traefik.http.routers.immich.entrypoints: websecure
       traefik.http.routers.immich.rule: Host(`photos.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.immich.service: immich

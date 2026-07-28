@@ -34,7 +34,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.photoprism.tls: true
-      traefik.http.routers.photoprism.middlewares: authelia@docker
+      traefik.http.routers.photoprism.middlewares: authelia@docker,web-utils@docker
       traefik.http.routers.photoprism.entrypoints: websecure
       traefik.http.routers.photoprism.rule: Host(`photo.${PERSONAL_DOMAINE_NAME}`)
       traefik.http.routers.photoprism.service: photoprism

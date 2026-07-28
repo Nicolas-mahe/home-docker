@@ -7,7 +7,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.skyblog1.tls: true
-      traefik.http.routers.skyblog1.middlewares: authelia@docker
+      traefik.http.routers.skyblog1.middlewares: authelia@docker,web-utils@docker
       traefik.http.routers.skyblog1.entrypoints: websecure
       traefik.http.routers.skyblog1.rule: Host(`${SKYBLOG1}.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.skyblog1.service: skyblog1
@@ -36,7 +36,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.skyblog2.tls: true
-      traefik.http.routers.skyblog2.middlewares: authelia@docker
+      traefik.http.routers.skyblog2.middlewares: authelia@docker,web-utils@docker
       traefik.http.routers.skyblog2.entrypoints: websecure
       traefik.http.routers.skyblog2.rule: Host(`${SKYBLOG2}.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.skyblog2.service: skyblog2
@@ -69,7 +69,7 @@ services:
       traefik.http.routers.python-pronostics.tls: true
       traefik.http.routers.python-pronostics.entrypoints: websecure
       traefik.http.routers.python-pronostics.rule: Host(`pronostic.${PERSONAL_DOMAIN_NAME}`)
-      traefik.http.routers.python-pronostics.middlewares: authelia@docker
+      traefik.http.routers.python-pronostics.middlewares: authelia@docker,web-utils@docker
       traefik.http.routers.python-pronostics.service: python-pronostics
       traefik.http.services.python-pronostics.loadBalancer.server.port: 5000
     environment:
@@ -102,7 +102,7 @@ services:
       traefik.enable: true
       traefik.http.routers.pythonbaby.tls: true
       traefik.http.routers.pythonbaby.entrypoints: websecure
-      traefik.http.routers.pythonbaby.middlewares: authelia@docker
+      traefik.http.routers.pythonbaby.middlewares: authelia@docker,web-utils@docker
       traefik.http.routers.pythonbaby.rule: Host(`baby.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.pythonbaby.service: pythonbaby
       traefik.http.services.pythonbaby.loadBalancer.server.port: 5000

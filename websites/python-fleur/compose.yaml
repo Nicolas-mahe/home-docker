@@ -7,6 +7,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.python-fleur.tls: true
+      traefik.http.routers.python-fleur.middlewares: web-utils@docker
       traefik.http.routers.python-fleur.entrypoints: websecure
       traefik.http.routers.python-fleur.rule: Host(`fleur.${PERSONAL_DOMAINE_NAME}`)
       traefik.http.routers.python-fleur.service: python-fleur
