@@ -1,6 +1,6 @@
 services:
   gitlab:
-    image: gitlab/gitlab-ee:${GITLAB_TAG:-18.3.1-ee.0}
+    image: gitlab/gitlab-ee:${GITLAB_TAG:-19.2.1-ee.0}
     container_name: gitlab
     restart: unless-stopped
     hostname: gitlab
@@ -70,7 +70,7 @@ services:
     #   disable: true
 
   gitlab-runner:
-    image: gitlab/gitlab-runner:${RUNNER_TAG:-v18.3.0}
+    image: gitlab/gitlab-runner:${RUNNER_TAG:-v19.2.0}
     container_name: gitlab-runner
     hostname: gitlab-runner
     restart: unless-stopped
