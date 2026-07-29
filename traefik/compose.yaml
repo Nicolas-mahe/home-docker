@@ -195,6 +195,8 @@ services:
       ROOT_DOMAIN: https://utils.${PERSONAL_DOMAIN_NAME}
     expose:
       - 5000
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/web-utils:/app/static/external
     networks:
       - webinternal
 
