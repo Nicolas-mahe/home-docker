@@ -9,7 +9,7 @@ services:
       traefik.http.routers.minidlna.tls: true
       traefik.http.routers.minidlna.middlewares: authelia@docker
       traefik.http.routers.minidlna.entrypoints: websecure
-      traefik.http.routers.minidlna.rule: Host(`dlna.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.minidlna.rule: Host(`dlna.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.minidlna.service: minidlna
       traefik.http.services.minidlna.loadBalancer.server.port: 8200
     environment:

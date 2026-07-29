@@ -10,15 +10,15 @@ services:
       traefik.http.routers.gafana.tls: true
       traefik.http.routers.gafana.middlewares: authelia@docker,web-utils@docker
       traefik.http.routers.gafana.entrypoints: websecure
-      traefik.http.routers.gafana.rule: Host(`monitoring.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.gafana.rule: Host(`monitoring.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.gafana.service: gafana
       traefik.http.services.gafana.loadBalancer.server.port: 3000
     environment:
       TZ: Europe/Paris
-      GF_SERVER_ROOT_URL: "https://monitoring.${PERSONAL_DOMAINE_NAME}"
+      GF_SERVER_ROOT_URL: "https://monitoring.${PERSONAL_DOMAIN_NAME}"
       GF_AUTH_BASIC_ENABLED: true
       GF_AUTH_GENERIC_OAUTH_ENABLED: true
-      GF_AUTH_GENERIC_OAUTH_NAME: "Authelia - ${PERSONAL_DOMAINE_NAME}"
+      GF_AUTH_GENERIC_OAUTH_NAME: "Authelia - ${PERSONAL_DOMAIN_NAME}"
       GF_AUTH_GENERIC_OAUTH_CLIENT_ID: "${GF_AUTH_GENERIC_OAUTH_CLIENT_ID}"
       GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: "${GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET}"
       GF_AUTH_GENERIC_OAUTH_SCOPES: "openid profile email groups"
@@ -26,10 +26,10 @@ services:
       GF_AUTH_GENERIC_OAUTH_GROUPS_ATTRIBUTE_PATH: groups
       GF_AUTH_GENERIC_OAUTH_NAME_ATTRIBUTE_PATH: name
       GF_AUTH_GENERIC_OAUTH_USE_PKCE: true
-      GF_AUTH_GENERIC_OAUTH_AUTH_URL: "https://auth.${PERSONAL_DOMAINE_NAME}/api/oidc/authorization"
-      GF_AUTH_GENERIC_OAUTH_TOKEN_URL: "https://auth.${PERSONAL_DOMAINE_NAME}/api/oidc/token"
-      GF_AUTH_GENERIC_OAUTH_API_URL: "https://auth.${PERSONAL_DOMAINE_NAME}/api/oidc/userinfo"
-      GF_AUTH_SIGNOUT_REDIRECT_URL: "https://auth.${PERSONAL_DOMAINE_NAME}/logout"
+      GF_AUTH_GENERIC_OAUTH_AUTH_URL: "https://auth.${PERSONAL_DOMAIN_NAME}/api/oidc/authorization"
+      GF_AUTH_GENERIC_OAUTH_TOKEN_URL: "https://auth.${PERSONAL_DOMAIN_NAME}/api/oidc/token"
+      GF_AUTH_GENERIC_OAUTH_API_URL: "https://auth.${PERSONAL_DOMAIN_NAME}/api/oidc/userinfo"
+      GF_AUTH_SIGNOUT_REDIRECT_URL: "https://auth.${PERSONAL_DOMAIN_NAME}/logout"
       GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH: "contains(groups, 'admin') && 'Admin' || contains(groups, 'Maison') && 'Editor' || 'Viewer'"
       # Optionally enable auto-login (bypasses Grafana login screen)
       GF_AUTH_GENERIC_OAUTH_AUTO_LOGIN: false
@@ -60,7 +60,7 @@ services:
       traefik.http.routers.prometheusdb.tls: true
       traefik.http.routers.prometheusdb.middlewares: authelia@docker,web-utils@docker
       traefik.http.routers.prometheusdb.entrypoints: websecure
-      traefik.http.routers.prometheusdb.rule: Host(`prometheus.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.prometheusdb.rule: Host(`prometheus.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.prometheusdb.service: prometheusdb
       traefik.http.services.prometheusdb.loadBalancer.server.port: 9090
     environment:
@@ -141,7 +141,7 @@ services:
       traefik.http.routers.influxdb2.tls: true
       traefik.http.routers.influxdb2.middlewares: authelia@docker,web-utils@docker
       traefik.http.routers.influxdb2.entrypoints: websecure
-      traefik.http.routers.influxdb2.rule: Host(`influxdb2.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.influxdb2.rule: Host(`influxdb2.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.influxdb2.service: influxdb2
       traefik.http.services.influxdb2.loadbalancer.server.port: 8086
     environment:

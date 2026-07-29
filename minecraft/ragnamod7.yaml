@@ -11,7 +11,7 @@ services:
     labels:
       gamecontainermanager.enable: true
       gamecontainermanager.group: "Minecraft"
-      gamecontainermanager.customlabel0: "r7.${PERSONAL_DOMAINE_NAME}"
+      gamecontainermanager.customlabel0: "r7.${PERSONAL_DOMAIN_NAME}"
     tty: true
     stdin_open: true
     environment:

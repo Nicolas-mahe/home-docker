@@ -9,7 +9,7 @@ services:
       traefik.http.routers.browser.tls: true
       traefik.http.routers.browser.middlewares: authelia@docker,web-utils@docker
       traefik.http.routers.browser.entrypoints: websecure
-      traefik.http.routers.browser.rule: Host(`browser.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.browser.rule: Host(`browser.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.browser.service: browser
       traefik.http.services.browser.loadBalancer.server.port: 5800
     environment:

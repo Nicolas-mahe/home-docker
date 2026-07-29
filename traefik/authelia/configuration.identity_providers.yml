@@ -49,7 +49,7 @@ identity_providers:
       # # Any origin with https is permitted unless this option is configured or the
       # # allowed_origins_from_client_redirect_uris option is enabled.
       # allowed_origins:
-      #   - 'https://${PERSONAL_DOMAINE_NAME}'
+      #   - 'https://${PERSONAL_DOMAIN_NAME}'
 
       # Automatically adds the origin portion of all redirect URI's on all clients to the list of allowed_origins,
       # provided they have the scheme http or https and do not have the hostname of localhost.
@@ -72,14 +72,14 @@ identity_providers:
 
         # # Sector Identifiers are occasionally used to generate pairwise subject identifiers. In most cases this is not
         # # necessary. It is critical to read the documentation for more information.
-        # sector_identifier_uri: 'https://${PERSONAL_DOMAINE_NAME}/sector.json'
+        # sector_identifier_uri: 'https://${PERSONAL_DOMAIN_NAME}/sector.json'
 
         # Sets the client to public. This should typically not be set, please see the documentation for usage.
         public: false
 
         # Redirect URI's specifies a list of valid case-sensitive callbacks for this client.
         redirect_uris:
-          - 'https://management.${PERSONAL_DOMAINE_NAME}'
+          - 'https://management.${PERSONAL_DOMAIN_NAME}'
         # Scopes this client is allowed to request.
         scopes:
           - 'openid'
@@ -101,8 +101,8 @@ identity_providers:
         require_pkce: true
         pkce_challenge_method: 'S256'
         redirect_uris:
-          - 'https://pve.${PERSONAL_DOMAINE_NAME}'
-          - 'https://pve-1.${PERSONAL_DOMAINE_NAME}'
+          - 'https://pve.${PERSONAL_DOMAIN_NAME}'
+          - 'https://pve-1.${PERSONAL_DOMAIN_NAME}'
         scopes:
           - 'openid'
           - 'groups'
@@ -122,7 +122,7 @@ identity_providers:
         require_pkce: true
         pkce_challenge_method: 'S256'
         redirect_uris:
-          - 'https://Grafana.${PERSONAL_DOMAINE_NAME}/login/generic_oauth'
+          - 'https://Grafana.${PERSONAL_DOMAIN_NAME}/login/generic_oauth'
         scopes:
           - 'openid'
           - 'groups'
@@ -142,7 +142,7 @@ identity_providers:
         require_pkce: true
         pkce_challenge_method: 'S256'
         redirect_uris:
-          - 'https://cloud.${PERSONAL_DOMAINE_NAME}/apps/oidc_login/oidc'
+          - 'https://cloud.${PERSONAL_DOMAIN_NAME}/apps/oidc_login/oidc'
         scopes:
           - 'openid'
           - 'groups'

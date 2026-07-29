@@ -4,7 +4,7 @@ http:
     satisfactory:
       entryPoints:
         - satisfactory-tcp
-      rule: "Host(`satisfactory.${PERSONAL_DOMAINE_NAME}`)"
+      rule: "Host(`satisfactory.${PERSONAL_DOMAIN_NAME}`)"
       service: satisfactory
       tls: true
 

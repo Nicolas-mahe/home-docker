@@ -11,7 +11,7 @@ services:
       - no-new-privileges=true
     environment:
       TZ: Europe/Paris
-      URL: ${PERSONAL_DOMAINE_NAME}
+      URL: ${PERSONAL_DOMAIN_NAME}
       VALIDATION: dns
       PROPAGATION: 30
       SUBDOMAINS: wildcard

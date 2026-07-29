@@ -109,7 +109,7 @@ totp:
   disable: false
 
   # The issuer name displayed in the Authenticator application of your choice.
-  issuer: 'Authelia | ${PERSONAL_DOMAINE_NAME}'
+  issuer: 'Authelia | ${PERSONAL_DOMAIN_NAME}'
 
   # The TOTP algorithm to use.
   # It is CRITICAL you read the documentation before changing this option:
@@ -140,7 +140,7 @@ webauthn:
   enable_passkey_login: false
 
   # The display name the browser should show the user for when using WebAuthn to login/register.
-  display_name: 'Authelia | ${PERSONAL_DOMAINE_NAME}'
+  display_name: 'Authelia | ${PERSONAL_DOMAIN_NAME}'
 
   # Conveyance preference controls if we collect the attestation statement including the AAGUID from the device.
   # Options are none, indirect, direct.
@@ -318,7 +318,7 @@ session:
 
       # The domain to protect.
       # Note: the Authelia portal must also be in that domain.
-      domain: '${PERSONAL_DOMAINE_NAME}'
+      domain: '${PERSONAL_DOMAIN_NAME}'
 
       # Required. The fully qualified URI of the portal to redirect users to on proxies that support redirections.
       # Rules:
@@ -326,7 +326,7 @@ session:
       #   - The above 'domain' option MUST either:
       #      - Match the host portion of this URI.
       #      - Match the suffix of the host portion when prefixed with '.'.
-      authelia_url: 'https://auth.${PERSONAL_DOMAINE_NAME}'
+      authelia_url: 'https://auth.${PERSONAL_DOMAIN_NAME}'
 
       # Optional. The fully qualified URI used as the redirection location if the portal is accessed directly. Not
       # configuring this option disables the automatic redirection behaviour.
@@ -398,7 +398,7 @@ session:
     # tls:
     #   # The server subject name to check the servers certificate against during the validation process.
     #   # This option is not required if the certificate has a SAN which matches the host option.
-    #   server_name: 'myredis.${PERSONAL_DOMAINE_NAME}'
+    #   server_name: 'myredis.${PERSONAL_DOMAIN_NAME}'
 
     #   # Skip verifying the server certificate entirely. In preference to setting this we strongly recommend you add the
     #   # certificate or the certificate of the authority signing the certificate to the certificates directory which is
@@ -544,7 +544,7 @@ notifier:
     identifier: 'localhost'
 
     # Subject configuration of the emails sent. {title} is replaced by the text from the notifier.
-    subject: '[Authelia ${PERSONAL_DOMAINE_NAME}] {title}'
+    subject: '[Authelia ${PERSONAL_DOMAIN_NAME}] {title}'
 
     # This address is used during the startup check to verify the email configuration is correct.
     # It's not important what it is except if your email server only allows local delivery.
