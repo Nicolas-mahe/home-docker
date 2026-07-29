@@ -24,7 +24,7 @@ services:
       RACKULA_AUTH_MODE: none
       RACKULA_STORAGE_MODE: server
       RACKULA_TRUST_PROXY: true
-      RACKULA_BASE_URL: https://rakula.${PERSONAL_DOMAIN_NAME}
+      RACKULA_BASE_URL: https://rackula.${PERSONAL_DOMAIN_NAME}
     depends_on:
       rackula-api:
         condition: service_healthy
@@ -55,13 +55,13 @@ services:
     environment:
       DATA_DIR: /data
       RACKULA_API_PORT: ${RACKULA_API_PORT:-3001}
-      CORS_ORIGIN: https://rakula.${PERSONAL_DOMAIN_NAME}
+      CORS_ORIGIN: https://rackula.${PERSONAL_DOMAIN_NAME}
       RACKULA_API_WRITE_TOKEN: ${RACKULA_API_WRITE_TOKEN}
       # L'API doit avoir le même mode d'authentification que le front
       RACKULA_AUTH_MODE: none
       ALLOW_INSECURE_CORS: false
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/rakula:/data
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/rackula:/data
     networks:
       - rackula-network
     stop_grace_period: 10s
