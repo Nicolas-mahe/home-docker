@@ -13,8 +13,8 @@ services:
     environment:
       # DEFAULT: minecraft-default:25565
       MAPPING: |
-        r7.${PERSONAL_DOMAINE_NAME}=${PERSONAL_IP_SERVER}:25565
-        atm.${PERSONAL_DOMAINE_NAME}=${PERSONAL_IP_SERVER}:25566
+        r7.${PERSONAL_DOMAIN_NAME}=${PERSONAL_IP_SERVER}:25565
+        atm.${PERSONAL_DOMAIN_NAME}=${PERSONAL_IP_SERVER}:25566
       TZ: Europe/Paris
     expose:
       - 25565
@@ -34,11 +34,11 @@ services:
 #       ENABLE_AUTOPAUSE: false
 #       EULA: true
 #       OVERRIDE_ICON: true
-#       ICON: https://utils.${PERSONAL_DOMAINE_NAME}/icon_server.webp
+#       ICON: https://utils.${PERSONAL_DOMAIN_NAME}/icon_server.webp
 #       MAX_MEMORY: 256M
 #       MOTD: | 
 #         §b§l§oRaBByT: §r§r§r§4§l§o Server Down
-#         §f§nSee games-manager.${PERSONAL_DOMAINE_NAME} to turn it on
+#         §f§nSee games-manager.${PERSONAL_DOMAIN_NAME} to turn it on
 #       MAX_PLAYERS: 0
 #       TZ: Europe/Paris
 #     expose:

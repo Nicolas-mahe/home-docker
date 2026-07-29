@@ -9,14 +9,14 @@ services:
       traefik.http.routers.duplicati.tls: true
       traefik.http.routers.duplicati.middlewares: authelia@docker,web-utils@docker
       traefik.http.routers.duplicati.entrypoints: websecure
-      traefik.http.routers.duplicati.rule: Host(`duplicati.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.duplicati.rule: Host(`duplicati.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.duplicati.service: duplicati
       traefik.http.services.duplicati.loadBalancer.server.port: 8200
     environment:
       TZ: Europe/Paris
       SETTINGS_ENCRYPTION_KEY: /run/secrets/SETTINGS_ENCRYPTION_KEY
       DUPLICATI__DISABLE_DB_ENCRYPTION: false
-      DUPLICATI__WEBSERVICE_ALLOWED_HOSTNAMES: duplicati.${PERSONAL_DOMAINE_NAME}
+      DUPLICATI__WEBSERVICE_ALLOWED_HOSTNAMES: duplicati.${PERSONAL_DOMAIN_NAME}
       DUPLICATI__WEBSERVICE_PASSWORD: ${DUPLICATI_WEB_PWD}
     volumes:
       - duplicati:/data

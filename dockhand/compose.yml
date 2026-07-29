@@ -9,7 +9,7 @@ services:
       traefik.http.routers.dockhand.tls: true
       traefik.http.routers.dockhand.middlewares: authelia@docker,web-utils@docker
       traefik.http.routers.dockhand.entrypoints: websecure
-      traefik.http.routers.dockhand.rule: Host(`docker.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.dockhand.rule: Host(`docker.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.dockhand.service: dockhand
       traefik.http.services.dockhand.loadBalancer.server.port: 3000
     environment:

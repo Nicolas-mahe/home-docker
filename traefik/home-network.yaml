@@ -2,7 +2,7 @@
 http:
   routers:
     box:
-      rule: "Host(`box.${PERSONAL_DOMAINE_NAME}`)"
+      rule: "Host(`box.${PERSONAL_DOMAIN_NAME}`)"
       service: box
       tls: true
       entrypoints:
@@ -11,7 +11,7 @@ http:
         - authelia@docker
         - web-utils@docker
     dns:
-      rule: "Host(`dns.${PERSONAL_DOMAINE_NAME}`)"
+      rule: "Host(`dns.${PERSONAL_DOMAIN_NAME}`)"
       service: dns
       tls: true
       entrypoints:
@@ -20,13 +20,13 @@ http:
         - authelia@docker
         - web-utils@docker
     gamescontainermanager:
-      rule: "Host(`games-manager.${PERSONAL_DOMAINE_NAME}`)"
+      rule: "Host(`games-manager.${PERSONAL_DOMAIN_NAME}`)"
       service: gamescontainermanager
       tls: true
       entrypoints:
         - websecure
     nas:
-      rule: "Host(`nas.${PERSONAL_DOMAINE_NAME}`)"
+      rule: "Host(`nas.${PERSONAL_DOMAIN_NAME}`)"
       service: nas
       tls: true
       entrypoints:
@@ -35,7 +35,7 @@ http:
         - authelia@docker
         - web-utils@docker   
     # mailcow:
-    #   rule: "Host(`mail.${PERSONAL_DOMAINE_NAME}`)"
+    #   rule: "Host(`mail.${PERSONAL_DOMAIN_NAME}`)"
     #   service: mailcow
     #   tls: true
     #   entrypoints:
@@ -44,7 +44,7 @@ http:
     #     - authelia@docker
     #     - web-utils@docker
     pterodactyl:
-      rule: "Host(`pterodactyl.${PERSONAL_DOMAINE_NAME}`)"
+      rule: "Host(`pterodactyl.${PERSONAL_DOMAIN_NAME}`)"
       service: pterodactyl
       tls: true
       entrypoints:
@@ -53,7 +53,7 @@ http:
         - authelia@docker
         - web-utils@docker
     pve:
-      rule: "Host(`pve.${PERSONAL_DOMAINE_NAME}`)"
+      rule: "Host(`pve.${PERSONAL_DOMAIN_NAME}`)"
       service: pve
       tls: true
       entrypoints:
@@ -62,7 +62,7 @@ http:
         - authelia@docker
         - web-utils@docker
     pve-1:
-      rule: "Host(`pve-1.${PERSONAL_DOMAINE_NAME}`)"
+      rule: "Host(`pve-1.${PERSONAL_DOMAIN_NAME}`)"
       service: pve-1
       tls: true
       entrypoints:
@@ -71,7 +71,7 @@ http:
         - authelia@docker
         - web-utils@docker
     # pve-test:
-    #   rule: "Host(`pve-test.${PERSONAL_DOMAINE_NAME}`)"
+    #   rule: "Host(`pve-test.${PERSONAL_DOMAIN_NAME}`)"
     #   service: pve-test
     #   tls: true
     #   entrypoints:
@@ -80,13 +80,13 @@ http:
     #     - authelia@docker
     #     - web-utils@docker
     python-test:
-      rule: "Host(`python-test.${PERSONAL_DOMAINE_NAME}`)"
+      rule: "Host(`python-test.${PERSONAL_DOMAIN_NAME}`)"
       service: python-test
       tls: true
       entrypoints:
         - websecure 
     zyxel-switch:
-      rule: "Host(`zyxel-switch.${PERSONAL_DOMAINE_NAME}`)"
+      rule: "Host(`zyxel-switch.${PERSONAL_DOMAIN_NAME}`)"
       service: zyxel-switch
       tls: true
       entrypoints:
@@ -95,7 +95,7 @@ http:
         - authelia@docker
         - web-utils@docker
     zyxel-wifi:
-      rule: "Host(`zyxel-wifi.${PERSONAL_DOMAINE_NAME}`)"
+      rule: "Host(`zyxel-wifi.${PERSONAL_DOMAIN_NAME}`)"
       service: zyxel-wifi
       tls: true
       entrypoints:

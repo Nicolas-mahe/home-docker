@@ -9,7 +9,7 @@ services:
       traefik.http.routers.gamecontainermanager.tls: true
       traefik.http.routers.gamecontainermanager.middlewares: authelia@docker,web-utils@docker
       traefik.http.routers.gamecontainermanager.entrypoints: websecure
-      traefik.http.routers.gamecontainermanager.rule: Host(`games-manager.${PERSONAL_DOMAINE_NAME}`)
+      traefik.http.routers.gamecontainermanager.rule: Host(`games-manager.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.gamecontainermanager.service: gamecontainermanager
       traefik.http.services.gamecontainermanager.loadBalancer.server.port: 5000
     environment:
