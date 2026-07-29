@@ -10,10 +10,10 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.rackula.tls: true
-      traefik.http.routers.rakula.middlewares: authelia@docker,web-utils@docker
+      traefik.http.routers.rackula.middlewares: authelia@docker,web-utils@docker
       traefik.http.routers.rackula.entrypoints: websecure
-      traefik.http.routers.rackula.rule: Host(`rakula.${PERSONAL_DOMAIN_NAME}`)
-      traefik.http.routers.rakula.service: rakula
+      traefik.http.routers.rackula.rule: Host(`rackula.${PERSONAL_DOMAIN_NAME}`)
+      traefik.http.routers.rackula.service: rackula
       traefik.http.services.rackula.loadbalancer.server.port: ${RACKULA_WEB_PORT:-8080}
     environment:
       API_HOST: rackula-api
