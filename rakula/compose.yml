@@ -1,0 +1,86 @@
+services:
+  rackula:
+    restart: ${RESTART_POLICY:-unless-stopped}
+    image: ghcr.io/rackulalives/rackula:persist
+    container_name: rackula
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    labels:
+      traefik.enable: true
+      traefik.http.routers.rackula.tls: true
+      traefik.http.routers.rakula.middlewares: authelia@docker,web-utils@docker
+      traefik.http.routers.rackula.entrypoints: websecure
+      traefik.http.routers.rackula.rule: Host(`rakula.${PERSONAL_DOMAIN_NAME}`)
+      traefik.http.routers.rakula.service: rakula
+      traefik.http.services.rackula.loadbalancer.server.port: ${RACKULA_WEB_PORT:-8080}
+    environment:
+      API_HOST: rackula-api
+      API_PORT: ${RACKULA_API_PORT:-3001}
+      RACKULA_LISTEN_PORT: ${RACKULA_WEB_PORT:-8080}
+      API_WRITE_TOKEN: ${RACKULA_API_WRITE_TOKEN}
+      # Désactivation de l'authentification locale
+      RACKULA_AUTH_MODE: none
+      RACKULA_STORAGE_MODE: server
+      RACKULA_TRUST_PROXY: true
+      RACKULA_BASE_URL: https://rakula.${PERSONAL_DOMAIN_NAME}
+    depends_on:
+      rackula-api:
+        condition: service_healthy
+    networks:
+      rackula-network:
+      webinternal:
+    stop_grace_period: 10s
+    tmpfs:
+      - /var/cache/nginx:size=10M
+      - /var/run:size=1M
+      - /tmp:size=5M
+      - /etc/nginx/conf.d:size=1M,uid=101,gid=101
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  rackula-api:
+    user: ${UID:-0}:${GUID:-0}
+    restart: ${RESTART_POLICY:-unless-stopped}
+    image: ghcr.io/rackulalives/rackula-api:latest
+    container_name: rackula-api
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    environment:
+      DATA_DIR: /data
+      RACKULA_API_PORT: ${RACKULA_API_PORT:-3001}
+      CORS_ORIGIN: https://rakula.${PERSONAL_DOMAIN_NAME}
+      RACKULA_API_WRITE_TOKEN: ${RACKULA_API_WRITE_TOKEN}
+      # L'API doit avoir le même mode d'authentification que le front
+      RACKULA_AUTH_MODE: none
+      ALLOW_INSECURE_CORS: false
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/rakula:/data
+    networks:
+      - rackula-network
+    stop_grace_period: 10s
+    tmpfs:
+      - /tmp:size=5M
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:${RACKULA_API_PORT:-3001}/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 5s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+networks:
+  rackula-network:
+    name: rackula-network
+  webinternal:
+    name: webinternal
