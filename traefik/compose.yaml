@@ -77,7 +77,6 @@ services:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/conf:/app/config
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/backups:/app/backups
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/certs/acme.json:/app/acme.json:ro
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/logs:/app/logs:ro
     networks:
       - webinternal
 
