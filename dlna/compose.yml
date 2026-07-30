@@ -30,6 +30,12 @@ services:
     ports:
       - 8200:8200
       - 1900:1900/udp
+    networks:
+      - webinternal
 
 volumes:
   data:
+
+networks:
+  webinternal:
+    name: webinternal
