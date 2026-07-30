@@ -1,7 +1,7 @@
 services:
   # systemctl enable systemd-networkd-wait-online , systemctl edit systemd-networkd-wait-online , ExecStart=/lib/systemd/systemd-networkd-wait-online --interface=XXX , systemctl daemon-reload
   minecraft:
-    restart: ${RESTART_POLICY:-unless-stopped}
+    restart: ${RESTART_POLICY:-on-failure:3}
     image: docker.io/itzg/minecraft-server:java21
     container_name: minecraft-atm
     hostname: minecraft-atm
