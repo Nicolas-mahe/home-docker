@@ -16,10 +16,10 @@ services:
       ALLOW_FLIGHT: "true"
       BROADCAST_CONSOLE_TO_OPS: TRUE
       BROADCAST_RCON_TO_OPS: TRUE
-      CF_SLUG: all-the-mons
-      CF_FILENAME_MATCHER: ${CF_FILENAME_MATCHER}
-      CURSEFORGE_FILES: "@/extras/cf-mods.txt"
-      CF_API_KEY: ${CF_API_KEY}
+      # CF_SLUG: all-the-mons
+      # CF_FILENAME_MATCHER: ${CF_FILENAME_MATCHER}
+      # CURSEFORGE_FILES: "@/extras/cf-mods.txt"
+      # CF_API_KEY: ${CF_API_KEY}
       CREATE_CONSOLE_IN_PIPE: TRUE
       ENABLE_AUTOPAUSE: FALSE
       ENFORCE_WHITELIST: TRUE
@@ -29,7 +29,10 @@ services:
       ICON: https://media.forgecdn.net/avatars/thumbnails/1567/555/64/64/639016249214580144.png
       MAX_PLAYERS: 6
       MAX_TICK_TIME : -1
-      MOD_PLATFORM: AUTO_CURSEFORGE
+      # MOD_PLATFORM: AUTO_CURSEFORGE
+      TYPE: NEOFORGE
+      VERSION: 1.21.1
+      NEOFORGE_VERSION: 21.1.234
       MEMORY: ${MEMORY:-16G}
       MOTD: "§b§l§oRaBByT Season 6:§r§l§o§2 All The Mons\n§6§kCest rigolo cette ligne qui bouge tout le temps"
       PAUSE_WHEN_EMPTY_SECONDS: -1
@@ -40,7 +43,7 @@ services:
       RCON_PORT: ${PERSONAL_PORT_MINECRAFT_RCON}
     volumes:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/minecraft/s6/prod:/data
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/minecraft/All-the-mons_extra.txt:/extras/cf-mods.txt:ro
+      # - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/minecraft/All-the-mons_extra.txt:/extras/cf-mods.txt:ro
       - nfs_backups:/data/simplebackups
     ports:
       - ${PERSONAL_PORT_MINECRAFT}:25565
