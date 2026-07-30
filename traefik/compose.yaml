@@ -24,7 +24,7 @@ services:
   # Throw Public IP
   cloudflare-ddns:
     restart: ${RESTART:-unless-stopped}
-    image: docker.io/oznu/cloudflare-ddns
+    image: docker.io/oznu/cloudflare-ddns:latest
     container_name: cloudflare-ddns
     hostname: cloudflare-ddns
     environment:
@@ -58,10 +58,10 @@ services:
       - webinternal
 
   traefik-manager:
-    image: ghcr.io/chr0nzz/traefik-manager:latest
+    restart: ${RESTART:-unless-stopped}
+    image: ghcr.io/chr0nzz/traefik-manager:${MANAGER_TAG:-latest}
     container_name: traefik-manager
     hostname: traefik-manager
-    restart: unless-stopped
     labels:
       traefik.enable: true
       traefik.http.routers.traefik-manager.tls: true
@@ -196,7 +196,7 @@ services:
       - --experimental.plugins.bouncer.version=${CROWDSEC_PLUGIN_VERSION:?bouncer version required}
 
   web-utils:
-    restart: unless-stopped
+    restart: ${RESTART:-unless-stopped}
     image: registry.${PERSONAL_DOMAIN_NAME}/${UTILS_PROJECT_PATH}:${UTILS_DOCKER_TAG:-main}
     container_name: web-utils
     hostname: web-utils
@@ -291,6 +291,7 @@ services:
         gauth-fr/immich
         timokoessler/gitlab
     volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/crowdsec/config:/etc/crowdsec #Config Crowdsec
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/crowdsec/html:/etc/traefik/conf #Additional Config Crowdsec
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/crowdsec/data:/var/lib/crowdsec/data/ #Config Crowdsec
@@ -332,6 +333,7 @@ services:
       # traefik.http.middlewares.authelia.forwardAuth.address: 'http://authelia:9091/api/authz/forward-auth?authelia_url=https%3A%2F%2Fauth.example.com%2F'
       traefik.http.middlewares.authelia.forwardAuth.trustForwardHeader: true
       traefik.http.middlewares.authelia.forwardAuth.authResponseHeaders: 'Remote-User,Remote-Groups,Remote-Email,Remote-Name'
+      traefik.http.middlewares.authelia.forwardAuth.maxResponseBodySize: -1
     environment:
       TZ: Europe/Paris
       AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE: /run/secrets/HMAC_SECRET_FILE
