@@ -82,6 +82,38 @@ services:
     networks:
       - immich
 
+
+  immich-kiosk:
+    restart: unless-stopped
+    image: ghcr.io/damongolding/immich-kiosk:latest
+    container_name: immich-kiosk
+    tty: true
+    labels:
+      traefik.enable: true
+      traefik.http.routers.kiosk.tls: true
+      traefik.http.routers.kiosk.middlewares: authelia@docker,web-utils@docker
+      traefik.http.routers.kiosk.entrypoints: websecure
+      traefik.http.routers.kiosk.rule: Host(`kiosk.${PERSONAL_DOMAIN_NAME}`)
+      traefik.http.routers.kiosk.service: kiosk
+      traefik.http.services.kiosk.loadBalancer.server.port: 3000
+    environment:
+      LANG: "fr_FR"
+      TZ: "Europe/Paris"
+    ports:
+      - 3333:3000
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/immich/kiosk:/config # add file from https://github.com/damongolding/immich-kiosk/blob/main/config.example.yaml
+    networks:
+      - webinternal
+    depends_on:
+      - immich-server
+    healthcheck:
+      test: ["CMD", "/kiosk", "--healthcheck"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
 volumes:
   postgres:
   model-cache:
