@@ -12,7 +12,7 @@ services:
       traefik.http.routers.redirect.entrypoints: websecure
       traefik.http.routers.redirect.rule: Host(`${PERSONAL_DOMAIN_NAME}`)
       traefik.http.middlewares.redirect-to-www.redirectregex.regex:  "^https?:\\/\\/(${PERSONAL_DOMAIN_NAME})(.*)"
-      traefik.http.middlewares.redirect-to-www.redirectregex.replacement: "https://www.$${1}/$${2}"
+      traefik.http.middlewares.redirect-to-www.redirectregex.replacement: "https://www.$${1}$${2}"
       traefik.http.middlewares.redirect-to-www.redirectregex.permanent: false
       # homepage
       traefik.http.routers.homepage.tls: true
