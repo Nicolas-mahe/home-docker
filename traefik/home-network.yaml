@@ -175,8 +175,90 @@ tcp:
         - minecraft
       service: minecraft
 
+    satisfactory:
+      entryPoints:
+        - satisfactory-tcp-reliable
+      rule: "HostSNI(`*`)"
+      service: satisfactory
+
+    mail-smtp:
+      rule: "HostSNI(`*`)"
+      entryPoints:
+        - mail-smtp
+      service: mail-smtp
+
+    mail-submissions:
+      rule: "HostSNI(`*`)"
+      entryPoints:
+        - mail-submissions
+      service: mail-submissions
+      tls:
+        passthrough: true
+
+    mail-imaps:
+      rule: "HostSNI(`*`)"
+      entryPoints:
+        - mail-imaps
+      service: mail-imaps
+      tls:
+        passthrough: true
+
+    mail-pop3s:
+      rule: "HostSNI(`*`)"
+      entryPoints:
+        - mail-pop3s
+      service: mail-pop3s
+      tls:
+        passthrough: true
+
   services:
     minecraft:
       loadBalancer:
         servers:
-          - address: "${PERSONAL_NETWORK}.4:25565"
+          - address: "${PERSONAL_NETWORK}.3:25565"
+
+    satisfactory:
+      loadBalancer:
+        servers:
+          - address: "${PERSONAL_NETWORK}.3:8888"
+
+    mail-smtp:
+      loadBalancer:
+        proxyProtocol:
+          version: 1
+        servers:
+          - address: "mailserver:25"
+
+    mail-submissions:
+      loadBalancer:
+        servers:
+          - address: "mailserver:465"
+        proxyProtocol:
+          version: 1
+
+    mail-imaps:
+      loadBalancer:
+        servers:
+          - address: "mailserver:993"
+        proxyProtocol:
+          version: 2
+
+    mail-pop3s:
+      loadBalancer:
+        servers:
+          - address: "mailserver:995"
+        proxyProtocol:
+          version: 2
+
+udp:
+  routers:
+    satisfactory:
+      entryPoints:
+        - satisfactory-udp
+      service: satisfactory
+
+  services:
+    satisfactory:
+      loadBalancer:
+        servers:
+          - address: "192.168.0.3:7777"
