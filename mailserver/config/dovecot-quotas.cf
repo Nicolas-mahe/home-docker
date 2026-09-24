@@ -1,0 +1,27 @@
+haproxy_trusted_networks = 172.16.42.2
+
+service imap-login {
+  inet_listener imap {
+    haproxy = yes
+  }
+
+  inet_listener imaps {
+    haproxy = yes
+  }
+}
+
+service pop3-login {
+  inet_listener pop3 {
+    haproxy = yes
+  }
+
+  inet_listener pop3s {
+    haproxy = yes
+  }
+}
+
+service managesieve-login {
+  inet_listener sieve {
+    haproxy = yes
+  }
+}

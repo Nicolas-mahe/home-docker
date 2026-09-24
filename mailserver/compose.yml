@@ -1,0 +1,171 @@
+services:
+  docker-mailserver:
+    restart: ${RESTART:-unless-stopped}
+    image: ghcr.io/docker-mailserver/docker-mailserver:${MAILSERVER_TAG:-15.0.2}
+    container_name: mailserver
+    hostname: ${PERSONAL_DOMAIN_NAME:?required}
+    # labels:
+    #   traefik.enable: true
+    #   traefik.docker.network: mailserver-ntw
+    #   # traefik.tcp.serversTransports.mail-tcp.proxyProtocol: 2 # in dynamic.yml, it's mandatory ?
+    #   traefik.tcp.routers.mail-smtp.entrypoints: mail-smtp
+    #   traefik.tcp.routers.mail-smtp.rule: HostSNI(`*`)
+    #   traefik.tcp.routers.mail-smtp.service: mail-smtp
+    #   traefik.tcp.services.mail-smtp.loadBalancer.server.port: 25
+    #   # traefik.tcp.services.mail-smtp.loadBalancer.serversTransport: mail-tcp@file
+    #   traefik.tcp.routers.mail-submissions.entrypoints: mail-submissions
+    #   traefik.tcp.routers.mail-submissions.rule: HostSNI(`*`)
+    #   traefik.tcp.routers.mail-submissions.service: mail-submissions
+    #   traefik.tcp.routers.mail-submissions.tls.passthrough: true
+    #   traefik.tcp.services.mail-submissions.loadBalancer.server.port: 465
+    #   # traefik.tcp.services.mail-submissions.loadBalancer.serversTransport: mail-tcp@file
+    #   traefik.tcp.routers.mail-imaps.entrypoints: mail-imaps
+    #   traefik.tcp.routers.mail-imaps.rule: HostSNI(`*`)
+    #   traefik.tcp.routers.mail-imaps.service: mail-imaps
+    #   traefik.tcp.routers.mail-imaps.tls.passthrough: true
+    #   traefik.tcp.services.mail-imaps.loadBalancer.server.port: 993
+    #   # traefik.tcp.services.mail-imaps.loadBalancer.serversTransport: mail-tcp@file
+    #   traefik.tcp.routers.mail-pop3ss.entrypoints: mail-pop3ss
+    #   traefik.tcp.routers.mail-pop3ss.rule: HostSNI(`*`)
+    #   traefik.tcp.routers.mail-pop3ss.service: mail-pop3ss
+    #   traefik.tcp.routers.mail-pop3ss.tls.passthrough: true
+    #   traefik.tcp.services.mail-pop3ss.loadBalancer.server.port: 995
+    #   # traefik.tcp.services.mail-pop3ss.loadBalancer.serversTransport: mail-tcp@file
+    environment:
+      ACCOUNT_PROVISIONER: FILE
+      AMAVIS_LOGLEVEL: 0
+      CLAMAV_MESSAGE_SIZE_LIMIT: 100M
+      DOVECOT_INET_PROTOCOLS: all
+      DOVECOT_MAILBOX_FORMAT: maildir
+      ENABLE_AMAVIS: 0
+      ENABLE_CLAMAV: 1
+      ENABLE_DNSBL: 0
+      ENABLE_FAIL2BAN: 1
+      ENABLE_FETCHMAIL: 0
+      ENABLE_GETMAIL: 0
+      ENABLE_IMAP: 1
+      ENABLE_MTA_STS: 0
+      ENABLE_OPENDKIM: 1
+      ENABLE_OPENDMARC: 0
+      ENABLE_POLICYD_SPF: 0
+      ENABLE_POP3: 1
+      ENABLE_POSTGREY: 0
+      ENABLE_QUOTAS: 1
+      ENABLE_RSPAMD: 1
+      ENABLE_RSPAMD_REDIS: 0
+      ENABLE_SASLAUTHD: 0
+      ENABLE_SPAMASSASSIN: 0
+      ENABLE_SPAMASSASSIN_KAM: 0
+      ENABLE_SRS: 0
+      ENABLE_UPDATE_CHECK: 0
+      FAIL2BAN_BLOCKTYPE: drop
+      FETCHMAIL_PARALLEL: 0
+      FETCHMAIL_POLL: 300
+      GETMAIL_POLL: 5
+      LOGROTATE_COUNT: 4
+      LOGROTATE_INTERVAL: weekly
+      LOG_LEVEL: info
+      MARK_SPAM_AS_READ: 0
+      MOVE_SPAM_TO_JUNK: 1
+      PERMIT_DOCKER: none
+      POSTFIX_INET_PROTOCOLS: all
+      POSTFIX_REJECT_UNKNOWN_CLIENT_HOSTNAME: 0
+      POSTGREY_AUTO_WHITELIST_CLIENTS: 5
+      POSTGREY_DELAY: 300
+      POSTGREY_MAX_AGE: 35
+      POSTGREY_TEXT: "Delayed by Postgrey"
+      POSTSCREEN_ACTION: enforce
+      RELAY_PORT: 25
+      RSPAMD_CHECK_AUTHENTICATED: 1
+      RSPAMD_GREYLISTING: 1
+      RSPAMD_HFILTER: 1
+      RSPAMD_HFILTER_HOSTNAME_UNKNOWN_SCORE: 6
+      RSPAMD_LEARN: 0
+      RSPAMD_NEURAL: 0
+      SA_KILL: 10.0
+      SA_TAG2: 6.31
+      SA_TAG: 2.0
+      SPAMASSASSIN_SPAM_TO_INBOX: 1
+      SPAM_SUBJECT: "[SPAM]"
+      SPOOF_PROTECTION: 1
+      SRS_SENDER_CLASSES: envelope_sender
+      TZ: Europe/Paris
+      UPDATE_CHECK_INTERVAL: 1d
+      SSL_TYPE: letsencrypt
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/certs/acme.json:/etc/letsencrypt/acme.json:ro
+      - /${DOCKER_DATA_DIRECTORY:?required}/docker/docker-data/mailserver/docker-mailserver/config/:/tmp/docker-mailserver/
+      - /${DOCKER_DATA_DIRECTORY:?required}/docker/docker-data/mailserver/docker-mailserver/data/:/var/mail/
+      - /${DOCKER_DATA_DIRECTORY:?required}/docker/docker-data/mailserver/docker-mailserver/state/:/var/mail-state/
+      - /${DOCKER_DATA_DIRECTORY:?required}/docker/docker-data/mailserver/docker-mailserver/logs/:/var/log/mail/
+      - /${DOCKER_DATA_DIRECTORY:?required}/docker/docker-data/mailserver/docker-mailserver/certs/:/certs/:ro
+      - /${DOCKER_DATA_DIRECTORY:?required}/docker/docker-data/mailserver/docker-mailserver/config/10-custom.conf:/etc/dovecot/conf.d/10-custom.conf:ro
+    stop_grace_period: 1m
+    cap_add:
+      - NET_ADMIN
+    networks:
+      mailserver-ntw:
+        ipv4_address: 172.16.42.3
+    # healthcheck:
+    #   test: "ss --listening --ipv4 --tcp | grep --silent ':smtp' || exit 1"
+    #   timeout: 3s
+    #   retries: 1
+
+  python-web:
+    restart: ${RESTART:-unless-stopped}
+    image: ${DOCKER_REGISTRY_ADDR}/${DOCKER_PROJET_PATH}/prod/web-mail:${DOCKER_WEB_MAIL_TAG:-latest}
+    container_name: mailserver-web
+    hostname: mailserver-web
+    labels:
+      traefik.enable: true
+      traefik.http.routers.mail-web.tls: true
+      traefik.http.routers.mail-web.middlewares: web-utils@docker #authelia@docker, add rules in authelia
+      traefik.http.routers.mail-web.entrypoints: websecure
+      traefik.http.routers.mail-web.rule: Host(`autoconfig.${PERSONAL_DOMAIN_NAME}`) || Host(`autodiscover.${PERSONAL_DOMAIN_NAME}`) || Host(`mail.${PERSONAL_DOMAIN_NAME}`) || Host(`mail.${PERSONAL_DOMAIN_NAME}`)
+      traefik.http.routers.mail-web.service: mail-web
+      traefik.http.services.mail-web.loadBalancer.server.port: 5000
+    environment:
+      TZ: Europe/Paris
+      SECRET_KEY: ${SECRET_KEY}
+      DEBUG: ${DEBUG_MODE}
+      DOMAIN: ${PERSONAL_DOMAIN_NAME}
+    networks:
+      - webinternal
+
+  python-pwd:
+    restart: ${RESTART:-unless-stopped}
+    image: ${DOCKER_REGISTRY_ADDR}/${DOCKER_PROJET_PATH}/prod/mail-pwd-mgr:${DOCKER_TAG_PWD:-main}
+    container_name: mailserver-pwd
+    hostname: mailserver-pwd
+    labels:
+      traefik.enable: true
+      traefik.http.routers.mail-pwd.tls: true
+      traefik.http.routers.mail-pwd.middlewares: authelia@docker,web-utils@docker
+      traefik.http.routers.mail-pwd.entrypoints: websecure
+      traefik.http.routers.mail-pwd.rule: Host(`mail-pwd.${PERSONAL_DOMAIN_NAME}`)
+      traefik.http.routers.mail-pwd.service: mail-pwd
+      traefik.http.services.mail-pwd.loadBalancer.server.port: 5000
+    environment:
+      TZ: Europe/Paris
+      SESSION_TOKEN: ${SESSION_TOKEN}
+      DEBUG_MODE: ${DEBUG_MODE:-False}
+      LIEN_FICHIER_CREDENTIALS: "/postfix-accounts.cf"
+      SQLALCHEMY_DATABASE_URI: ${SQLALCHEMY_DATABASE_URI}
+      EMAIL_SENDER: ${EMAIL_SENDER}
+      EMAIL_SENDER_PASSWORD: ${EMAIL_SENDER_PASSWORD}
+      SMTP_SERVER: ${SMTP_SERVER}
+      SMTP_PORT: ${SMTP_PORT}
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY:?required}/docker/docker-data/mailserver/docker-mailserver/config/postfix-accounts.cf:/postfix-accounts.cf
+      - /${DOCKER_DATA_DIRECTORY:?required}/docker/docker-data/mailserver/pwd:/data/instance
+    networks:
+      - webinternal
+
+networks:
+  webinternal:
+    name: webinternal
+  mailserver-ntw:
+    name: mailserver-ntw
+    ipam:
+      config:
+        - subnet: "172.16.42.0/24"
