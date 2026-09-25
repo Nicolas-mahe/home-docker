@@ -58,30 +58,6 @@ services:
     networks:
       - webinternal
 
-  traefik-manager:
-    restart: ${RESTART:-unless-stopped}
-    image: ghcr.io/chr0nzz/traefik-manager:${MANAGER_TAG:-latest}
-    container_name: traefik-manager
-    hostname: traefik-manager
-    labels:
-      traefik.enable: true
-      traefik.http.routers.traefik-manager.tls: true
-      traefik.http.routers.traefik-manager.tls.certresolver: cloudflare
-      traefik.http.routers.traefik-manager.middlewares: authelia@docker,web-utils@docker
-      traefik.http.routers.traefik-manager.rule: Host(`traefik-manager.${PERSONAL_DOMAIN_NAME}`)
-      traefik.http.routers.traefik-manager.entrypoints: websecure
-      traefik.http.routers.traefik-manager.service: traefik-manager
-      traefik.http.services.traefik-manager.loadbalancer.server.port: 5000
-    environment:
-      COOKIE_SECURE: true
-    volumes:
-      # - /opt/docker-compose/traefik/config.yml:/app/config/dynamic.yml
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/conf:/app/config
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/backups:/app/backups
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/certs/acme.json:/app/acme.json:ro
-    networks:
-      - webinternal
-
   traefik:
     restart: ${RESTART:-unless-stopped}
     image: docker.io/library/traefik:${TRAEFIK_TAG:-v3.6.2}
