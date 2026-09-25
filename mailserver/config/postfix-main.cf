@@ -1,3 +1,4 @@
+mydestination = localhost.localdomain, localhost
 smtp/inet/postscreen_upstream_proxy_protocol=haproxy
 submission/inet/smtpd_upstream_proxy_protocol=haproxy
 submissions/inet/smtpd_upstream_proxy_protocol=haproxy
