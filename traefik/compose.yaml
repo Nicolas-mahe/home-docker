@@ -85,7 +85,7 @@ services:
       - 443:443/tcp
       - 465:465/tcp
       - 993:993/tcp
-      - 995:995/tcp
+      # - 995:995/tcp
       - 6322:6322/tcp
       - 25565:25565/tcp
       - 7777:7777/tcp
@@ -98,7 +98,7 @@ services:
       - 443   # HTTPS
       - 465   # ESMTP (implicit TLS)
       - 993   # IMAP4 (implicit TLS)
-      - 995   # POP3 (implicit TLS)
+      # - 995   # POP3 (implicit TLS)
       - 6322  # Gitlab SSH
       - 8080  # dashboard
       - 8082  # ping
@@ -118,10 +118,11 @@ services:
       crowdsec:
         ipv4_address: 172.50.0.254
       docker-proxy-ro:
+      mailserver:
+        ipv4_address: 172.16.42.253
       monitoring:
       webexpose:
       webinternal:
-        ipv4_address: 172.16.42.253
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:8082/ping"]
       interval: 30s
@@ -177,7 +178,7 @@ services:
       - --entryPoints.mail-smtp.address=:25
       - --entryPoints.mail-submissions.address=:465
       - --entryPoints.mail-imaps.address=:993
-      - --entryPoints.mail-pop3s.address=:995
+      # - --entryPoints.mail-pop3s.address=:995
 
       # Provider definition
       - --providers.docker.endpoint=tcp://docker-proxy-ro:2375
@@ -401,12 +402,14 @@ networks:
         - subnet: "172.50.0.0/24"
   docker-proxy-ro:
     name: docker-proxy-ro
+  mailserver:
+    name: mailserver
+    ipam:
+      config:
+        - subnet: "172.16.42.0/24"
   monitoring:
     name: monitoring
   webexpose:
     name: webexpose
   webinternal:
     name: webinternal
-    ipam:
-      config:
-        - subnet: "172.16.42.0/24"

@@ -41,6 +41,17 @@ http:
         - authelia@docker
         - web-utils@docker
 
+    games-manager:
+      rule: "Host(`games-manager.${PERSONAL_DOMAIN_NAME}`)"
+      service: games-manager
+      tls:
+        certresolver: cloudflare
+      entrypoints:
+        - websecure
+      middlewares:
+        - authelia@docker
+        - web-utils@docker
+
     homeassistant:
       rule: "Host(`homeassistant.${PERSONAL_DOMAIN_NAME}`)"
       service: homeassistant
@@ -127,10 +138,15 @@ http:
         servers:
           - url: "http://${PERSONAL_NETWORK}.2:8201"
 
+    games-manager:
+      loadBalancer:
+        servers:
+          - url: "http://${PERSONAL_NETWORK}.2:5000"
+
     homeassistant:
       loadBalancer:
         servers:
-          - url: "http://192.168.9.2:8123"
+          - url: "http://${PERSONAL_NETWORK}.2:8123"
 
     nas:
       loadBalancer:
@@ -195,11 +211,8 @@ tcp:
         passthrough: true
 
   services:
-
     mail-smtp:
       loadBalancer:
-        proxyProtocol:
-          version: 1
         servers:
           - address: "mailserver:25"
 
@@ -207,19 +220,19 @@ tcp:
       loadBalancer:
         servers:
           - address: "mailserver:465"
-        proxyProtocol:
-          version: 1
+        serversTransport: mailserver
 
     mail-imaps:
       loadBalancer:
         servers:
           - address: "mailserver:993"
-        proxyProtocol:
-          version: 2
 
     mail-pop3s:
       loadBalancer:
         servers:
           - address: "mailserver:995"
-        proxyProtocol:
-          version: 2
+
+  serversTransports:
+    mailserver:
+      proxyProtocol:
+        version: 1

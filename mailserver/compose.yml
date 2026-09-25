@@ -1,36 +1,32 @@
+#sudo docker network create --driver bridge --subnet 172.16.42.0/24 mailserver
 services:
   docker-mailserver:
     restart: ${RESTART:-unless-stopped}
     image: ghcr.io/docker-mailserver/docker-mailserver:${MAILSERVER_TAG:-15.0.2}
     container_name: mailserver
     hostname: mail.${PERSONAL_DOMAIN_NAME:?required}
-    # labels:
-    #   traefik.enable: true
-    #   traefik.docker.network: mailserver-ntw
-    #   # traefik.tcp.serversTransports.mail-tcp.proxyProtocol: 2 # in dynamic.yml, it's mandatory ?
-    #   traefik.tcp.routers.mail-smtp.entrypoints: mail-smtp
-    #   traefik.tcp.routers.mail-smtp.rule: HostSNI(`*`)
-    #   traefik.tcp.routers.mail-smtp.service: mail-smtp
-    #   traefik.tcp.services.mail-smtp.loadBalancer.server.port: 25
-    #   # traefik.tcp.services.mail-smtp.loadBalancer.serversTransport: mail-tcp@file
-    #   traefik.tcp.routers.mail-submissions.entrypoints: mail-submissions
-    #   traefik.tcp.routers.mail-submissions.rule: HostSNI(`*`)
-    #   traefik.tcp.routers.mail-submissions.service: mail-submissions
-    #   traefik.tcp.routers.mail-submissions.tls.passthrough: true
-    #   traefik.tcp.services.mail-submissions.loadBalancer.server.port: 465
-    #   # traefik.tcp.services.mail-submissions.loadBalancer.serversTransport: mail-tcp@file
-    #   traefik.tcp.routers.mail-imaps.entrypoints: mail-imaps
-    #   traefik.tcp.routers.mail-imaps.rule: HostSNI(`*`)
-    #   traefik.tcp.routers.mail-imaps.service: mail-imaps
-    #   traefik.tcp.routers.mail-imaps.tls.passthrough: true
-    #   traefik.tcp.services.mail-imaps.loadBalancer.server.port: 993
-    #   # traefik.tcp.services.mail-imaps.loadBalancer.serversTransport: mail-tcp@file
-    #   traefik.tcp.routers.mail-pop3ss.entrypoints: mail-pop3ss
-    #   traefik.tcp.routers.mail-pop3ss.rule: HostSNI(`*`)
-    #   traefik.tcp.routers.mail-pop3ss.service: mail-pop3ss
-    #   traefik.tcp.routers.mail-pop3ss.tls.passthrough: true
-    #   traefik.tcp.services.mail-pop3ss.loadBalancer.server.port: 995
-    #   # traefik.tcp.services.mail-pop3ss.loadBalancer.serversTransport: mail-tcp@file
+    labels:
+      traefik.enable: true
+      traefik.docker.network: mailserver
+      traefik.tcp.routers.mail-smtp.entrypoints: mail-smtp
+      traefik.tcp.routers.mail-smtp.rule: HostSNI(`*`)
+      traefik.tcp.routers.mail-smtp.service: mail-smtp
+      traefik.tcp.services.mail-smtp.loadBalancer.server.port: 25
+      traefik.tcp.routers.mail-submissions.entrypoints: mail-submissions
+      traefik.tcp.routers.mail-submissions.rule: HostSNI(`*`)
+      traefik.tcp.routers.mail-submissions.service: mail-submissions
+      traefik.tcp.routers.mail-submissions.tls.passthrough: true
+      traefik.tcp.services.mail-submissions.loadBalancer.server.port: 465
+      traefik.tcp.routers.mail-imaps.entrypoints: mail-imaps
+      traefik.tcp.routers.mail-imaps.rule: HostSNI(`*`)
+      traefik.tcp.routers.mail-imaps.service: mail-imaps
+      traefik.tcp.routers.mail-imaps.tls.passthrough: true
+      traefik.tcp.services.mail-imaps.loadBalancer.server.port: 993
+      # traefik.tcp.routers.mail-pop3ss.entrypoints: mail-pop3ss
+      # traefik.tcp.routers.mail-pop3ss.rule: HostSNI(`*`)
+      # traefik.tcp.routers.mail-pop3ss.service: mail-pop3ss
+      # traefik.tcp.routers.mail-pop3ss.tls.passthrough: true
+      # traefik.tcp.services.mail-pop3ss.loadBalancer.server.port: 995
     environment:
       ACCOUNT_PROVISIONER: FILE
       AMAVIS_LOGLEVEL: 0
@@ -104,7 +100,7 @@ services:
     cap_add:
       - NET_ADMIN
     networks:
-      webinternal:
+      mailserver:
         ipv4_address: 172.16.42.252
     healthcheck:
       test: "ss --listening --ipv4 --tcp | grep --silent ':smtp' || exit 1"
@@ -167,6 +163,8 @@ services:
 networks:
   webinternal:
     name: webinternal
+  mailserver:
+    name: mailserver
     ipam:
       config:
         - subnet: "172.16.42.0/24"
