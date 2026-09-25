@@ -28,6 +28,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.semaphore.tls: true
+      traefik.http.routers.semaphore.tls.certresolver: cloudflare
       traefik.http.routers.semaphore.entrypoints: websecure
       traefik.http.routers.semaphore.middlewares: authelia@docker,web-utils@docker
       traefik.http.routers.semaphore.rule: Host(`ansible.${PERSONAL_DOMAIN_NAME}`)

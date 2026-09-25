@@ -45,6 +45,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.whoami.tls: true
+      traefik.http.routers.whoami.tls.certresolver: cloudflare
       traefik.http.routers.whoami.middlewares: authelia@docker,web-utils@docker
       traefik.http.routers.whoami.entrypoints: websecure
       traefik.http.routers.whoami.rule: Host(`whoami.${PERSONAL_DOMAIN_NAME}`)
@@ -65,6 +66,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.traefik-manager.tls: true
+      traefik.http.routers.traefik-manager.tls.certresolver: cloudflare
       traefik.http.routers.traefik-manager.middlewares: authelia@docker,web-utils@docker
       traefik.http.routers.traefik-manager.rule: Host(`traefik-manager.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.traefik-manager.entrypoints: websecure
@@ -90,6 +92,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.dashboard.tls: true
+      traefik.http.routers.dashboard.tls.certresolver: cloudflare
       traefik.http.routers.dashboard.middlewares: authelia@docker,web-utils@docker
       traefik.http.routers.dashboard.entrypoints: websecure
       traefik.http.routers.dashboard.rule: Host(`traefik.${PERSONAL_DOMAIN_NAME}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
@@ -167,10 +170,6 @@ services:
       - --certificatesresolvers.cloudflare.acme.dnsChallenge.resolvers=1.1.1.1:53,1.0.0.1:53
       - --certificatesresolvers.cloudflare.acme.email=${PERSONAL_CF_MAIL}
       - --certificatesresolvers.cloudflare.acme.storage=/etc/traefik/certs/acme.json
-      - --entrypoints.websecure.http.tls.domains[0].main=${PERSONAL_DOMAIN_NAME}
-      - --entrypoints.websecure.http.tls.domains[0].sans=*.${PERSONAL_DOMAIN_NAME}
-      - --entrypoints.websecure.http.tls.domains[1].main=s3.${PERSONAL_DOMAIN_NAME}
-      - --entrypoints.websecure.http.tls.domains[1].sans=*.s3.${PERSONAL_DOMAIN_NAME}
 
       # Entrypoint management
       - --entrypoints.ping.address=:8082
@@ -185,7 +184,6 @@ services:
       # - --entryPoints.websecure.forwardedHeaders.trustedIPs=172.18.0.0/16,172.50.0.0/24
       # - --entryPoints.websecure.proxyProtocol.trustedIPs=172.18.0.0/16,172.50.0.0/24
       - --entrypoints.websecure.http.middlewares=crowdsec@docker
-      - --entrypoints.websecure.http.tls.certResolver=cloudflare
       - --serversTransport.insecureSkipVerify=true  # need to put a validate cert everywhere for delete it
       - --entrypoints.gitlab-ssh.address=:6322
       - --entrypoints.minecraft.address=:25565
@@ -218,6 +216,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.web-utils.tls: true
+      traefik.http.routers.web-utils.tls.certresolver: cloudflare
       traefik.http.routers.web-utils.entrypoints: websecure
       traefik.http.routers.web-utils.middlewares: web-utils@docker
       traefik.http.routers.web-utils.rule: Host(`utils.${PERSONAL_DOMAIN_NAME}`)
@@ -338,6 +337,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.authelia.tls: true
+      traefik.http.routers.authelia.tls.certresolver: cloudflare
       traefik.http.routers.authelia.entrypoints: websecure
       traefik.http.routers.authelia.rule: Host(`auth.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.authelia.service: authelia

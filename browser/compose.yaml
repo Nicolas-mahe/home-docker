@@ -7,6 +7,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.browser.tls: true
+      traefik.http.routers.browser.tls.certresolver: cloudflare
       traefik.http.routers.browser.middlewares: authelia@docker,web-utils@docker
       traefik.http.routers.browser.entrypoints: websecure
       traefik.http.routers.browser.rule: Host(`browser.${PERSONAL_DOMAIN_NAME}`)

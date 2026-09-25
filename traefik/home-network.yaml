@@ -1,103 +1,106 @@
----
 http:
   routers:
+    satisfactory:
+      entryPoints:
+        - satisfactory-tcp
+      rule: "Host(`satisfactory.${PERSONAL_DOMAIN_NAME}`)"
+      service: satisfactory
+      tls:
+        certresolver: cloudflare
+
     box:
       rule: "Host(`box.${PERSONAL_DOMAIN_NAME}`)"
       service: box
-      tls: true
+      tls:
+        certresolver: cloudflare
       entrypoints:
         - websecure
       middlewares:
         - authelia@docker
         - web-utils@docker
+
     dns:
       rule: "Host(`dns.${PERSONAL_DOMAIN_NAME}`)"
       service: dns
-      tls: true
+      tls:
+        certresolver: cloudflare
       entrypoints:
         - websecure
       middlewares:
         - authelia@docker
         - web-utils@docker
-    gamescontainermanager:
-      rule: "Host(`games-manager.${PERSONAL_DOMAIN_NAME}`)"
-      service: gamescontainermanager
-      tls: true
+
+    duplicati:
+      rule: "Host(`duplicati.${PERSONAL_DOMAIN_NAME}`)"
+      service: duplicati
+      tls:
+        certresolver: cloudflare
       entrypoints:
         - websecure
+      middlewares:
+        - authelia@docker
+        - web-utils@docker
+
+    homeassistant:
+      rule: "Host(`homeassistant.${PERSONAL_DOMAIN_NAME}`)"
+      service: homeassistant
+      tls:
+        certresolver: cloudflare
+      entrypoints:
+        - websecure
+      middlewares:
+        - authelia@docker
+        - web-utils@docker
+
     nas:
       rule: "Host(`nas.${PERSONAL_DOMAIN_NAME}`)"
       service: nas
-      tls: true
-      entrypoints:
-        - websecure
-      middlewares:
-        - authelia@docker
-        - web-utils@docker   
-    # mailcow:
-    #   rule: "Host(`mail.${PERSONAL_DOMAIN_NAME}`)"
-    #   service: mailcow
-    #   tls: true
-    #   entrypoints:
-    #     - websecure
-    #   middlewares:
-    #     - authelia@docker
-    #     - web-utils@docker
-    pterodactyl:
-      rule: "Host(`pterodactyl.${PERSONAL_DOMAIN_NAME}`)"
-      service: pterodactyl
-      tls: true
+      tls:
+        certresolver: cloudflare
       entrypoints:
         - websecure
       middlewares:
         - authelia@docker
         - web-utils@docker
-    pve:
-      rule: "Host(`pve.${PERSONAL_DOMAIN_NAME}`)"
-      service: pve
-      tls: true
+
+    pfsense:
+      rule: "Host(`pfsense.${PERSONAL_DOMAIN_NAME}`) || Host(`pdcvf1001pfsense.${PERSONAL_DOMAIN_NAME}`)"
+      service: pfsense
+      tls:
+        certresolver: cloudflare
       entrypoints:
         - websecure
       middlewares:
         - authelia@docker
         - web-utils@docker
-    pve-1:
-      rule: "Host(`pve-1.${PERSONAL_DOMAIN_NAME}`)"
-      service: pve-1
-      tls: true
+
+    smlight:
+      rule: "Host(`pdcpx9003mr2u.${PERSONAL_DOMAIN_NAME}`)"
+      service: smlight
+      tls:
+        certresolver: cloudflare
       entrypoints:
         - websecure
       middlewares:
         - authelia@docker
         - web-utils@docker
-    # pve-test:
-    #   rule: "Host(`pve-test.${PERSONAL_DOMAIN_NAME}`)"
-    #   service: pve-test
-    #   tls: true
-    #   entrypoints:
-    #     - websecure
-    #   middlewares:
-    #     - authelia@docker
-    #     - web-utils@docker
-    python-test:
-      rule: "Host(`python-test.${PERSONAL_DOMAIN_NAME}`)"
-      service: python-test
-      tls: true
-      entrypoints:
-        - websecure 
+
     zyxel-switch:
       rule: "Host(`zyxel-switch.${PERSONAL_DOMAIN_NAME}`)"
       service: zyxel-switch
-      tls: true
+      tls:
+        certresolver: cloudflare
       entrypoints:
         - websecure
       middlewares:
         - authelia@docker
         - web-utils@docker
+
     zyxel-wifi:
       rule: "Host(`zyxel-wifi.${PERSONAL_DOMAIN_NAME}`)"
       service: zyxel-wifi
-      tls: true
+      tls:
+        certresolver: cloudflare
       entrypoints:
         - websecure
       middlewares:
@@ -105,76 +108,56 @@ http:
         - web-utils@docker
 
   services:
+    satisfactory:
+      loadBalancer:
+        servers:
+          - url: "https://${PERSONAL_NETWORK}.3:7777"
     box:
       loadBalancer:
         servers:
-          - url: "https://${PERSONAL_NETWORK}.254:443"
+          - url: "https://192.168.1.1:443"
+
     dns:
       loadBalancer:
         servers:
-          - url: "http://${PERSONAL_NETWORK}.2:82"
-    gamescontainermanager:
+          - url: "http://${PERSONAL_NETWORK}.2:81"
+
+    duplicati:
       loadBalancer:
         servers:
-          - url: "http://${PERSONAL_NETWORK}.10:5000"
+          - url: "http://${PERSONAL_NETWORK}.2:8201"
+
+    homeassistant:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.9.2:8123"
+
     nas:
       loadBalancer:
         servers:
-          - url: "http://${PERSONAL_NETWORK}.2:81"
-    # mailcow:
-    #   loadBalancer:
-    #     servers:
-    #       - url: "http://${PERSONAL_NETWORK}.11:8080"
-    pterodactyl:
+          - url: "https://${PERSONAL_NETWORK}.2:8443"
+
+    pfsense:
       loadBalancer:
         servers:
-          - url: "http://${PERSONAL_NETWORK}.13:80"
-    pve:
+          - url: "http://${PERSONAL_NETWORK}.1:80"
+
+    smlight:
       loadBalancer:
         servers:
-          - url: "https://${PERSONAL_NETWORK}.3:8006" # pve-1
-        sticky:
-          cookie:
-            name: pve-host
-            MaxAge: -1
-            secure: true
-        healthCheck:
-          path: /
-          port: 8006
-          scheme: https
-          interval: "10s"
-          timeout: "3s"
-    pve-kratos:
-      loadBalancer:
-        servers:
-          - url: "https://${PERSONAL_NETWORK}.3:8006"
-    # pve-test:
-    #   loadBalancer:
-    #     servers:
-    #       - url: "https://${PERSONAL_NETWORK}.4:8006"
-    python-test:
-      loadBalancer:
-        servers:
-          - url: "http://${PERSONAL_NETWORK}.11:5000"
+          - url: "http://192.168.9.3:80"
+
     zyxel-switch:
       loadBalancer:
         servers:
           - url: "https://${PERSONAL_NETWORK}.252:443"
+
     zyxel-wifi:
       loadBalancer:
         servers:
           - url: "https://${PERSONAL_NETWORK}.253:443"
-
-
-
 tcp:
   routers:
-    minecraft:
-      rule: "HostSNI(`*`)"
-      entryPoints:
-        - minecraft
-      service: minecraft
-
     satisfactory:
       entryPoints:
         - satisfactory-tcp-reliable
@@ -212,15 +195,6 @@ tcp:
         passthrough: true
 
   services:
-    minecraft:
-      loadBalancer:
-        servers:
-          - address: "${PERSONAL_NETWORK}.3:25565"
-
-    satisfactory:
-      loadBalancer:
-        servers:
-          - address: "${PERSONAL_NETWORK}.3:8888"
 
     mail-smtp:
       loadBalancer:
@@ -249,16 +223,3 @@ tcp:
           - address: "mailserver:995"
         proxyProtocol:
           version: 2
-
-udp:
-  routers:
-    satisfactory:
-      entryPoints:
-        - satisfactory-udp
-      service: satisfactory
-
-  services:
-    satisfactory:
-      loadBalancer:
-        servers:
-          - address: "192.168.0.3:7777"

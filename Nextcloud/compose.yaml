@@ -8,6 +8,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.nextcloud.tls: true
+      traefik.http.routers.nextcloud.tls.certresolver: cloudflare
       traefik.http.routers.nextcloud.entrypoints: websecure
       traefik.http.routers.nextcloud.middlewares: authelia@docker,nextcloud-headers@docker,web-utils@docker
       traefik.http.routers.nextcloud.rule: Host(`cloud.${PERSONAL_DOMAIN_NAME}`)

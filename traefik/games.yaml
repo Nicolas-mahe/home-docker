@@ -31,7 +31,7 @@ tcp:
     satisfactory:
       loadBalancer:
         servers:
-          - address: "${PERSONAL_NETWORK}:8888"
+          - address: "${PERSONAL_NETWORK}.3:8888"
 
 udp:
   routers:
@@ -44,4 +44,4 @@ udp:
     satisfactory:
       loadBalancer:
         servers:
-          - address: "${PERSONAL_NETWORK}:7777"
+          - address: "${PERSONAL_NETWORK}.3:7777"

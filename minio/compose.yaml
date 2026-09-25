@@ -7,6 +7,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.minio-web.tls: true
+      traefik.http.routers.minio-web.tls.certresolver: cloudflare
       traefik.http.routers.minio-storage.entrypoints: websecure
       traefik.http.routers.minio-storage.middlewares: authelia@docker #,web-utils@docker
       traefik.http.routers.minio-storage.rule: Host(`s3.${PERSONAL_DOMAIN_NAME}`) || HostRegexp(`^.+\.(s3.${PERSONAL_DOMAIN_NAME})$`)
