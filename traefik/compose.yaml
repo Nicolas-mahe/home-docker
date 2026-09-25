@@ -114,9 +114,11 @@ services:
       - 25565:25565/tcp
       - 7777:7777/tcp
       - 7777:7777/udp
+      - 8080:80/tcp
       - 8888:8888/tcp
     expose:
       - 25    # SMTP (STARTTLS)
+      - 80    # HTTP
       - 443   # HTTPS
       - 465   # ESMTP (implicit TLS)
       - 993   # IMAP4 (implicit TLS)
@@ -173,6 +175,11 @@ services:
 
       # Entrypoint management
       - --entrypoints.ping.address=:8082
+      - --entrypoints.web.address=:80
+      # - --entrypoints.web.http.encodedCharacters.allowEncodedSlash=true
+      - --entrypoints.web.http.redirections.entryPoint.to=websecure
+      - --entrypoints.web.http.redirections.entryPoint.scheme=https
+      - --entrypoints.web.http.middlewares=crowdsec@docker
       - --entrypoints.websecure.address=:443
       # - --entrypoints.websecure.http.encodedCharacters.allowEncodedSlash=true
       - --entrypoints.websecure.transport.respondingTimeouts.readTimeout=600s
@@ -192,10 +199,10 @@ services:
       - --entryPoints.satisfactory-tcp.http.redirections.entryPoint.scheme=https
       - --entryPoints.satisfactory-udp.address=:7777/udp
       - --entryPoints.satisfactory-tcp-reliable.address=:8888/tcp
-      - --entryPoints.mail-smtp.address=:25/tcp
-      - --entryPoints.mail-submissions.address=:465/tcp
-      - --entryPoints.mail-imaps.address=:993/tcp
-      - --entryPoints.mail-pop3s.address=:995/tcp
+      - --entryPoints.mail-smtp.address=:25
+      - --entryPoints.mail-submissions.address=:46
+      - --entryPoints.mail-imaps.address=:99
+      - --entryPoints.mail-pop3s.address=:99
 
       # Provider definition
       - --providers.docker.endpoint=tcp://docker-proxy-ro:2375
