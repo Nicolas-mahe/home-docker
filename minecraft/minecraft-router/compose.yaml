@@ -13,6 +13,7 @@ services:
     environment:
       # DEFAULT: minecraft-default:25565
       MAPPING: |
+        test.${PERSONAL_DOMAIN_NAME}=${PERSONAL_IP_SERVER}:25564
         r7.${PERSONAL_DOMAIN_NAME}=${PERSONAL_IP_SERVER}:25565
         atm.${PERSONAL_DOMAIN_NAME}=${PERSONAL_IP_SERVER}:25566
       TZ: Europe/Paris

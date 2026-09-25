@@ -4,6 +4,15 @@ services:
     image: ghcr.io/coldfirel15/gamecontainermanager:${DOCKER_TAG_FRONT:-main}
     container_name: gamecontainermanager-front
     hostname: gamecontainermanager-front
+    # labels:
+      # traefik.enable: true # put in dynamic.yml because oh network_mode: host
+      # traefik.http.routers.games-manager.tls: true
+      # traefik.http.routers.games-manager.tls.certresolver: cloudflare
+      # traefik.http.routers.games-manager.middlewares: authelia@docker,web-utils@docker
+      # traefik.http.routers.games-manager.entrypoints: websecure
+      # traefik.http.routers.games-manager.rule: Host(`games-manager.${PERSONAL_DOMAIN_NAME}`)
+      # traefik.http.routers.games-manager.service: games-manager
+      # traefik.http.services.games-manager.loadBalancer.server.port: 5000
     environment:
       DOCKERCONTAINERMANAGER_AUTHENTICATION: "True"
       DOCKERCONTAINERMANAGER_BACKEND_URL: ${DOCKERCONTAINERMANAGER_BACKEND_URL}
@@ -14,9 +23,10 @@ services:
       DOCKERCONTAINERMANAGER_FRONTEND_URL: ${DOCKERCONTAINERMANAGER_FRONTEND_URL}
       DOCKERCONTAINERMANAGER_SECRET_KEY: ${DOCKERCONTAINERMANAGER_SECRET_KEY}
       DOCKERCONTAINERMANAGER_SERVICE_TYPE: frontend
+      PERSONAL_DOMAIN_NAME: ${PERSONAL_DOMAIN_NAME}
     expose:
       - 5000
-    network_mode: "host"
+    network_mode: "host" # mandatory for Wake on LAN
 
   bot:
     restart: unless-stopped

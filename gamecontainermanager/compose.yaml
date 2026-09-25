@@ -6,12 +6,13 @@ services:
     hostname: gamecontainermanager-front
     labels:
       traefik.enable: true
-      traefik.http.routers.gamecontainermanager.tls: true
-      traefik.http.routers.gamecontainermanager.middlewares: authelia@docker,web-utils@docker
-      traefik.http.routers.gamecontainermanager.entrypoints: websecure
-      traefik.http.routers.gamecontainermanager.rule: Host(`games-manager.${PERSONAL_DOMAIN_NAME}`)
-      traefik.http.routers.gamecontainermanager.service: gamecontainermanager
-      traefik.http.services.gamecontainermanager.loadBalancer.server.port: 5000
+      traefik.http.routers.games-manager.tls: true
+      traefik.http.routers.games-manager.tls.certresolver: cloudflare
+      traefik.http.routers.games-manager.middlewares: authelia@docker,web-utils@docker
+      traefik.http.routers.games-manager.entrypoints: websecure
+      traefik.http.routers.games-manager.rule: Host(`games-manager.${PERSONAL_DOMAIN_NAME}`)
+      traefik.http.routers.games-manager.service: games-manager
+      traefik.http.services.games-manager.loadBalancer.server.port: 5000
     environment:
       DOCKERCONTAINERMANAGER_AUTHENTICATION: "True"
       DOCKERCONTAINERMANAGER_DEBUG: "False"

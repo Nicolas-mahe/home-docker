@@ -7,6 +7,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.skyblog1.tls: true
+      traefik.http.routers.skyblog1.tls.certresolver: cloudflare
       traefik.http.routers.skyblog1.middlewares: authelia@docker,web-utils@docker
       traefik.http.routers.skyblog1.entrypoints: websecure
       traefik.http.routers.skyblog1.rule: Host(`${SKYBLOG1}.${PERSONAL_DOMAIN_NAME}`)
@@ -36,6 +37,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.skyblog2.tls: true
+      traefik.http.routers.skyblog2.tls.certresolver: cloudflare
       traefik.http.routers.skyblog2.middlewares: authelia@docker,web-utils@docker
       traefik.http.routers.skyblog2.entrypoints: websecure
       traefik.http.routers.skyblog2.rule: Host(`${SKYBLOG2}.${PERSONAL_DOMAIN_NAME}`)
@@ -67,6 +69,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.python-pronostics.tls: true
+      traefik.http.routers.python-pronostics.tls.certresolver: cloudflare
       traefik.http.routers.python-pronostics.entrypoints: websecure
       traefik.http.routers.python-pronostics.rule: Host(`pronostic.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.python-pronostics.middlewares: authelia@docker,web-utils@docker
@@ -101,6 +104,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.pythonbaby.tls: true
+      traefik.http.routers.pythonbaby.tls.certresolver: cloudflare
       traefik.http.routers.pythonbaby.entrypoints: websecure
       traefik.http.routers.pythonbaby.middlewares: authelia@docker,web-utils@docker
       traefik.http.routers.pythonbaby.rule: Host(`baby.${PERSONAL_DOMAIN_NAME}`)

@@ -10,6 +10,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.rackula.tls: true
+      traefik.http.routers.rackula.tls.certresolver: cloudflare
       traefik.http.routers.rackula.middlewares: authelia@docker,web-utils@docker
       traefik.http.routers.rackula.entrypoints: websecure
       traefik.http.routers.rackula.rule: Host(`rackula.${PERSONAL_DOMAIN_NAME}`)
