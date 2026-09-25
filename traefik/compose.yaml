@@ -118,11 +118,10 @@ services:
       crowdsec:
         ipv4_address: 172.50.0.254
       docker-proxy-ro:
-      mailserver-ntw:
-        ipv4_address: 172.16.42.2
       monitoring:
       webexpose:
       webinternal:
+        ipv4_address: 172.16.42.253
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:8082/ping"]
       interval: 30s
@@ -176,9 +175,9 @@ services:
       - --entryPoints.satisfactory-udp.address=:7777/udp
       - --entryPoints.satisfactory-tcp-reliable.address=:8888/tcp
       - --entryPoints.mail-smtp.address=:25
-      - --entryPoints.mail-submissions.address=:46
-      - --entryPoints.mail-imaps.address=:99
-      - --entryPoints.mail-pop3s.address=:99
+      - --entryPoints.mail-submissions.address=:465
+      - --entryPoints.mail-imaps.address=:993
+      - --entryPoints.mail-pop3s.address=:995
 
       # Provider definition
       - --providers.docker.endpoint=tcp://docker-proxy-ro:2375
@@ -408,8 +407,6 @@ networks:
     name: webexpose
   webinternal:
     name: webinternal
-  mailserver-ntw:
-    name: mailserver-ntw
     ipam:
       config:
         - subnet: "172.16.42.0/24"

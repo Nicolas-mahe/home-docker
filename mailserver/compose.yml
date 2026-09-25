@@ -3,7 +3,7 @@ services:
     restart: ${RESTART:-unless-stopped}
     image: ghcr.io/docker-mailserver/docker-mailserver:${MAILSERVER_TAG:-15.0.2}
     container_name: mailserver
-    hostname: ${PERSONAL_DOMAIN_NAME:?required}
+    hostname: mail.${PERSONAL_DOMAIN_NAME:?required}
     # labels:
     #   traefik.enable: true
     #   traefik.docker.network: mailserver-ntw
@@ -104,12 +104,13 @@ services:
     cap_add:
       - NET_ADMIN
     networks:
-      mailserver-ntw:
-        ipv4_address: 172.16.42.3
-    # healthcheck:
-    #   test: "ss --listening --ipv4 --tcp | grep --silent ':smtp' || exit 1"
-    #   timeout: 3s
-    #   retries: 1
+      webinternal:
+        ipv4_address: 172.16.42.252
+    healthcheck:
+      test: "ss --listening --ipv4 --tcp | grep --silent ':smtp' || exit 1"
+      timeout: 3s
+      retries: 1
+      start_period: 30s
 
   python-web:
     restart: ${RESTART:-unless-stopped}
@@ -119,9 +120,10 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.mail-web.tls: true
+      traefik.http.routers.mail-web.tls.certresolver: cloudflare
       traefik.http.routers.mail-web.middlewares: web-utils@docker #authelia@docker, add rules in authelia
       traefik.http.routers.mail-web.entrypoints: websecure
-      traefik.http.routers.mail-web.rule: Host(`autoconfig.${PERSONAL_DOMAIN_NAME}`) || Host(`autodiscover.${PERSONAL_DOMAIN_NAME}`) || Host(`mail.${PERSONAL_DOMAIN_NAME}`) || Host(`mail.${PERSONAL_DOMAIN_NAME}`)
+      traefik.http.routers.mail-web.rule: Host(`mail.${PERSONAL_DOMAIN_NAME}`) || Host(`autoconfig.${PERSONAL_DOMAIN_NAME}`) || Host(`autodiscover.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.mail-web.service: mail-web
       traefik.http.services.mail-web.loadBalancer.server.port: 5000
     environment:
@@ -140,6 +142,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.mail-pwd.tls: true
+      traefik.http.routers.mail-pwd.tls.certresolver: cloudflare
       traefik.http.routers.mail-pwd.middlewares: authelia@docker,web-utils@docker
       traefik.http.routers.mail-pwd.entrypoints: websecure
       traefik.http.routers.mail-pwd.rule: Host(`mail-pwd.${PERSONAL_DOMAIN_NAME}`)
@@ -164,8 +167,6 @@ services:
 networks:
   webinternal:
     name: webinternal
-  mailserver-ntw:
-    name: mailserver-ntw
     ipam:
       config:
         - subnet: "172.16.42.0/24"
