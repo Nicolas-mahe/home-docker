@@ -2,7 +2,7 @@
 services:
   docker-mailserver:
     restart: ${RESTART:-unless-stopped}
-    image: ghcr.io/docker-mailserver/docker-mailserver:${MAILSERVER_TAG:-15.0.2}
+    image: ghcr.io/docker-mailserver/docker-mailserver:${MAILSERVER_TAG:-15.1.0}
     container_name: mailserver
     hostname: mail.${PERSONAL_DOMAIN_NAME:?required}
     labels:
