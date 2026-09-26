@@ -1,0 +1,98 @@
+services:
+  mealie:
+    restart: unless-stopped
+    container_name: mealie
+    hostname: mealie
+    image: ghcr.io/mealie-recipes/mealie:${MEALIE_TAG:-v3.27.0}
+    labels:
+      traefik.enable: true
+      traefik.http.routers.mealie.tls: true
+      traefik.http.routers.mealie.tls.certresolver: cloudflare
+      traefik.http.routers.mealie.middlewares: web-utils@docker #authelia@docker,
+      traefik.http.routers.mealie.entrypoints: websecure
+      traefik.http.routers.mealie.rule: Host(`mealie.${PERSONAL_DOMAIN_NAME}`)
+      traefik.http.routers.mealie.service: mealie
+      traefik.http.services.mealie.loadBalancer.server.port: 9000
+    environment:
+      ALLOW_SIGNUP: false
+      ALLOW_PASSWORD_LOGIN: true # Whether or not to display the username+password input fields. Keep set to true unless you use OIDC authentication
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Paris
+      BASE_URL: https://mealie.${PERSONAL_DOMAIN_NAME}
+      TOKEN_TIME: 168
+      DAILY_SCHEDULE_TIME: 23:45
+      SECURITY_MAX_LOGIN_ATTEMPTS: 5
+      SECURITY_USER_LOCKOUT_TIME: 24
+      # SMTP Settings
+      SMTP_HOST: mail.${PERSONAL_DOMAIN_NAME}
+      SMTP_PORT: 465
+      SMTP_AUTH_STRATEGY: TLS
+      SMTP_USER: mealie@${PERSONAL_DOMAIN_NAME}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      SMTP_FROM_EMAIL: mealie@${PERSONAL_DOMAIN_NAME}
+      SMTP_FROM_NAME: Mealie.Chou-dou.com
+      # OIDC Settings
+      OIDC_AUTH_ENABLED: true
+      OIDC_AUTO_REDIRECT: true
+      OIDC_REMEMBER_ME: true
+      OIDC_SIGNUP_ENABLED: true
+      OIDC_CONFIGURATION_URL: https://auth.${PERSONAL_DOMAIN_NAME}/.well-known/openid-configuration
+      OIDC_CLIENT_ID: ${OIDC_CLIENT_ID}
+      OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET}
+      OIDC_USER_GROUP: ${OIDC_USER_GROUP}
+      OIDC_ADMIN_GROUP: ${OIDC_ADMIN_GROUP}
+      OIDC_PROVIDER_NAME: Authelia
+      OIDC_USER_CLAIM: email
+      OIDC_NAME_CLAIM: preferred_username
+      OIDC_GROUPS_CLAIM: groups
+      OIDC_REQUIRES_EMAIL_VERIFICATION: true
+      # Database Settings
+      DB_ENGINE: postgres
+      POSTGRES_USER: ${POSTGRES_MEALIE_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_MEALIE_PWD}
+      POSTGRES_SERVER: mealie-postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_MEALIE_DB}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 1000M
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/mealie:/app/data/
+    networks:
+      - mealie
+      - webinternal
+
+  postgres:
+    restart: unless-stopped
+    container_name: mealie-postgres
+    hostname: mealie-postgres
+    image: postgres:${POSTGRES_MEALIE_TAG:-17}
+    volumes:
+      - mealie-postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_MEALIE_PWD}
+      POSTGRES_USER: ${POSTGRES_MEALIE_USER}
+      PGUSER: ${PG_MEALIE_USER}
+      POSTGRES_DB: ${POSTGRES_MEALIE_DB}
+    networks:
+      - mealie
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+volumes:
+  mealie-postgres:
+    name: mealie-postgres
+
+networks:
+  mealie:
+    name: mealie
+  webinternal:
+    name: webinternal
