@@ -1,6 +1,6 @@
 services:
   minio:
-    restart: unless-stopped
+    restart: ${RESTART:-unless-stopped}
     image: quay.io/minio/aistor/minio:${MINIO_TAG:-latest}
     container_name: minio
     hostname: minio
