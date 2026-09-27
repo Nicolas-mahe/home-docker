@@ -1,6 +1,6 @@
 services:
   mealie:
-    restart: unless-stopped
+    restart: ${RESTART:-unless-stopped}
     container_name: mealie
     hostname: mealie
     image: ghcr.io/mealie-recipes/mealie:${MEALIE_TAG:-v3.27.0}
