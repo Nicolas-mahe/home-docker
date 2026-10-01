@@ -1,0 +1,94 @@
+# Docker Compose file for running paperless from the Docker Hub.
+# This file contains everything paperless needs to run.
+# Paperless supports amd64, arm and arm64 hardware.
+#
+# All compose files of paperless configure paperless in the following way:
+#
+# - Paperless is (re)started on system boot, if it was running before shutdown.
+# - Docker volumes for storing data are managed by Docker.
+# - Folders for importing and exporting files are created in the same directory
+#   as this file and mounted to the correct folders inside the container.
+# - Paperless listens on port 8000.
+#
+# In addition to that, this Docker Compose file adds the following optional
+# configurations:
+#
+# - Instead of SQLite (default), PostgreSQL is used as the database server.
+#
+# To install and update paperless with this file, do the following:
+#
+# - Copy this file as 'docker-compose.yml' and the files 'docker-compose.env'
+#   and '.env' into a folder.
+# - Run 'docker compose pull'.
+# - Run 'docker compose up -d'.
+#
+# For more extensive installation and update instructions, refer to the
+# documentation.
+services:
+  webserver:
+    restart: ${RESTART:-unless-stopped}
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    container_name: paperless-server
+    hostname: paperless-server
+    labels:
+      traefik.enable: true
+      traefik.http.routers.paperless.tls: true
+      traefik.http.routers.paperless.tls.certresolver: cloudflare
+      traefik.http.routers.paperless.middlewares:  authelia@docker,web-utils@docker
+      traefik.http.routers.paperless.entrypoints: websecure
+      traefik.http.routers.paperless.rule: Host(`paperless.${PERSONAL_DOMAIN_NAME}`)
+      traefik.http.routers.paperless.service: paperless
+      traefik.http.services.paperless.loadbalancer.server.port: 8000
+    environment:
+      USERMAP_UID: ${PAPERLESS_UID:?user id is required}
+      USERMAP_GID: ${PAPERLESS_GID:?group id is required}
+      PAPERLESS_REDIS: redis://broker:6379
+      PAPERLESS_DBENGINE: sqlite
+      PAPERLESS_SECRET_KEY: ${PAPERLESS_SECRET_KEY:?secret key is required}
+      PAPERLESS_TIME_ZONE: Europe/Paris
+      PAPERLESS_OCR_LANGUAGE: fra
+      PAPERLESS_URL: https://paperless.${PERSONAL_DOMAIN_NAME}
+      PAPERLESS_AUTO_LOGIN_USERNAME: ${PAPERLESS_USER}
+      PAPERLESS_ADMIN_USER: ${PAPERLESS_USER:?admin user is required}
+      PAPERLESS_ADMIN_MAIL: ${PAPERLESS_ADMIN_MAIL}
+      PAPERLESS_ADMIN_PASSWORD: ${PAPERLESS_ADMIN_PASSWORD:?admin password is required}
+      PAPERLESS_USE_X_FORWARD_HOST: true
+      PAPERLESS_USE_X_FORWARD_PORT: true
+      # PAPERLESS_FILENAME_FORMAT: # https://docs.paperless-ngx.com/advanced_usage/#file-name-handling
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/paperless:/usr/src/paperless/data
+      - /${RAID_DATA_DIRECTORY:?raid path is required}/paperless/media:/usr/src/paperless/media
+      - /${RAID_DATA_DIRECTORY:?raid path is required}/paperless/export:/usr/src/paperless/export
+      - /${RAID_DATA_DIRECTORY:?raid path is required}/paperless/consume:/usr/src/paperless/consume
+    networks:
+      - paperless
+      - webinternal
+    depends_on:
+      broker:
+        condition: service_healthy
+
+  broker:
+    restart: ${RESTART:-unless-stopped}
+    image: docker.io/valkey/valkey:9-alpine
+    container_name: paperless-broker
+    hostname: paperless-broker
+    volumes:
+      - paperless-redis:/data
+    networks:
+      - paperless
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  paperless-redis:
+    name: paperless-redis
+
+networks:
+  paperless:
+    name: paperless
+  webinternal:
+    name: webinternal
