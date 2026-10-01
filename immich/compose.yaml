@@ -13,8 +13,6 @@ services:
       traefik.http.routers.immich.rule: Host(`photos.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.immich.service: immich
       traefik.http.services.immich.loadbalancer.server.port: 2283
-    env_file:
-      - stack.env
     environment:
       IMMICH_CONFIG_FILE: /immich-config.json
       IMMICH_TRUSTED_PROXIES: 172.18.0.0/16
@@ -27,8 +25,10 @@ services:
       - /${RAID_DATA_DIRECTORY:?raid path is required}/partage:/partage
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/immich/config.json:/immich-config.json:ro
     depends_on:
-      - redis
-      - database
+      redis:
+        condition: service_healthy
+      database:
+        condition: service_healthy
     networks:
       - immich
       - webinternal
@@ -45,8 +45,6 @@ services:
     #   service: cpu # set to one of [armnn, cuda, rocm, openvino, openvino-wsl, rknn] for accelerated inference - use the `-wsl` version for WSL2 where applicable
     environment:
       TZ: Europe/Paris
-    env_file:
-      - stack.env
     volumes:
       - model-cache:/cache
     networks:
@@ -108,7 +106,8 @@ services:
     networks:
       - webinternal
     depends_on:
-      - immich-server
+      immich-server:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "/kiosk", "--healthcheck"]
       interval: 30s
