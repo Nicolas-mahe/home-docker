@@ -1,0 +1,66 @@
+services:
+  open-webui:
+    restart: ${RESTART:-unless-stopped}
+    image: ghcr.io/open-webui/open-webui:latest
+    container_name: open-webui
+    hostname: open-webui
+    # labels:
+    #   traefik.enable: true
+    #   traefik.http.routers.open-webui.tls: true
+    #   traefik.http.routers.open-webui.tls.certresolver: cloudflare
+    #   traefik.http.routers.open-webui.middlewares: authelia@docker,web-utils@docker
+    #   traefik.http.routers.open-webui.entrypoints: websecure
+    #   traefik.http.routers.open-webui.rule: Host(`open-webui.${PERSONAL_DOMAIN_NAME}`)
+    #   traefik.http.routers.open-webui.service: open-webui
+    #   traefik.http.services.open-webui.loadbalancer.server.port: 8080
+    environment:
+      TZ: Europe/Paris
+      OLLAMA_BASE_URL: http://ollama:11434
+    depends_on:
+      - ollama
+    ports:
+      - 8080:8080
+    networks:
+      - ollama
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/paperless/open-webui:/app/backend/data
+
+  ollama:
+    restart: ${RESTART:-unless-stopped}
+    image: ollama/ollama:latest
+    container_name: ollama
+    hostname: ollama
+    # labels:
+    #   traefik.enable: true
+    #   traefik.http.routers.ollama.tls: true
+    #   traefik.http.routers.ollama.tls.certresolver: cloudflare
+    #   traefik.http.routers.ollama.middlewares: authelia@docker,web-utils@docker
+    #   traefik.http.routers.ollama.entrypoints: websecure
+    #   traefik.http.routers.ollama.rule: Host(`ollama.${PERSONAL_DOMAIN_NAME}`)
+    #   traefik.http.routers.ollama.service: ollama
+    #   traefik.http.services.ollama.loadbalancer.server.port: 11434
+    environment:
+      TZ: Europe/Paris
+      OLLAMA_KEEP_ALIVE: 5m
+      # NVIDIA_DRIVER_CAPABILITIES: all # comment out if you aren't using NVIDIA GPUs
+      # NVIDIA_VISIBLE_DEVICES: all # comment out if you aren't using NVIDIA GPUs
+      OLLAMA_HOST: 0.0.0.0:11434
+      OLLAMA_MODELS: ollama-models
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/paperless/ollama/data/:/root/.ollama
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/paperless/ollama/models:/ollama-models
+    ports:
+      - 11434:11434
+    networks:
+      - ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+networks:
+  ollama:
+    name: ollama
