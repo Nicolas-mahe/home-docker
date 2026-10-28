@@ -3,7 +3,7 @@ services:
     restart: ${RESTART:-unless-stopped}
     container_name: mealie
     hostname: mealie
-    image: ghcr.io/mealie-recipes/mealie:${MEALIE_TAG:-v3.27.0}
+    image: ghcr.io/mealie-recipes/mealie:${MEALIE_TAG:-v3.29.0}
     labels:
       traefik.enable: true
       traefik.http.routers.mealie.tls: true
