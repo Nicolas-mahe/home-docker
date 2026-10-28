@@ -17,7 +17,8 @@ services:
       TZ: Europe/Paris
       OLLAMA_BASE_URL: http://ollama:11434
     depends_on:
-      - ollama
+      ollama:
+        condition: service_healthy #service_started
     ports:
       - 8080:8080
     networks:
@@ -42,8 +43,8 @@ services:
     environment:
       TZ: Europe/Paris
       OLLAMA_KEEP_ALIVE: 5m
-      # NVIDIA_DRIVER_CAPABILITIES: all # comment out if you aren't using NVIDIA GPUs
-      # NVIDIA_VISIBLE_DEVICES: all # comment out if you aren't using NVIDIA GPUs
+      NVIDIA_DRIVER_CAPABILITIES: all # comment out if you aren't using NVIDIA GPUs
+      NVIDIA_VISIBLE_DEVICES: all # comment out if you aren't using NVIDIA GPUs
       OLLAMA_HOST: 0.0.0.0:11434
       OLLAMA_MODELS: ollama-models
     volumes:
@@ -60,6 +61,12 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
+    healthcheck:
+      test: ollama --version || exit 1
+      start_period: 10s
+      interval: 30s
+      retries: 5
+      timeout: 5s
 
 networks:
   ollama:
