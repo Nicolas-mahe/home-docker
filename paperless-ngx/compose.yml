@@ -52,10 +52,16 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      gotenberg:
-        condition: service_healthy
-      tika:
-        condition: service_started
+      # gotenberg:
+      #   condition: service_healthy
+      # tika:
+      #   condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "-S", "-L", "--max-time", "2", "http://localhost:8000" ]
+      start_period: 300s
+      interval: 30s
+      retries: 5
+      timeout: 10s
 
   postgres:
     image: postgres:18
@@ -91,35 +97,35 @@ services:
     healthcheck:
       test: redis-cli ping || exit 1
 
-  gotenberg:
-    restart: ${RESTART:-unless-stopped}
-    image: docker.io/gotenberg/gotenberg:8.25
-    container_name: gotenberg
-    hostname: gotenberg
-    environment:
-      TZ: Europe/Paris
-    command:
-      - "gotenberg"
-      - "--chromium-disable-javascript=true"
-      - "--chromium-allow-list=file:///tmp/.*"
-    networks:
-      - paperless
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
-      start_period: 20s
-      interval: 30s
-      retries: 5
-      timeout: 5s
+  # gotenberg:
+  #   restart: ${RESTART:-unless-stopped}
+  #   image: docker.io/gotenberg/gotenberg:8.25
+  #   container_name: gotenberg
+  #   hostname: gotenberg
+  #   environment:
+  #     TZ: Europe/Paris
+  #   command:
+  #     - "gotenberg"
+  #     - "--chromium-disable-javascript=true"
+  #     - "--chromium-allow-list=file:///tmp/.*"
+  #   networks:
+  #     - paperless
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+  #     start_period: 20s
+  #     interval: 30s
+  #     retries: 5
+  #     timeout: 5s
 
-  tika:
-    restart: ${RESTART:-unless-stopped}
-    image: docker.io/apache/tika:latest
-    container_name: tika
-    hostname: tika
-    environment:
-      TZ: Europe/Paris
-    networks:
-      - paperless
+  # tika:
+  #   restart: ${RESTART:-unless-stopped}
+  #   image: docker.io/apache/tika:latest
+  #   container_name: tika
+  #   hostname: tika
+  #   environment:
+  #     TZ: Europe/Paris
+  #   networks:
+  #     - paperless
 
   paperless-ai:
     restart: ${RESTART:-unless-stopped}
@@ -137,13 +143,13 @@ services:
       traefik.http.services.paperless-ai.loadbalancer.server.port: 3000
     environment:
       TZ: Europe/Paris
-      PAPERLESS_API_URL: http://paperless-server:8000
-      PAPERLESS_API_TOKEN: ${PAPERLESS_API_TOKEN} # to generate in Web Ui and restart both
-      PAPERLESS_USERNAME: ${PAPERLESS_USER}
-      AI_PROVIDER: ollama
+      PAPERLESS_API_URL: "http://paperless-server:8000/api"
+      PAPERLESS_API_TOKEN: "${PAPERLESS_API_TOKEN}" # to generate in Web Ui and restart both
+      PAPERLESS_USERNAME: "${PAPERLESS_USER}"
+      AI_PROVIDER: "ollama"
       OLLAMA_API_URL: "${OLLAMA_HOST:-http://ollama:11434}"
-      OLLAMA_MODEL: llama3.2:3b
-      RAG_SERVICE_URL: "http://localhost:8000"
+      OLLAMA_MODEL: "llama3.2:3b"
+      RAG_SERVICE_URL: "http://paperless-server:8000"
       RAG_SERVICE_ENABLED: true
       SCAN_INTERVAL: '30 21 * * *'
       PAPERLESS_URL: "http://paperless-server:8000"
@@ -173,6 +179,7 @@ services:
     environment:
       TZ: Europe/Paris
       PAPERLESS_BASE_URL: "http://paperless-server:8000"
+      PAPERLESS_PUBLIC_URL: "https://paperless.${PERSONAL_DOMAIN_NAME}"
       PAPERLESS_API_TOKEN: ${PAPERLESS_API_TOKEN}
       LLM_PROVIDER: "ollama"
       LLM_MODEL: "llama3.2:3b"
