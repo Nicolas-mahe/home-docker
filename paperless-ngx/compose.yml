@@ -1,31 +1,7 @@
-# Docker Compose file for running paperless from the Docker Hub.
-# This file contains everything paperless needs to run.
-# Paperless supports amd64, arm and arm64 hardware.
-#
-# All compose files of paperless configure paperless in the following way:
-#
-# - Paperless is (re)started on system boot, if it was running before shutdown.
-# - Docker volumes for storing data are managed by Docker.
-# - Folders for importing and exporting files are created in the same directory
-#   as this file and mounted to the correct folders inside the container.
-# - Paperless listens on port 8000.
-#
-# In addition to that, this Docker Compose file adds the following optional
-# configurations:
-#
-# - Instead of SQLite (default), PostgreSQL is used as the database server.
-#
-# To install and update paperless with this file, do the following:
-#
-# - Copy this file as 'docker-compose.yml' and the files 'docker-compose.env'
-#   and '.env' into a folder.
-# - Run 'docker compose pull'.
-# - Run 'docker compose up -d'.
-#
-# For more extensive installation and update instructions, refer to the
-# documentation.
+# https://technotim.com/posts/paperless-ngx-local-ai/
+# https://github.com/timothystewart6/paperless-stack
 services:
-  webserver:
+  paperless:
     restart: ${RESTART:-unless-stopped}
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
     container_name: paperless-server
@@ -34,16 +10,21 @@ services:
       traefik.enable: true
       traefik.http.routers.paperless.tls: true
       traefik.http.routers.paperless.tls.certresolver: cloudflare
-      traefik.http.routers.paperless.middlewares:  authelia@docker,web-utils@docker
+      traefik.http.routers.paperless.middlewares: authelia@docker,web-utils@docker
       traefik.http.routers.paperless.entrypoints: websecure
       traefik.http.routers.paperless.rule: Host(`paperless.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.paperless.service: paperless
       traefik.http.services.paperless.loadbalancer.server.port: 8000
     environment:
+      TZ: Europe/Paris
       USERMAP_UID: ${PAPERLESS_UID:?user id is required}
       USERMAP_GID: ${PAPERLESS_GID:?group id is required}
-      PAPERLESS_REDIS: redis://broker:6379
-      PAPERLESS_DBENGINE: sqlite
+      PAPERLESS_REDIS: redis://redis:6379
+      PAPERLESS_DBENGINE: postgresql
+      PAPERLESS_DBHOST: postgres
+      POSTGRES_DB: ${POSTGRES_DB}
+      PAPERLESS_DBUSER: ${POSTGRES_USER}
+      PAPERLESS_DBPASS: ${POSTGRES_PASSWORD}
       PAPERLESS_SECRET_KEY: ${PAPERLESS_SECRET_KEY:?secret key is required}
       PAPERLESS_TIME_ZONE: Europe/Paris
       PAPERLESS_OCR_LANGUAGE: fra
@@ -54,9 +35,12 @@ services:
       PAPERLESS_ADMIN_PASSWORD: ${PAPERLESS_ADMIN_PASSWORD:?admin password is required}
       PAPERLESS_USE_X_FORWARD_HOST: true
       PAPERLESS_USE_X_FORWARD_PORT: true
+      PAPERLESS_TIKA_ENABLED: 1
+      PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
+      PAPERLESS_TIKA_ENDPOINT: http://tika:9998
       # PAPERLESS_FILENAME_FORMAT: # https://docs.paperless-ngx.com/advanced_usage/#file-name-handling
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/paperless:/usr/src/paperless/data
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/paperless/data:/usr/src/paperless/data
       - /${RAID_DATA_DIRECTORY:?raid path is required}/paperless/media:/usr/src/paperless/media
       - /${RAID_DATA_DIRECTORY:?raid path is required}/paperless/export:/usr/src/paperless/export
       - /${RAID_DATA_DIRECTORY:?raid path is required}/paperless/consume:/usr/src/paperless/consume
@@ -64,26 +48,160 @@ services:
       - paperless
       - webinternal
     depends_on:
-      broker:
+      postgres:
         condition: service_healthy
+      redis:
+        condition: service_healthy
+      gotenberg:
+        condition: service_healthy
+      tika:
+        condition: service_started
 
-  broker:
+  postgres:
+    image: postgres:18
     restart: ${RESTART:-unless-stopped}
-    image: docker.io/valkey/valkey:9-alpine
-    container_name: paperless-broker
-    hostname: paperless-broker
+    container_name: postgres
+    environment:
+      TZ: Europe/Paris
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - paperless-postgres:/var/lib/postgresql
+    networks:
+      - paperless
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 5s
+
+  redis:
+    restart: ${RESTART:-unless-stopped}
+    image: docker.io/library/redis:8
+    container_name: redis
+    hostname: redis
+    environment:
+      TZ: Europe/Paris
     volumes:
       - paperless-redis:/data
     networks:
       - paperless
     healthcheck:
-      test: ["CMD", "valkey-cli", "ping"]
-      interval: 10s
-      timeout: 5s
+      test: redis-cli ping || exit 1
+
+  gotenberg:
+    restart: ${RESTART:-unless-stopped}
+    image: docker.io/gotenberg/gotenberg:8.25
+    container_name: gotenberg
+    hostname: gotenberg
+    environment:
+      TZ: Europe/Paris
+    command:
+      - "gotenberg"
+      - "--chromium-disable-javascript=true"
+      - "--chromium-allow-list=file:///tmp/.*"
+    networks:
+      - paperless
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      start_period: 20s
+      interval: 30s
       retries: 5
-      start_period: 10s
+      timeout: 5s
+
+  tika:
+    restart: ${RESTART:-unless-stopped}
+    image: docker.io/apache/tika:latest
+    container_name: tika
+    hostname: tika
+    environment:
+      TZ: Europe/Paris
+    networks:
+      - paperless
+
+  paperless-ai:
+    restart: ${RESTART:-unless-stopped}
+    image: clusterzx/paperless-ai:latest
+    container_name: paperless-ai
+    hostname: paperless-ai
+    labels:
+      traefik.enable: true
+      traefik.http.routers.paperless-ai.tls: true
+      traefik.http.routers.paperless-ai.tls.certresolver: cloudflare
+      traefik.http.routers.paperless-ai.middlewares: authelia@docker,web-utils@docker
+      traefik.http.routers.paperless-ai.entrypoints: websecure
+      traefik.http.routers.paperless-ai.rule: Host(`paperless-ai.${PERSONAL_DOMAIN_NAME}`)
+      traefik.http.routers.paperless-ai.service: paperless-ai
+      traefik.http.services.paperless-ai.loadbalancer.server.port: 3000
+    environment:
+      TZ: Europe/Paris
+      PAPERLESS_API_URL: http://paperless-server:8000
+      PAPERLESS_API_TOKEN: ${PAPERLESS_API_TOKEN} # to generate in Web Ui and restart both
+      PAPERLESS_USERNAME: ${PAPERLESS_USER}
+      AI_PROVIDER: ollama
+      OLLAMA_API_URL: "${OLLAMA_HOST:-http://ollama:11434}"
+      OLLAMA_MODEL: llama3.2:3b
+      RAG_SERVICE_URL: "http://localhost:8000"
+      RAG_SERVICE_ENABLED: true
+      SCAN_INTERVAL: '30 21 * * *'
+      PAPERLESS_URL: "http://paperless-server:8000"
+    depends_on:
+      paperless:
+        condition: service_healthy
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/paperless/paperless-ai:/app/data
+    networks:
+      - paperless
+      - webinternal
+  
+  paperless-gpt:
+    restart: ${RESTART:-unless-stopped}
+    image: icereed/paperless-gpt:latest
+    container_name: paperless-gpt
+    hostname: paperless-gpt
+    labels:
+      traefik.enable: true
+      traefik.http.routers.paperless-gpt.tls: true
+      traefik.http.routers.paperless-gpt.tls.certresolver: cloudflare
+      traefik.http.routers.paperless-gpt.middlewares: authelia@docker,web-utils@docker
+      traefik.http.routers.paperless-gpt.entrypoints: websecure
+      traefik.http.routers.paperless-gpt.rule: Host(`paperless-gpt.${PERSONAL_DOMAIN_NAME}`)
+      traefik.http.routers.paperless-gpt.service: paperless-gpt
+      traefik.http.services.paperless-gpt.loadbalancer.server.port: 8080
+    environment:
+      TZ: Europe/Paris
+      PAPERLESS_BASE_URL: "http://paperless-server:8000"
+      PAPERLESS_API_TOKEN: ${PAPERLESS_API_TOKEN}
+      LLM_PROVIDER: "ollama"
+      LLM_MODEL: "llama3.2:3b"
+      OLLAMA_HOST: "${OLLAMA_HOST:-http://ollama:11434}"
+      OLLAMA_CONTEXT_LENGTH: "8192" # Sets Ollama NumCtx (context window)
+      TOKEN_LIMIT: 1000 # Recommended for smaller models
+      LLM_LANGUAGE: "English" # Optional, default: English
+      OCR_PROVIDER: "llm" # Default OCR provider
+      VISION_LLM_PROVIDER: "ollama" # openai, ollama, mistral, or anthropic
+      VISION_LLM_MODEL: "minicpm-v:8b" # minicpm-v (ollama) or gpt-4o (openai) or claude-sonnet-4-5 (anthropic/claude)
+      AUTO_OCR_TAG: "paperless-gpt-ocr-auto"
+      AUTO_TAG: "paperless-gpt-auto"
+      MANUAL_TAG: "paperless-gpt-manual"
+      PDF_OCR_TAGGING: "true"
+      PDF_OCR_COMPLETE_TAG: "paperless-gpt-ocr-complete"
+      PDF_UPLOAD: "false"
+      LOG_LEVEL: "DEBUG" 
+    depends_on:
+      paperless:
+        condition: service_healthy
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/paperless/paperless-gpt:/app/prompts
+    networks:
+      - paperless
+      - webinternal
 
 volumes:
+  paperless-postgres:
+    name: paperless-postgres
   paperless-redis:
     name: paperless-redis
 
