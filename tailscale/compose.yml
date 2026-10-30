@@ -1,53 +1,46 @@
 services:
   tailscale:
-    restart: unless-stopped
-    image: tailscale/tailscale:latest
+    restart: ${RESTART:-always}
+    image: ghcr.io/tailscale/tailscale:v1.104.4@sha256:ed6480b33c6eb67c9cbd203ed42b9fb57e361986725b6856def71b7a3d9e276c #ghcr.io/tailscale/tailscale:latest #v1.104.4
     container_name: tailscale
-    hostname: tailscale
+    hostname: ${HOSTNAME}
+    cap_add:
+      - CAP_CHOWN
+      - CAP_DAC_OVERRIDE
+      - CAP_FOWNER
+      - CAP_NET_ADMIN
+      - CAP_NET_RAW
+      - CAP_SYS_MODULE
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges=true
     environment:
+      TS_SOCKET: /var/run/tailscale/tailscaled.sock
       TS_AUTHKEY: ${TS_AUTHKEY}
-      TS_EXTRA_ARGS: --advertise-tags=tag:container
+      UMASK_SET: 002
+      TS_ACCEPT_DNS: false
+      TS_HOSTNAME: ${HOSTNAME}
+      TZ: Europe/Paris
+      NVIDIA_VISIBLE_DEVICES: void
+      TS_EXTRA_ARGS: --advertise-exit-node=false --reset=false --accept-routes=false
+      UMASK: 002
       TS_STATE_DIR: /var/lib/tailscale
       TS_USERSPACE: false
+      TS_AUTH_ONCE: true
     volumes:
-      - tailscale:/var/lib/tailscale
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/tailscale:/var/lib/tailscale
+    network_mode: host
     devices:
       - /dev/net/tun:/dev/net/tun
-    cap_add:
-      - net_admin
-      - net_raw
-    network_mode: host
-
-volumes:
-  tailscale:
-
-version: '3.8'
-services:
-  tailscale:
-    image: ghcr.io/tailscale/tailscale:v1.96.5
-    cap_add:
-      - NET_ADMIN
-      - NET_RAW
-      - SYS_MODULE
-      - CHOWN
-      - FOWNER
-      - DAC_OVERRIDE
-    devices:
-      - /dev/net/tun
-    environment:
-      - TS_STATE_DIR=/var/lib/tailscale
-      - TS_ACCEPT_DNS=false
-      - TS_HOSTNAME=pdcpd1002nas
-      - TS_USERSPACE=false
-      - TS_AUTH_ONCE=true
-      - TS_AUTHKEY=tskey-auth-kifEZ9RYN911CNTRL-RSkNjdENC6XnmW4ja3fM6XRKVAvMUwqx
-      - TS_SOCKET=/var/run/tailscale/tailscaled.sock
-      - TS_EXTRA_ARGS=--advertise-exit-node=false --reset=false --accept-routes=false
-      - TZ=Europe/Paris
-    healthcheck:
-      test: ["CMD", "tailscale", "status"]
-    network_mode: host
     tmpfs:
-      - /var/run/tailscale:mode=0755
-    volumes:
-      - /mnt/.ix-apps/app_mounts/tailscale/state:/var/lib/tailscale
+      - /var/run/tailscale
+    healthcheck:
+      test:
+        - CMD
+        - tailscale
+        - status
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
