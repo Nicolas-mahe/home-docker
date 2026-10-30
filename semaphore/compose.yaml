@@ -1,6 +1,6 @@
 services:
   postgres:
-    restart: unless-stopped
+    restart: ${RESTART:-unless-stopped}
     image: docker.io/postgres:${POSTGRES_TAG:-17.6-bookworm}
     container_name: semaphore-postgres
     hostname: semaphore-postgres
@@ -20,8 +20,8 @@ services:
       timeout: 5s
 
   semaphore:
-    user: "${DOCKER_USER_EXECUTOR:-1000}:${DOCKER_USER_EXECUTOR:-1000}"
-    restart: unless-stopped
+    user: "${DOCKER_USER_EXECUTOR:-1000}:${DOCKER_GROUP_EXECUTOR:-1000}"
+    restart: ${RESTART:-unless-stopped}
     image: docker.io/semaphoreui/semaphore:${SEMAPHORE_TAG:-v2.16.19}
     container_name: semaphore-app
     hostname: semaphore-app
