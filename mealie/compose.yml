@@ -8,11 +8,17 @@ services:
       traefik.enable: true
       traefik.http.routers.mealie.tls: true
       traefik.http.routers.mealie.tls.certresolver: cloudflare
-      traefik.http.routers.mealie.middlewares: web-utils@docker #authelia@docker,
+      traefik.http.routers.mealie.middlewares: sablier-mealie@docker,web-utils@docker
       traefik.http.routers.mealie.entrypoints: websecure
       traefik.http.routers.mealie.rule: Host(`mealie.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.mealie.service: mealie
       traefik.http.services.mealie.loadBalancer.server.port: 9000
+      #sablier
+      sablier.enable: true
+      sablier.group: mealie
+      traefik.docker.allownonrunning: true
+      traefik.http.middlewares.sablier-mealie.plugin.sablier.group: mealie
+      traefik.http.middlewares.sablier-mealie.plugin.sablier.dynamic.displayName: mealie
     environment:
       ALLOW_SIGNUP: false
       ALLOW_PASSWORD_LOGIN: true # Whether or not to display the username+password input fields. Keep set to true unless you use OIDC authentication
@@ -71,13 +77,17 @@ services:
     container_name: mealie-postgres
     hostname: mealie-postgres
     image: postgres:${POSTGRES_MEALIE_TAG:-17}
-    volumes:
-      - mealie-postgres:/var/lib/postgresql/data
+    labels:
+      #sablier
+      sablier.enable: true
+      sablier.group: mealie
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_MEALIE_PWD}
       POSTGRES_USER: ${POSTGRES_MEALIE_USER}
       PGUSER: ${PG_MEALIE_USER}
       POSTGRES_DB: ${POSTGRES_MEALIE_DB}
+    volumes:
+      - mealie-postgres:/var/lib/postgresql/data
     networks:
       - mealie
     healthcheck:

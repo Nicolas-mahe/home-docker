@@ -8,16 +8,22 @@ services:
       traefik.enable: true
       traefik.http.routers.skyblog1.tls: true
       traefik.http.routers.skyblog1.tls.certresolver: cloudflare
-      traefik.http.routers.skyblog1.middlewares: authelia@docker,web-utils@docker
+      traefik.http.routers.skyblog1.middlewares: authelia@docker,sablier-skyblog@docker,web-utils@docker
       traefik.http.routers.skyblog1.entrypoints: websecure
       traefik.http.routers.skyblog1.rule: Host(`${SKYBLOG1}.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.skyblog1.service: skyblog1
       traefik.http.services.skyblog1.loadBalancer.server.port: 80
-    volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/websites/${SKYBLOG1}.skyrock.com:/usr/share/nginx/html:ro
+      #sablier
+      sablier.enable: true
+      sablier.group: skyblog
+      traefik.docker.allownonrunning: true
+      traefik.http.middlewares.sablier-skyblog.plugin.sablier.group: skyblog
+      traefik.http.middlewares.sablier-skyblog.plugin.sablier.dynamic.displayName: Skyblogs
     environment:
       TZ: Europe/Paris
       NGINX_HOST: ${SKYBLOG1}.${PERSONAL_DOMAIN_NAME}
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/websites/${SKYBLOG1}.skyrock.com:/usr/share/nginx/html:ro
     expose:
       - 80
     networks:
@@ -38,18 +44,20 @@ services:
       traefik.enable: true
       traefik.http.routers.skyblog2.tls: true
       traefik.http.routers.skyblog2.tls.certresolver: cloudflare
-      traefik.http.routers.skyblog2.middlewares: authelia@docker,web-utils@docker
+      traefik.http.routers.skyblog2.middlewares: authelia@docker,sablier-skyblog@docker,web-utils@docker
       traefik.http.routers.skyblog2.entrypoints: websecure
       traefik.http.routers.skyblog2.rule: Host(`${SKYBLOG2}.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.skyblog2.service: skyblog2
       traefik.http.services.skyblog2.loadBalancer.server.port: 80
-    volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/websites/${SKYBLOG2}.skyrock.com:/usr/share/nginx/html:ro
+      #sablier
+      sablier.enable: true
+      sablier.group: skyblog
+      traefik.docker.allownonrunning: true
     environment:
-      PUID: 1000
-      PGID: 100
       TZ: Europe/Paris
       NGINX_HOST: ${SKYBLOG2}.${PERSONAL_DOMAIN_NAME}
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/websites/${SKYBLOG2}.skyrock.com:/usr/share/nginx/html:ro
     expose:
       - 80
     networks:
@@ -72,9 +80,15 @@ services:
       traefik.http.routers.python-pronostics.tls.certresolver: cloudflare
       traefik.http.routers.python-pronostics.entrypoints: websecure
       traefik.http.routers.python-pronostics.rule: Host(`pronostic.${PERSONAL_DOMAIN_NAME}`)
-      traefik.http.routers.python-pronostics.middlewares: authelia@docker,web-utils@docker
+      traefik.http.routers.python-pronostics.middlewares: authelia@docker,sablier-pronostics@docker,web-utils@docker
       traefik.http.routers.python-pronostics.service: python-pronostics
       traefik.http.services.python-pronostics.loadBalancer.server.port: 5000
+      #sablier
+      sablier.enable: true
+      sablier.group: pronostics
+      traefik.docker.allownonrunning: true
+      traefik.http.middlewares.sablier-pronostics.plugin.sablier.group: pronostics
+      traefik.http.middlewares.sablier-pronostics.plugin.sablier.dynamic.displayName: Pronostics
     environment:
       TZ: Europe/Paris
     volumes:
@@ -106,10 +120,16 @@ services:
       traefik.http.routers.pythonbaby.tls: true
       traefik.http.routers.pythonbaby.tls.certresolver: cloudflare
       traefik.http.routers.pythonbaby.entrypoints: websecure
-      traefik.http.routers.pythonbaby.middlewares: authelia@docker,web-utils@docker
+      traefik.http.routers.pythonbaby.middlewares: authelia@docker,sablier-baby@docker,web-utils@docker
       traefik.http.routers.pythonbaby.rule: Host(`baby.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.pythonbaby.service: pythonbaby
       traefik.http.services.pythonbaby.loadBalancer.server.port: 5000
+      #sablier
+      sablier.enable: true
+      sablier.group: babyfollow
+      traefik.docker.allownonrunning: true
+      traefik.http.middlewares.sablier-baby.plugin.sablier.group: babyfollow
+      traefik.http.middlewares.sablier-baby.plugin.sablier.dynamic.displayName: Baby Follow
     environment:
       TZ: Europe/Paris
       SESSION_TOKEN: ${SESSION_TOKEN_BABY}
@@ -118,6 +138,12 @@ services:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/websites/baby-follow:/app/instance
     networks:
     - webinternal
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:5000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
 networks:
   webinternal:

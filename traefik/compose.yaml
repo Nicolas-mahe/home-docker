@@ -46,11 +46,17 @@ services:
       traefik.enable: true
       traefik.http.routers.whoami.tls: true
       traefik.http.routers.whoami.tls.certresolver: cloudflare
-      traefik.http.routers.whoami.middlewares: authelia@docker,web-utils@docker
+      traefik.http.routers.whoami.middlewares: authelia@docker,sablier-whoami@docker,web-utils@docker
       traefik.http.routers.whoami.entrypoints: websecure
       traefik.http.routers.whoami.rule: Host(`whoami.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.whoami.service: whoami
       traefik.http.services.whoami.loadBalancer.server.port: 80
+      #sablier
+      sablier.enable: true
+      sablier.group: whoami
+      traefik.docker.allownonrunning: true
+      traefik.http.middlewares.sablier-whoami.plugin.sablier.group: whoami
+      traefik.http.middlewares.sablier-whoami.plugin.sablier.dynamic.displayName: whoami
     environment:
       TZ: Europe/Paris
     expose:
@@ -191,6 +197,46 @@ services:
       - --experimental.plugins.bouncer.moduleName=github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
       - --experimental.plugins.bouncer.version=${CROWDSEC_PLUGIN_VERSION:?bouncer version required}
 
+      # Sablier
+      - --experimental.plugins.sablier.moduleName=github.com/sablierapp/sablier #https://plugins.traefik.io/plugins/6715d1d37dd5a6c3095befd4/sablier
+      - --experimental.plugins.sablier.version=${SABLIER_PLUGIN_VERSION:?sablier version required} #v1.10.0
+
+  sablier:
+    restart: ${RESTART:-unless-stopped}
+    image:  docker.io/sablierapp/sablier:${SABLIER_TAG:-1.19.1}
+    container_name: sablier
+    hostname: sablier
+    security_opt:
+      - no-new-privileges=true
+    environment:
+      TZ: Europe/Paris
+      # DOCKER_HOST: tcp://docker-proxy-rw:2375
+      SABLIER_PROVIDER_NAME: docker
+      SABLIER_PROVIDER_DOCKER_STRATEGY: stop
+      SABLIER_PROVIDER_AUTO_STOP_ON_STARTUP: false
+      SABLIER_PROVIDER_REJECT_UNLABELED_REQUESTS: true
+      SABLIER_PROVIDER_VERFY_ENABLE_ON_EXPIRATION: true
+      SABLIER_STORAGE_FILE: /etc/sablier/state/state.json
+      SABLIER_STRATEGY_DYNAMIC_DEFAULT_THEME: ghost
+      SABLIER_STRATEGY_DYNAMIC_SHOW_DETAILS_BY_DEFAULT: true
+      SABLIER_STRATEGY_DYNAMIC_DEFAULT_REFRESH_FREQUENCY: 2s
+      SABLIER_SESSIONS_DEFAULT_DURATION: 30m
+      SABLIER_SERVER_METRICS_ENABLED: false
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/traefik/sablier/state:/etc/sablier/state
+    networks: 
+      - webinternal
+    depends_on:
+      traefik:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "sablier", "health"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 3s
+  
   web-utils:
     restart: ${RESTART:-unless-stopped}
     image: registry.${PERSONAL_DOMAIN_NAME}/${UTILS_PROJECT_PATH}:${UTILS_DOCKER_TAG:-main}
@@ -409,6 +455,7 @@ networks:
         - subnet: "172.16.42.0/24"
   monitoring:
     name: monitoring
+    internal: true
   webexpose:
     name: webexpose
   webinternal:

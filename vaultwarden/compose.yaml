@@ -6,22 +6,19 @@ services:
     hostname: vaultwarden
     labels:
       traefik.enable: true
-      # admin interface
-      traefik.http.routers.vaultwarden-admin.tls: true
-      traefik.http.routers.vaultwarden-admin.tls.certresolver: cloudflare
-      traefik.http.routers.vaultwarden-admin.middlewares: authelia@docker
-      traefik.http.routers.vaultwarden-admin.entrypoints: websecure
-      traefik.http.routers.vaultwarden-admin.rule: Host(`vaultwarden.${PERSONAL_DOMAIN_NAME}`) && PathPrefix(`/admin`) 
-      traefik.http.routers.vaultwarden-admin.service: vaultwarden-admin
-      traefik.http.services.vaultwarden-admin.loadBalancer.server.port: 80
-      # user interface
       traefik.http.routers.vaultwarden.tls: true
       traefik.http.routers.vaultwarden.tls.certresolver: cloudflare
-      traefik.http.routers.vaultwarden.middlewares: authelia@docker
+      traefik.http.routers.vaultwarden.middlewares: authelia@docker,sablier-vaultwarden@docker
       traefik.http.routers.vaultwarden.entrypoints: websecure
-      traefik.http.routers.vaultwarden.rule: Host(`vaultwarden.${PERSONAL_DOMAIN_NAME}`) && !PathPrefix(`/admin`) 
+      traefik.http.routers.vaultwarden.rule: Host(`vaultwarden.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.vaultwarden.service: vaultwarden
       traefik.http.services.vaultwarden.loadBalancer.server.port: 80
+      #sablier
+      sablier.enable: true
+      sablier.group: vaultwarden
+      traefik.docker.allownonrunning: true
+      traefik.http.middlewares.sablier-vaultwarden.plugin.sablier.group: vaultwarden
+      traefik.http.middlewares.sablier-vaultwarden.plugin.sablier.dynamic.displayName: vaultwarden
     environment:
       DOMAIN: https://vaultwarden.${PERSONAL_DOMAIN_NAME}
       TZ: Europe/Paris
@@ -32,6 +29,12 @@ services:
       - 80
     networks:
       - webinternal
+    healthcheck:
+      test: ["CMD", "/healthcheck.sh"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
 
 networks:
   webinternal:
