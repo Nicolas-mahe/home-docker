@@ -11,12 +11,14 @@ services:
       traefik.http.services.gitlab-web.loadBalancer.server.port: 80
       traefik.http.routers.gitlab-web.service: gitlab-web
       traefik.http.routers.gitlab-web.rule: Host(`gitlab.${PERSONAL_DOMAIN_NAME}`)
+      traefik.http.routers.gitlab-web.middlewares: sablier-gitlab@docker
       traefik.http.routers.gitlab-web.entrypoints: websecure
       traefik.http.routers.gitlab-web.tls: true
       traefik.http.routers.gitlab-web.tls.certresolver: cloudflare
       traefik.http.services.gitlab-registry.loadBalancer.server.port: 5050
       traefik.http.routers.gitlab-registry.service: gitlab-registry
       traefik.http.routers.gitlab-registry.rule: Host(`registry.${PERSONAL_DOMAIN_NAME}`)
+      traefik.http.routers.gitlab-registry.middlewares: sablier-gitlab@docker
       traefik.http.routers.gitlab-registry.entrypoints: websecure
       traefik.http.routers.gitlab-registry.tls: true
       traefik.http.routers.gitlab-registry.tls.certresolver: cloudflare
@@ -24,6 +26,13 @@ services:
       traefik.tcp.routers.gitlab-ssh.entrypoints: gitlab-ssh
       traefik.tcp.routers.gitlab-ssh.service: gitlab-ssh
       traefik.tcp.services.gitlab-ssh.loadbalancer.server.port: 22
+      #sablier
+      sablier.enable: true
+      sablier.group: gitlab
+      traefik.docker.allownonrunning: true
+      traefik.http.middlewares.sablier-gitlab.plugin.sablier.group: gitlab
+      traefik.http.middlewares.sablier-gitlab.plugin.sablier.sessionDuration: 2h
+      traefik.http.middlewares.sablier-gitlab.plugin.sablier.dynamic.displayName: Gitlab
     environment:
       GITLAB_OMNIBUS_CONFIG: |
         external_url 'https://gitlab.${PERSONAL_DOMAIN_NAME}'
@@ -66,23 +75,29 @@ services:
     networks:
       - gitlab
       - webinternal
+    # In case of restoration of a backup, the healthcheck should be disabled to avoid the container being restarted while restoring.
     # healthcheck:
     #   disable: true
 
   gitlab-runner:
+    restart: unless-stopped
     image: gitlab/gitlab-runner:${RUNNER_TAG:-v19.2.0}
     container_name: gitlab-runner
     hostname: gitlab-runner
-    restart: unless-stopped
+    labels:
+      #sablier
+      sablier.enable: true
+      sablier.group: gitlab
+      traefik.docker.allownonrunning: true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/runner-config:/etc/gitlab-runner
       - runner-home:/home/gitlab-runner
     networks:
       - gitlab
-    # depends_on:
-    #   gitlab:
-    #     condition: service_healthy
+    depends_on:
+      gitlab:
+        condition: service_healthy
 volumes:
   data:
   logs:

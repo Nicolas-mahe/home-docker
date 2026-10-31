@@ -11,11 +11,17 @@ services:
       traefik.enable: true
       traefik.http.routers.rackula.tls: true
       traefik.http.routers.rackula.tls.certresolver: cloudflare
-      traefik.http.routers.rackula.middlewares: authelia@docker,web-utils@docker
+      traefik.http.routers.rackula.middlewares: authelia@docker,sablier-rakula@docker,web-utils@docker
       traefik.http.routers.rackula.entrypoints: websecure
       traefik.http.routers.rackula.rule: Host(`rackula.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.rackula.service: rackula
       traefik.http.services.rackula.loadbalancer.server.port: ${RACKULA_WEB_PORT:-8080}
+      #sablier
+      sablier.enable: true
+      sablier.group: rakula
+      traefik.docker.allownonrunning: true
+      traefik.http.middlewares.sablier-rakula.plugin.sablier.group: rakula
+      traefik.http.middlewares.sablier-rakula.plugin.sablier.dynamic.displayName: rakula
     environment:
       API_HOST: rackula-api
       API_PORT: ${RACKULA_API_PORT:-3001}
@@ -53,6 +59,11 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    labels:
+      #sablier
+      sablier.enable: true
+      sablier.group: rakula
+      traefik.docker.allownonrunning: true
     environment:
       DATA_DIR: /data
       RACKULA_API_PORT: ${RACKULA_API_PORT:-3001}

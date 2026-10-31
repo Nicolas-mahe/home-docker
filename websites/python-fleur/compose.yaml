@@ -7,11 +7,19 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.python-fleur.tls: true
-      traefik.http.routers.python-fleur.middlewares: web-utils@docker
+      traefik.http.routers.python-fleur.tls.certresolver: cloudflare
+      traefik.http.routers.python-fleur.middlewares: sablier-python-fleur@docker,web-utils@docker
       traefik.http.routers.python-fleur.entrypoints: websecure
       traefik.http.routers.python-fleur.rule: Host(`fleur.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.python-fleur.service: python-fleur
       traefik.http.services.python-fleur.loadBalancer.server.port: 5000
+      #sablier
+      sablier.enable: true
+      sablier.group: python-fleur
+      traefik.docker.allownonrunning: true
+      traefik.http.middlewares.sablier-python-fleur.plugin.sablier.group: python-fleur
+      traefik.http.middlewares.sablier-python-fleur.plugin.sablier.sessionDuration: 6h
+      traefik.http.middlewares.sablier-python-fleur.plugin.sablier.dynamic.displayName: Fleur
     environment: 
       TZ: Europe/Paris
     volumes:

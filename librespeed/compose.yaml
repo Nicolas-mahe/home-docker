@@ -8,11 +8,17 @@ services:
       traefik.enable: true
       traefik.http.routers.librespeed.tls: true
       traefik.http.routers.librespeed.tls.certresolver: cloudflare
-      traefik.http.routers.librespeed.middlewares: authelia@docker,web-utils@docker
+      traefik.http.routers.librespeed.middlewares: authelia@docker,sablier-librespeed@docker,web-utils@docker
       traefik.http.routers.librespeed.entrypoints: websecure
       traefik.http.routers.librespeed.rule: Host(`librespeed.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.librespeed.service: librespeed
       traefik.http.services.librespeed.loadBalancer.server.port: 80
+      #sablier
+      sablier.enable: true
+      sablier.group: librespeed
+      traefik.docker.allownonrunning: true
+      traefik.http.middlewares.sablier-librespeed.plugin.sablier.group: librespeed
+      traefik.http.middlewares.sablier-librespeed.plugin.sablier.dynamic.displayName: librespeed
     environment:
       TZ: Europe/Paris
       PASSWORD: ${PERSONAL_LIBRESPEED_PWD}

@@ -9,7 +9,7 @@ services:
       # Redirection Root Domain
       traefik.http.routers.redirect.tls: true
       traefik.http.routers.redirect.tls.certresolver: cloudflare
-      traefik.http.routers.redirect.middlewares: authelia@docker,redirect-to-www,web-utils@docker
+      traefik.http.routers.redirect.middlewares: authelia@docker,redirect-to-www,sablier-homepage@docker,web-utils@docker
       traefik.http.routers.redirect.entrypoints: websecure
       traefik.http.routers.redirect.rule: Host(`${PERSONAL_DOMAIN_NAME}`)
       traefik.http.middlewares.redirect-to-www.redirectregex.regex:  "^https?:\\/\\/(${PERSONAL_DOMAIN_NAME})(.*)"
@@ -18,11 +18,17 @@ services:
       # homepage
       traefik.http.routers.homepage.tls: true
       traefik.http.routers.homepage.tls.certresolver: cloudflare
-      traefik.http.routers.homepage.middlewares: authelia@docker,web-utils@docker
+      traefik.http.routers.homepage.middlewares: authelia@docker,sablier-homepage@docker,web-utils@docker
       traefik.http.routers.homepage.entrypoints: websecure
       traefik.http.routers.homepage.rule: Host(`www.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.homepage.service: homepage
       traefik.http.services.homepage.loadBalancer.server.port: 3000
+      #sablier
+      sablier.enable: true
+      sablier.group: homepage
+      traefik.docker.allownonrunning: true
+      traefik.http.middlewares.sablier-homepage.plugin.sablier.group: homepage
+      traefik.http.middlewares.sablier-homepage.plugin.sablier.dynamic.displayName: homepage
     environment:
       TZ: Europe/Paris
       LOG_TARGETS: stdout
