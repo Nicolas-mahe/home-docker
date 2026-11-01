@@ -55,6 +55,16 @@ identity_providers:
       # provided they have the scheme http or https and do not have the hostname of localhost.
       allowed_origins_from_client_redirect_uris: true
 
+    claims_policies:
+      standard_claims:
+        id_token:
+          - groups
+          - email
+          - email_verified
+          - alt_emails
+          - preferred_username
+          - name
+
     # Clients is a list of registered clients and their configuration.
     # It's recommended you read the documentation before configuration of a registered client.
     # See: https://www.authelia.com/c/oidc/registered-clients
@@ -119,6 +129,7 @@ identity_providers:
         client_secret: 'XXX'
         public: false
         authorization_policy: 'one_factor'
+        claims_policy: standard_claims
         require_pkce: true
         pkce_challenge_method: 'S256'
         redirect_uris:

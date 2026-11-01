@@ -4,31 +4,42 @@ services:
     image: gcr.io/cadvisor/cadvisor:${CADVISOR_TAG:-latest} # google registry
     container_name: cadvisor
     hostname: cadvisor
+    user: "${PERSONAL_MONITORING_UID:-0}:${PERSONAL_MONITORING_GID:-0}"
+    pid: host
     privileged: true
-    labels:
     environment:
       TZ: Europe/Paris
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos/home-docker/timezone:/etc/timezone:ro
       - /:/rootfs:ro
       - /run:/run:ro
       - /sys:/sys:ro
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-config:/var/lib/docker:ro
+      - /var/lib/docker:/var/lib/docker:ro
       - /dev/disk/:/dev/disk:ro
     devices:
       - /dev/kmsg
+    expose:
+      - 8080
     ports:
       - 8080:8080
     networks:
       - monitoring
+    command:
+      - --docker_only=true
+      - --disable_metrics=disk,diskIO,process,referenced_memory
+    # healthcheck:
+    #   test: ["CMD", "wget", "http://127.0.0.1:8080/healthz"]
+    #   interval: 10s
+    #   timeout: 15s
+    #   retries: 10
+    #   start_period: 40s
 
   node_exporter:
     restart: unless-stopped
     image: quay.io/prometheus/node-exporter:${NODE_EXPORTER_TAG:-latest}
     container_name: node_exporter
     hostname: node_exporter
+    user: "${PERSONAL_MONITORING_UID:-0}:${PERSONAL_MONITORING_GID:-0}"
     pid: host
-    labels:
     environment:
       TZ: Europe/Paris
     volumes:
