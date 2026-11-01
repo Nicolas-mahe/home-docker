@@ -20,7 +20,7 @@ services:
       ollama:
         condition: service_healthy #service_started
     ports:
-      - 8080:8080
+      - ${OPEN_WEBUI_PORT:-8080}:8080
     networks:
       - ollama
     volumes:
@@ -51,7 +51,7 @@ services:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/paperless/ollama/data/:/root/.ollama
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/paperless/ollama/models:/ollama-models
     ports:
-      - 11434:11434
+      - ${OLLAMA_PORT:-11434}:11434
     networks:
       - ollama
     deploy:
