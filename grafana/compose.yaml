@@ -83,8 +83,6 @@ services:
     volumes:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/grafana/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
       - prometheus:/prometheus
-    ports:
-      - 9090:9090
     command: 
       - "--config.file=/etc/prometheus/prometheus.yaml"
       - "--storage.tsdb.path=/prometheus"
@@ -122,7 +120,7 @@ services:
     devices:
       - /dev/kmsg
     ports:
-      - ${CADVISOR_PORT:-8080}:8080
+      - ${CADVISOR_PORT:-8081}:8080
     networks:
       - monitoring
     command:
@@ -216,7 +214,6 @@ volumes:
 networks:
   monitoring:
     name: monitoring
-    internal: true
   webinternal:
     name: webinternal
     external: true

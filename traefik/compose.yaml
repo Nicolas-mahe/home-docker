@@ -455,7 +455,6 @@ networks:
         - subnet: "172.16.42.0/24"
   monitoring:
     name: monitoring
-    internal: true
   webexpose:
     name: webexpose
   webinternal:
