@@ -20,7 +20,7 @@ services:
     expose:
       - 8080
     ports:
-      - ${CADVISOR_PORT:-8080}:8080
+      - ${CADVISOR_PORT:-8081}:8080
     networks:
       - monitoring
     command:
