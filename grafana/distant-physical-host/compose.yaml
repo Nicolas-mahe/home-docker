@@ -25,7 +25,9 @@ services:
       - monitoring
     command:
       - --docker_only=true
-      - --disable_metrics=advtcp,app,cpuLoad,cpu_topology,cpuset,disk,diskIO,hugetlb,memory_numa,oom_event,percpu,perf_event,process,referenced_memory,resctrl,sched,tcp,udp
+      - --store_container_labels=false
+      - --whitelisted_container_labels=com.docker.compose.project,com.docker.compose.service
+      - --disable_metrics=disk,process,referenced_memory,cpuLoad,percpu,hugetlb,memory_numa,oom_event,perf_event,resctrl,sched,tcp,udp,advtcp,app,cpuset
     healthcheck:
       test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://127.0.0.1:8080/healthz || exit 1"]
       interval: 30s
