@@ -24,8 +24,18 @@ scrape_configs:
         - ${PERSONAL_NETWORK}.2:8081
         - ${PERSONAL_NETWORK}.3:8081
         - ${PERSONAL_NETWORK}.4:8081
-    # - targets: ['pdcpd1003games.lan:8080']
-    # - targets: ['pdcpd1004ai.lan:8080']
+    metric_relabel_configs:
+      # Nom du conteneur Docker
+      - source_labels: [name]
+        target_label: container
+
+      # Nom du service Docker Compose
+      - source_labels: [container_label_com_docker_compose_service]
+        target_label: service
+
+      # Projet Docker Compose (optionnel)
+      - source_labels: [container_label_com_docker_compose_project]
+        target_label: compose_project
 
   # Example job for node_exporter
   - job_name: 'node_exporter'
@@ -34,8 +44,6 @@ scrape_configs:
         - ${PERSONAL_NETWORK}.2:9100
         - ${PERSONAL_NETWORK}.3:9100
         - ${PERSONAL_NETWORK}.4:9100
-    # - targets: ['pdcpd1003games.lan:8080']
-    # - targets: ['pdcpd1004ai.lan:8080']
 
   # Traefik
   - job_name: 'traefik'
