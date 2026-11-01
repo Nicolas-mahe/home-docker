@@ -145,6 +145,37 @@ services:
       retries: 3
       start_period: 30s
 
+  brainstorm:
+    restart: unless-stopped
+    image: ${DOCKER_REGISTRY_ADDR}/${PROJECT_PATH}:${DOCKER_TAG:-main}
+    container_name: brainstorm
+    hostname: brainstorm
+    labels:
+      traefik.enable: true
+      traefik.http.routers.brainstorm.tls: true
+      traefik.http.routers.brainstorm.tls.certresolver: cloudflare
+      traefik.http.routers.brainstorm.middlewares: authelia@docker,sablier-brainstorm@docker,web-utils@docker
+      traefik.http.routers.brainstorm.entrypoints: websecure
+      traefik.http.routers.brainstorm.rule: Host(`brainstorm.${PERSONAL_DOMAIN_NAME}`)
+      traefik.http.routers.brainstorm.service: brainstorm
+      traefik.http.services.brainstorm.loadBalancer.server.port: 5000
+      #sablier
+      sablier.enable: true
+      sablier.group: brainstorm
+      traefik.docker.allownonrunning: true
+      traefik.http.middlewares.sablier-brainstorm.plugin.sablier.group: brainstorm
+      traefik.http.middlewares.sablier-brainstorm.plugin.sablier.dynamic.displayName: Brainstorm
+    environment:
+      TZ: Europe/Paris
+      SECRET_KEY: ${SECRET_KEY_BRAINSTORM}
+      DEBUG_MODE: ${DEBUG_MODE}
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY:?required}/docker/docker-data/websites/brainstorm:/app/instance
+    expose:
+      - 5000
+    networks:
+      - webinternal
+
 networks:
   webinternal:
     name: webinternal
