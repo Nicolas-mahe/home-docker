@@ -1,35 +1,76 @@
 services:
   dockhand:
     restart: unless-stopped
-    image: docker.io/fnsys/dockhand:latest
-    container_name: dockhand
-    hostname: dockhand
+    image: docker.io/fnsys/dockhand:v1.0.55@sha256:039fbb65899f5ecc1d63083736d94587306b35736bca666eca623416859ddaa5
+    container_name: ix-dockhand-dockhand-1 #dockhand
+    # hostname: dockhand
     labels:
       traefik.enable: true
       traefik.http.routers.dockhand.tls: true
       traefik.http.routers.dockhand.tls.certresolver: cloudflare
-      traefik.http.routers.dockhand.middlewares: authelia@docker,web-utils@docker
+      traefik.http.routers.dockhand.middlewares: authelia@docker,sablier-dockhand@docker,web-utils@docker
       traefik.http.routers.dockhand.entrypoints: websecure
-      traefik.http.routers.dockhand.rule: Host(`docker.${PERSONAL_DOMAIN_NAME}`)
+      traefik.http.routers.dockhand.rule: Host(`management.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.dockhand.service: dockhand
       traefik.http.services.dockhand.loadBalancer.server.port: 3000
+      #sablier
+      sablier.enable: true
+      sablier.group: dockhand
+      traefik.docker.allownonrunning: true
+      traefik.http.middlewares.sablier-dockhand.plugin.sablier.group: dockhand
+      traefik.http.middlewares.sablier-dockhand.plugin.sablier.dynamic.displayName: Dockhand
     environment:
       TZ: Europe/Paris
-      # PUID: 3001
-      # PGID: 1000
-      DISABLE_LOCAL_LOGIN: True #https://dockhand.pro/manual/#emergency
+      DISABLE_LOCAL_LOGIN: true #https://dockhand.pro/manual/#emergency
+      DISABLE_WHATS_NEW: true
+      OIDC_AUTOLOGIN: true
       DATA_DIR: /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/dockerhand
-      ENCRYPTION_KEY: ${PERSONAL_DOCKHAND_ENCRYPTION_KEY:?encryption key is required}
+      PGID: ${PGID}
+      UMASK: 002
+      HOST_DATA_DIR: /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/dockerhand
+      PUID: ${PUID}
+      UMASK_SET: 002
+      NVIDIA_VISIBLE_DEVICES: void
+      PORT: 3000
+      USER_ID: ${PUID}
+      HOME: /tmp
+      UID: ${PUID}
+      GROUP_ID: ${PGID}
+      GID: ${PGID}
+      FEAT_BACKUPS_ENABLED: true
     ports:
       - "${PERSONAL_PORT_DOCKHAND:-3000}:3000"
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /mnt/ssd/repos:/mnt/ssd/repos
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data:/${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/dockhand:/${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/dockhand
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-secret:/${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-secret:ro
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/repos:/${DOCKER_DATA_DIRECTORY:?data path is required}/repos
     networks:
       - webinternal
-
+    cap_drop:
+      - ALL
+    user: '${PUID}:${PGID}'
+    working_dir: /app
+    security_opt:
+      - no-new-privileges=true
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - '--request'
+        - GET
+        - '--silent'
+        - '--output'
+        - /dev/null
+        - '--show-error'
+        - '--fail'
+        - http://127.0.0.1:3000/api/health
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
 networks:
   webinternal:
     name: webinternal
+    external: true
