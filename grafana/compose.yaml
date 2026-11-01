@@ -4,25 +4,33 @@ services:
     image: docker.io/grafana/grafana-oss:${GRAFANA_TAG:-latest}
     container_name: grafana
     hostname: grafana
-    user: "${PERSONAL_GRAFANA_UID:-0}:${PERSONAL_GRAFANA_GID:-0}"
+    user: "${PERSONAL_MONITORING_UID:-0}:${PERSONAL_MONITORING_GID:-0}"
     labels:
       traefik.enable: true
-      traefik.http.routers.gafana.tls: true
+      traefik.http.routers.grafana.tls: true
       traefik.http.routers.grafana.tls.certresolver: cloudflare
-      traefik.http.routers.gafana.middlewares: authelia@docker,web-utils@docker
-      traefik.http.routers.gafana.entrypoints: websecure
-      traefik.http.routers.gafana.rule: Host(`monitoring.${PERSONAL_DOMAIN_NAME}`)
-      traefik.http.routers.gafana.service: gafana
-      traefik.http.services.gafana.loadBalancer.server.port: 3000
+      traefik.http.routers.grafana.middlewares: authelia@docker,sablier-grafana@docker,web-utils@docker
+      traefik.http.routers.grafana.entrypoints: websecure
+      traefik.http.routers.grafana.rule: Host(`monitoring.${PERSONAL_DOMAIN_NAME}`)
+      traefik.http.routers.grafana.service: grafana
+      traefik.http.services.grafana.loadBalancer.server.port: 3000
+      #sablier
+      sablier.enable: true
+      sablier.group: grafana
+      traefik.docker.allownonrunning: true
+      traefik.http.middlewares.sablier-grafana.plugin.sablier.group: grafana
+      traefik.http.middlewares.sablier-grafana.plugin.sablier.dynamic.displayName: Grafana
     environment:
       TZ: Europe/Paris
       GF_SERVER_ROOT_URL: "https://monitoring.${PERSONAL_DOMAIN_NAME}"
       GF_AUTH_BASIC_ENABLED: true
       GF_AUTH_GENERIC_OAUTH_ENABLED: true
       GF_AUTH_GENERIC_OAUTH_NAME: "Authelia - ${PERSONAL_DOMAIN_NAME}"
+      GF_AUTH_GENERIC_OAUTH_ICON: signin
       GF_AUTH_GENERIC_OAUTH_CLIENT_ID: "${GF_AUTH_GENERIC_OAUTH_CLIENT_ID}"
       GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: "${GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET}"
-      GF_AUTH_GENERIC_OAUTH_SCOPES: "openid profile email groups"
+      GF_AUTH_GENERIC_OAUTH_SCOPES: openid profile email groups
+      GF_AUTH_GENERIC_OAUTH_EMPTY_SCOPES: false
       GF_AUTH_GENERIC_OAUTH_LOGIN_ATTRIBUTE_PATH: preferred_username
       GF_AUTH_GENERIC_OAUTH_GROUPS_ATTRIBUTE_PATH: groups
       GF_AUTH_GENERIC_OAUTH_NAME_ATTRIBUTE_PATH: name
@@ -31,9 +39,11 @@ services:
       GF_AUTH_GENERIC_OAUTH_TOKEN_URL: "https://auth.${PERSONAL_DOMAIN_NAME}/api/oidc/token"
       GF_AUTH_GENERIC_OAUTH_API_URL: "https://auth.${PERSONAL_DOMAIN_NAME}/api/oidc/userinfo"
       GF_AUTH_SIGNOUT_REDIRECT_URL: "https://auth.${PERSONAL_DOMAIN_NAME}/logout"
-      GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH: "contains(groups, 'admin') && 'Admin' || contains(groups, 'Maison') && 'Editor' || 'Viewer'"
+      GF_AUTH_GENERIC_OAUTH_ALLOW_ASSIGN_GRAFANA_ADMIN: true
+      GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH: "contains(groups[*], 'admin') && 'GrafanaAdmin' || contains(groups[*], 'Maison') && 'Admin' || contains(groups[*], 'Gamers') && 'Editor' || 'Viewer'"
+      GF_AUTH_GENERIC_OAUTH_AUTH_STYLE: InHeader
       # Optionally enable auto-login (bypasses Grafana login screen)
-      GF_AUTH_GENERIC_OAUTH_AUTO_LOGIN: false
+      GF_AUTH_GENERIC_OAUTH_AUTO_LOGIN: true
       GF_AUTH_GOOGLE_AUTO_LOGIN: false
       GF_AUTH_GITHUB_AUTO_LOGIN: false
     volumes:
@@ -43,19 +53,19 @@ services:
     networks:
       - webinternal
       - monitoring
-    # healthcheck:
-    #   test: ["CMD", "wget", "http://127.0.0.1:3000/api/health"]
-    #   interval: 10s
-    #   timeout: 15s
-    #   retries: 10
-    #   start_period: 40s 
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
 
   prometheus:
     restart: unless-stopped
     image: docker.io/prom/prometheus:${PROMETHEUS_TAG:-latest}
     container_name: prometheus
     hostname: prometheus
-    user: "${PERSONAL_GRAFANA_UID:-0}:${PERSONAL_GRAFANA_GID:-0}"
+    user: "${PERSONAL_MONITORING_UID:-0}:${PERSONAL_MONITORING_GID:-0}"
     labels:
       traefik.enable: true
       traefik.http.routers.prometheusdb.tls: true
@@ -93,15 +103,15 @@ services:
     image: gcr.io/cadvisor/cadvisor:${CADVISOR_TAG:-latest} # google registry
     container_name: cadvisor
     hostname: cadvisor
+    pid: host
     privileged: true
-    labels:
     environment:
       TZ: Europe/Paris
     volumes:
       - /:/rootfs:ro
       - /run:/run:ro
       - /sys:/sys:ro
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-config:/var/lib/docker:ro
+      - /var/lib/docker:/var/lib/docker:ro
       - /dev/disk/:/dev/disk:ro
     devices:
       - /dev/kmsg
@@ -109,12 +119,15 @@ services:
       - 8080
     networks:
       - monitoring
+    command:
+      - --docker_only=true
+      - --disable_metrics=disk,diskIO,process,referenced_memory
     # healthcheck:
     #   test: ["CMD", "wget", "http://127.0.0.1:8080/healthz"]
     #   interval: 10s
     #   timeout: 15s
     #   retries: 10
-    #   start_period: 40s 
+    #   start_period: 40s
 
   node_exporter:
     restart: unless-stopped
@@ -122,7 +135,6 @@ services:
     container_name: node_exporter
     hostname: node_exporter
     pid: host
-    labels:
     environment:
       TZ: Europe/Paris
     volumes:
@@ -133,34 +145,34 @@ services:
     networks:
       - monitoring
 
-  influxdb:
-    restart: unless-stopped
-    image: docker.io/library/influxdb:${INFLUXDB2_TAG:-2.7.10-alpine}
-    container_name: influxdb2
-    hostname: influxdb2
-    labels:
-      traefik.enable: true
-      traefik.http.routers.influxdb2.tls: true
-      traefik.http.routers.influxdb2.tls.certresolver: cloudflare
-      traefik.http.routers.influxdb2.middlewares: authelia@docker,web-utils@docker
-      traefik.http.routers.influxdb2.entrypoints: websecure
-      traefik.http.routers.influxdb2.rule: Host(`influxdb2.${PERSONAL_DOMAIN_NAME}`)
-      traefik.http.routers.influxdb2.service: influxdb2
-      traefik.http.services.influxdb2.loadbalancer.server.port: 8086
-    environment:
-      TZ: Europe/Paris
-    # (Optional) change retention time
-      DOCKER_INFLUXDB_INIT_RETENTION: ${PERSONAL_METRICS_RETENTION_TIME}  # (optional) configure data retention 1 week
-    # (Optional) add admin token
-      # DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${PERSONAL_INFLUXDB_ADMIN_TOKEN}  # (optional) set admin token
-    ports:
-      - 8086:8086
-    volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/grafana/influxdb2/data:/var/lib/influxdb2
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/grafana/influxdb2/etc:/etc/influxdb2
-    networks:
-      - webinternal
-      - monitoring
+  # influxdb:
+  #   restart: unless-stopped
+  #   image: docker.io/library/influxdb:${INFLUXDB2_TAG:-2.7.10-alpine}
+  #   container_name: influxdb2
+  #   hostname: influxdb2
+  #   labels:
+  #     traefik.enable: true
+  #     traefik.http.routers.influxdb2.tls: true
+  #     traefik.http.routers.influxdb2.tls.certresolver: cloudflare
+  #     traefik.http.routers.influxdb2.middlewares: authelia@docker,web-utils@docker
+  #     traefik.http.routers.influxdb2.entrypoints: websecure
+  #     traefik.http.routers.influxdb2.rule: Host(`influxdb2.${PERSONAL_DOMAIN_NAME}`)
+  #     traefik.http.routers.influxdb2.service: influxdb2
+  #     traefik.http.services.influxdb2.loadbalancer.server.port: 8086
+  #   environment:
+  #     TZ: Europe/Paris
+  #   # (Optional) change retention time
+  #     DOCKER_INFLUXDB_INIT_RETENTION: ${PERSONAL_METRICS_RETENTION_TIME}  # (optional) configure data retention 1 week
+  #   # (Optional) add admin token
+  #     # DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${PERSONAL_INFLUXDB_ADMIN_TOKEN}  # (optional) set admin token
+  #   ports:
+  #     - 8086:8086
+  #   volumes:
+  #     - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/grafana/influxdb2/data:/var/lib/influxdb2
+  #     - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/grafana/influxdb2/etc:/etc/influxdb2
+  #   networks:
+  #     - webinternal
+  #     - monitoring
 
 volumes:
   prometheus:
@@ -169,5 +181,7 @@ volumes:
 networks:
   monitoring:
     name: monitoring
+    internal: true
   webinternal:
     name: webinternal
+    external: true
