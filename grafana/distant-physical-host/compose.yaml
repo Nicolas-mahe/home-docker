@@ -20,18 +20,18 @@ services:
     expose:
       - 8080
     ports:
-      - 8080:8080
+      - ${CADVISOR_PORT:-8080}:8080
     networks:
       - monitoring
     command:
       - --docker_only=true
-      - --disable_metrics=disk,diskIO,process,referenced_memory
-    # healthcheck:
-    #   test: ["CMD", "wget", "http://127.0.0.1:8080/healthz"]
-    #   interval: 10s
-    #   timeout: 15s
-    #   retries: 10
-    #   start_period: 40s
+      - --disable_metrics=advtcp,app,cpuLoad,cpu_topology,cpuset,disk,diskIO,hugetlb,memory_numa,oom_event,percpu,perf_event,process,referenced_memory,resctrl,sched,tcp,udp
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://127.0.0.1:8080/healthz || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
 
   node_exporter:
     restart: unless-stopped
@@ -46,7 +46,7 @@ services:
       - /:/host:ro,rslave
     command: --path.rootfs=/host
     ports:
-      - 9100:9100
+      - ${NODE_EXPORTER_PORT:-9100}:9100
     networks:
       - monitoring
 
