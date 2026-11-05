@@ -1,0 +1,116 @@
+services:
+  portabase:
+    restart: ${RESTART:-unless-stopped}
+    image: portabase/portabase:latest
+    container_name: portabase-app
+    hostname: portabase-app
+    labels:
+      traefik.enable: true
+      traefik.http.routers.portabase.tls: true
+      traefik.http.routers.portabase.tls.certresolver: cloudflare
+      traefik.http.routers.portabase.middlewares: authelia@docker,web-utils@docker
+      traefik.http.routers.portabase.entrypoints: websecure
+      traefik.http.routers.portabase.rule: Host(`portabase.${PERSONAL_DOMAIN_NAME}`)
+      traefik.http.routers.portabase.service: portabase
+      traefik.http.services.portabase.loadBalancer.server.port: 80
+    environment:
+      TZ: Europe/Paris
+      PROJECT_URL: https://portabase.${PERSONAL_DOMAIN_NAME}
+      TUSD_BEHIND_PROXY: true
+      PROJECT_SECRET: ${PROJECT_SECRET:?project secret is required}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-portabase}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?schema=public
+      STALE_BACKUP_THRESHOLD_HOURS: 48
+      BACKUP_FOLDER_NAME: "portabase"
+      TELEMETRY: false
+
+      # AUTH_OIDC_AUTHELIA_ID: authelia
+      # AUTH_OIDC_AUTHELIA_TITLE: Authelia
+      # AUTH_OIDC_AUTHELIA_DESC: "Connexion avec Authelia ${PERSONAL_DOMAIN_NAME}"
+      # AUTH_OIDC_AUTHELIA_CLIENT: ${AUTH_OIDC_AUTHELIA_CLIENT}
+      # AUTH_OIDC_AUTHELIA_SECRET: ${AUTH_OIDC_AUTHELIA_SECRET}
+      # AUTHELIA_ISSUER_URL: "https://auth.${PERSONAL_DOMAIN_NAME}"
+      # AUTH_OIDC_AUTHELIA_HOST: "auth.${PERSONAL_DOMAIN_NAME}"
+      # AUTH_OIDC_AUTHELIA_SCOPES: "openid profile email groups"
+      # AUTH_OIDC_AUTHELIA_PKCE: true
+      # AUTH_OIDC_AUTHELIA_ROLE_MAP: "admin:admin,default:user"
+      # AUTH_OIDC_AUTHELIA_ALLOW_UNLINKING: false
+      # TRUSTED_DOMAINS: "https://auth.${PERSONAL_DOMAIN_NAME}/, https://portabase.${PERSONAL_DOMAIN_NAME}/"
+
+      # SMTP_HOST:
+      # SMTP_PORT:
+      # SMTP_USER:
+      # SMTP_PASSWORD:
+      # SMTP_FROM:
+      # SMTP_SECURE:
+    networks:
+      - database
+      - webinternal
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/portabase/data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+
+  postgres:
+    restart: ${RESTART:-unless-stopped}
+    image: postgres:17-alpine
+    container_name: portabase-pg
+    hostname: portabase-pg
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    networks:
+      - database
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  agent:
+    restart: ${RESTART:-unless-stopped}
+    image: portabase/agent:latest
+    container_name: portabase-agent
+    hostname: portabase-agent
+    environment:
+      TZ: Europe/Paris
+      APP_ENV: production
+      LOG: info
+      EDGE_KEY: ${EDGE_KEY:?edge key is required}
+    volumes:
+      # Déclaration des bases à sauvegarder
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/portabase/agent:/config
+      # # Nécessaire uniquement pour la sauvegarde de volumes Docker (à vous de voir)
+      # - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - database
+      - portabase # needed for the agent to reach the S3 app
+    depends_on:
+      portabase:
+        condition: service_healthy
+
+volumes:
+  postgres:
+
+networks:
+  database:
+    name: database
+    internal: true
+  portabase:
+    name: portabase
+  webinternal:
+    name: webinternal
