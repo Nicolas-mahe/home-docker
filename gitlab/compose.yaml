@@ -1,8 +1,8 @@
 services:
   gitlab:
+    restart: ${RESTART:-unless-stopped}
     image: gitlab/gitlab-ee:${GITLAB_TAG:-19.2.1-ee.0}
     container_name: gitlab
-    restart: unless-stopped
     hostname: gitlab
     shm_size: '256m'
     labels:
@@ -68,10 +68,10 @@ services:
         gitlab_rails['gitlab_default_color_mode'] = 2
         gitlab_rails['initial_gitlab_product_usage_data'] = false
     volumes:
-      -  data:/var/opt/gitlab
-      -  logs:/var/log/gitlab
-      -  /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/config:/etc/gitlab
-      -  /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/backups:/var/opt/gitlab/backups
+      - data:/var/opt/gitlab
+      - logs:/var/log/gitlab
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/config:/etc/gitlab
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/backups:/var/opt/gitlab/backups
     networks:
       - gitlab
       - webinternal
@@ -80,7 +80,7 @@ services:
     #   disable: true
 
   gitlab-runner:
-    restart: unless-stopped
+    restart: ${RESTART:-unless-stopped}
     image: gitlab/gitlab-runner:${RUNNER_TAG:-v19.2.0}
     container_name: gitlab-runner
     hostname: gitlab-runner
@@ -98,12 +98,45 @@ services:
     depends_on:
       gitlab:
         condition: service_healthy
+
+  portabase-agent:
+    restart: ${RESTART:-unless-stopped}
+    image: portabase/agent:latest
+    container_name: portabase-agent-gitlab
+    hostname: portabase-agent-gitlab
+    labels:
+      #sablier
+      sablier.enable: true
+      sablier.group: gitlab
+      traefik.docker.allownonrunning: true
+    environment:
+      TZ: Europe/Paris
+      APP_ENV: production
+      LOG: info
+      EDGE_KEY: ${PORTABASE_EDGE_KEY:?edge key is required}
+      MAX_CONCURRENT_BACKUPS: 1
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/portabase/agents/gitlab:/config
+      # gitlab data volumes to backup
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/backups:/var/opt/gitlab/backups
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/config:/etc/gitlab
+      # gitlab-runner data volumes to backup
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/gitlab/runner-config:/etc/gitlab-runner
+    networks:
+      - portabase-agent # needed for the agent to reach the S3 app & portabase
+    depends_on:
+      gitlab:
+        condition: service_healthy
+
 volumes:
   data:
   logs:
   runner-home:
+
 networks:
   gitlab:
     name: gitlab
+  portabase-agent:
+    name: portabase-agent
   webinternal:
     name: webinternal
