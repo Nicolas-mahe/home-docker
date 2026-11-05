@@ -48,7 +48,8 @@ services:
       # SMTP_FROM:
       # SMTP_SECURE:
     networks:
-      - database
+      - portabase
+      - portabase-agent # needed for agents to reach this instance
       - webinternal
     depends_on:
       postgres:
@@ -74,7 +75,7 @@ services:
     volumes:
       - postgres:/var/lib/postgresql/data
     networks:
-      - database
+      - portabase
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
@@ -91,14 +92,13 @@ services:
       APP_ENV: production
       LOG: info
       EDGE_KEY: ${EDGE_KEY:?edge key is required}
+      MAX_CONCURRENT_BACKUPS: 1
     volumes:
-      # Déclaration des bases à sauvegarder
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/portabase/agent:/config
-      # # Nécessaire uniquement pour la sauvegarde de volumes Docker (à vous de voir)
-      # - /var/run/docker.sock:/var/run/docker.sock
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/portabase/agents/local:/config
+      # - /var/run/docker.sock:/var/run/docker.sock # Nécessaire uniquement pour la sauvegarde de volumes Docker (à vous de voir)
     networks:
-      - database
-      - portabase # needed for the agent to reach the S3 app
+      - portabase
+      - portabase-agent # needed for the agent to reach the S3 app
     depends_on:
       portabase:
         condition: service_healthy
@@ -107,10 +107,10 @@ volumes:
   postgres:
 
 networks:
-  database:
+  portabase:
     name: database
     internal: true
-  portabase:
-    name: portabase
+  portabase-agent:
+    name: portabase-agent
   webinternal:
     name: webinternal
