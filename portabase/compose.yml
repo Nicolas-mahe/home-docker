@@ -25,7 +25,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-portabase}
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?schema=public
       STALE_BACKUP_THRESHOLD_HOURS: 48
-      BACKUP_FOLDER_NAME: "portabase"
+      BACKUP_FOLDER_NAME: backups
       TELEMETRY: false
 
       # AUTH_OIDC_AUTHELIA_ID: authelia
