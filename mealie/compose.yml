@@ -90,6 +90,7 @@ services:
       - mealie-postgres:/var/lib/postgresql/data
     networks:
       - mealie
+      - portabase-agent
     healthcheck:
       test: ["CMD", "pg_isready"]
       interval: 30s
@@ -103,5 +104,8 @@ volumes:
 networks:
   mealie:
     name: mealie
+  portabase-agent:
+    name: portabase-agent
+    external: true
   webinternal:
     name: webinternal
