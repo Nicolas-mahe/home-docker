@@ -95,7 +95,7 @@ services:
       MAX_CONCURRENT_BACKUPS: 1
     volumes:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/portabase/agents/local:/config
-      # - /var/run/docker.sock:/var/run/docker.sock # Nécessaire uniquement pour la sauvegarde de volumes Docker (à vous de voir)
+      - /var/run/docker.sock:/var/run/docker.sock # Nécessaire uniquement pour la sauvegarde de volumes Docker
     networks:
       - portabase
       - portabase-agent # needed for the agent to reach the S3 app

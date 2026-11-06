@@ -76,6 +76,7 @@ services:
     volumes:
       - paperless-postgres:/var/lib/postgresql
     networks:
+      - portabase-agent
       - paperless
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
@@ -216,5 +217,8 @@ volumes:
 networks:
   paperless:
     name: paperless
+  portabase-agent:
+    name: portabase-agent
+    external: true
   webinternal:
     name: webinternal
