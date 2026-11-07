@@ -13,6 +13,13 @@ services:
       traefik.http.routers.portabase.rule: Host(`portabase.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.portabase.service: portabase
       traefik.http.services.portabase.loadBalancer.server.port: 80
+      #sablier
+      sablier.enable: true
+      sablier.group: portabase
+      sablier.running-hours: "04:50-05:30"
+      traefik.docker.allownonrunning: true
+      traefik.http.middlewares.sablier-portabase.plugin.sablier.group: portabase
+      traefik.http.middlewares.sablier-portabase.plugin.sablier.dynamic.displayName: Portabase
     environment:
       TZ: Europe/Paris
       PROJECT_URL: https://portabase.${PERSONAL_DOMAIN_NAME}
@@ -68,6 +75,11 @@ services:
     image: postgres:17-alpine
     container_name: portabase-pg
     hostname: portabase-pg
+    labels:
+      #sablier
+      sablier.enable: true
+      sablier.group: portabase
+      sablier.running-hours: "04:50-05:30"
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -87,6 +99,11 @@ services:
     image: portabase/agent:latest
     container_name: portabase-agent
     hostname: portabase-agent
+    labels:
+      #sablier
+      sablier.enable: true
+      sablier.group: portabase
+      sablier.running-hours: "04:50-05:30"
     environment:
       TZ: Europe/Paris
       APP_ENV: production
@@ -95,7 +112,8 @@ services:
       MAX_CONCURRENT_BACKUPS: 1
     volumes:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/portabase/agents/local:/config
-      - /var/run/docker.sock:/var/run/docker.sock # Nécessaire uniquement pour la sauvegarde de volumes Docker
+      - /var/run/docker.sock:/var/run/docker.sock # needed for the agent to backup docker volumes
+      - mealie:/save/mealie
     networks:
       - portabase
       - portabase-agent # needed for the agent to reach the S3 app
@@ -105,6 +123,9 @@ services:
 
 volumes:
   postgres:
+  mealie:
+    name: mealie-backups
+    external: true
 
 networks:
   portabase:
