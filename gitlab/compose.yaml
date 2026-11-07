@@ -111,8 +111,8 @@ services:
     labels:
       #sablier
       sablier.enable: true
-      sablier.group: gitlab
-      traefik.docker.allownonrunning: true
+      sablier.group: gitlab,portabase
+      sablier.running-hours: "04:50-05:30"
     environment:
       TZ: Europe/Paris
       APP_ENV: production
