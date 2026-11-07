@@ -170,12 +170,42 @@ services:
       SECRET_KEY: ${SECRET_KEY_BRAINSTORM}
       DEBUG_MODE: ${DEBUG_MODE}
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?required}/docker/docker-data/websites/brainstorm:/app/instance
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/websites/brainstorm:/app/instance
     expose:
       - 5000
     networks:
       - webinternal
 
+  portabase-agent:
+    restart: ${RESTART:-unless-stopped}
+    image: portabase/agent:latest
+    container_name: portabase-agent-websites
+    hostname: portabase-agent-websites
+    environment:
+      TZ: Europe/Paris
+      APP_ENV: production
+      LOG: info
+      EDGE_KEY: ${PORTABASE_EDGE_KEY:?edge key is required}
+      MAX_CONCURRENT_BACKUPS: 1
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/portabase/agents/websites:/config
+      # volumes to backup
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/websites/pronostics:/save/pronostics
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/websites/baby-follow:/save/baby-follow
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/websites/brainstorm:/save/brainstorm
+    networks:
+      - portabase-agent # needed for the agent to reach the S3 app & portabase
+    depends_on:
+      python-pronostics:
+        condition: service_healthy
+      python-baby-follow:
+        condition: service_healthy
+      brainstorm:
+        condition: service_healthy
+
 networks:
+  portabase-agent:
+    name: portabase-agent
+    external: true
   webinternal:
     name: webinternal

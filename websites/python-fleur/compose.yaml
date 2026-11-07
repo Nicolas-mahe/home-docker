@@ -41,10 +41,34 @@ services:
       retries: 3
       start_period: 30s
 
+  portabase-agent:
+    restart: ${RESTART:-unless-stopped}
+    image: portabase/agent:latest
+    container_name: portabase-agent-fleurs
+    hostname: portabase-agent-fleurs
+    environment:
+      TZ: Europe/Paris
+      APP_ENV: production
+      LOG: info
+      EDGE_KEY: ${PORTABASE_EDGE_KEY:?edge key is required}
+      MAX_CONCURRENT_BACKUPS: 1
+    volumes:
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/portabase/agents/python-fleur:/config
+      # volumes to backup
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/websites/fleurs:/save/python-fleur
+    networks:
+      - portabase-agent # needed for the agent to reach the S3 app & portabase
+    depends_on:
+      python-fleur:
+        condition: service_healthy
+
 volumes:
   python-fleur:
     name: python-fleur
 
 networks:
+  portabase-agent:
+    name: portabase-agent
+    external: true
   webinternal:
     name: webinternal
