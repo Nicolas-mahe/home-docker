@@ -16,6 +16,7 @@ services:
       #sablier
       sablier.enable: true
       sablier.group: mealie
+      sablier.running-hours: "04:50-05:30"
       traefik.docker.allownonrunning: true
       traefik.http.middlewares.sablier-mealie.plugin.sablier.group: mealie
       traefik.http.middlewares.sablier-mealie.plugin.sablier.dynamic.displayName: mealie
@@ -68,6 +69,7 @@ services:
           memory: 1000M
     volumes:
       - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/mealie:/app/data/
+      - backups:/app/data/backups
     networks:
       - mealie
       - webinternal
@@ -88,10 +90,9 @@ services:
       PGUSER: ${PG_MEALIE_USER}
       POSTGRES_DB: ${POSTGRES_MEALIE_DB}
     volumes:
-      - mealie-postgres:/var/lib/postgresql/data
+      - postgres:/var/lib/postgresql/data
     networks:
       - mealie
-      - portabase-agent
     healthcheck:
       test: ["CMD", "pg_isready"]
       interval: 30s
@@ -99,14 +100,13 @@ services:
       retries: 3
 
 volumes:
-  mealie-postgres:
+  postgres:
     name: mealie-postgres
+  backups:
+    name: mealie-backups
 
 networks:
   mealie:
     name: mealie
-  portabase-agent:
-    name: portabase-agent
-    external: true
   webinternal:
     name: webinternal
