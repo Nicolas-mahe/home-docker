@@ -1,3 +1,5 @@
+# create cron command as root:
+# 30 4 * * * /bin/docker exec -t gitlab gitlab-backup create CRON=1 && /bin/docker exec -t gitlab gitlab-ctl backup-etc --backup-path /var/opt/gitlab/backups CRON=1 && /bin/docker exec -t gitlab chmod -R 677 /var/opt/gitlab/backups/
 services:
   gitlab:
     restart: ${RESTART:-unless-stopped}
@@ -29,6 +31,7 @@ services:
       #sablier
       sablier.enable: true
       sablier.group: gitlab
+      sablier.running-hours: "04:20-05:30"
       traefik.docker.allownonrunning: true
       traefik.http.middlewares.sablier-gitlab.plugin.sablier.group: gitlab
       traefik.http.middlewares.sablier-gitlab.plugin.sablier.sessionDuration: 2h
@@ -63,6 +66,7 @@ services:
         puma['worker_processes'] = 1
         letsencrypt['enable'] = false
         gitlab_rails['backup_archive_permissions'] = 0655
+        gitlab_rails['backup_keep_time'] = 86400 # 24h
         prometheus_monitoring['enable'] = false
         gitlab_rails['gitlab_default_theme'] = 2
         gitlab_rails['gitlab_default_color_mode'] = 2
