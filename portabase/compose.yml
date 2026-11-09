@@ -8,7 +8,7 @@ services:
       traefik.enable: true
       traefik.http.routers.portabase.tls: true
       traefik.http.routers.portabase.tls.certresolver: cloudflare
-      traefik.http.routers.portabase.middlewares: authelia@docker,web-utils@docker
+      traefik.http.routers.portabase.middlewares: authelia@docker,sablier-portabase@docker,web-utils@docker
       traefik.http.routers.portabase.entrypoints: websecure
       traefik.http.routers.portabase.rule: Host(`portabase.${PERSONAL_DOMAIN_NAME}`)
       traefik.http.routers.portabase.service: portabase
