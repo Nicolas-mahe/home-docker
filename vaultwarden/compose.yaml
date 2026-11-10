@@ -1,6 +1,6 @@
 services:
   vaultwarden:
-    restart: unless-stopped
+    restart: ${RESTART:-unless-stopped}
     image: docker.io/vaultwarden/server:${VAULTWARDEN_TAG:-latest-alpine}
     container_name: vaultwarden
     hostname: vaultwarden
@@ -16,15 +16,16 @@ services:
       #sablier
       sablier.enable: true
       sablier.group: vaultwarden
+      sablier.running-hours: "04:50-05:30"
       traefik.docker.allownonrunning: true
       traefik.http.middlewares.sablier-vaultwarden.plugin.sablier.group: vaultwarden
       traefik.http.middlewares.sablier-vaultwarden.plugin.sablier.dynamic.displayName: vaultwarden
     environment:
       DOMAIN: https://vaultwarden.${PERSONAL_DOMAIN_NAME}
       TZ: Europe/Paris
-      ADMIN_TOKEN: ${ADMIN_TOKEN}
+      # ADMIN_TOKEN: ${ADMIN_TOKEN} # only on creation
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/vaultwarden/:/data/
+      - vaultwarden:/data/
     expose:
       - 80
     networks:
@@ -35,6 +36,10 @@ services:
       timeout: 10s
       retries: 3
       start_period: 5s
+
+volumes:
+  vaultwarden:
+    name: vaultwarden
 
 networks:
   webinternal:
