@@ -24,7 +24,7 @@ services:
     networks:
       - ollama
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/paperless/open-webui:/app/backend/data
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/ollama/open-webui:/app/backend/data
 
   ollama:
     restart: ${RESTART:-unless-stopped}
@@ -48,8 +48,8 @@ services:
       OLLAMA_HOST: 0.0.0.0:11434
       OLLAMA_MODELS: ollama-models
     volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/paperless/ollama/data/:/root/.ollama
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/paperless/ollama/models:/ollama-models
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/ollama/data/:/root/.ollama
+      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/ollama/models:/ollama-models
     ports:
       - ${OLLAMA_PORT:-11434}:11434
     networks:
