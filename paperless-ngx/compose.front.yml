@@ -44,6 +44,8 @@ services:
       - /${RAID_DATA_DIRECTORY:?raid path is required}/paperless/media:/usr/src/paperless/media
       - /${RAID_DATA_DIRECTORY:?raid path is required}/paperless/export:/usr/src/paperless/export
       - /${RAID_DATA_DIRECTORY:?raid path is required}/paperless/consume:/usr/src/paperless/consume
+    ports:
+      - 8000:8000
     networks:
       - paperless
       - webinternal
@@ -128,85 +130,6 @@ services:
       TZ: Europe/Paris
     networks:
       - paperless
-
-  paperless-ai:
-    restart: ${RESTART:-unless-stopped}
-    image: clusterzx/paperless-ai:latest
-    container_name: paperless-ai
-    hostname: paperless-ai
-    labels:
-      traefik.enable: true
-      traefik.http.routers.paperless-ai.tls: true
-      traefik.http.routers.paperless-ai.tls.certresolver: cloudflare
-      traefik.http.routers.paperless-ai.middlewares: authelia@docker,web-utils@docker
-      traefik.http.routers.paperless-ai.entrypoints: websecure
-      traefik.http.routers.paperless-ai.rule: Host(`paperless-ai.${PERSONAL_DOMAIN_NAME}`)
-      traefik.http.routers.paperless-ai.service: paperless-ai
-      traefik.http.services.paperless-ai.loadbalancer.server.port: 3000
-    environment:
-      TZ: Europe/Paris
-      PAPERLESS_API_URL: "http://paperless-server:8000/api"
-      PAPERLESS_API_TOKEN: "${PAPERLESS_API_TOKEN}" # to generate in Web Ui and restart both
-      PAPERLESS_USERNAME: "${PAPERLESS_USER}"
-      AI_PROVIDER: "ollama"
-      OLLAMA_API_URL: "${OLLAMA_HOST:-http://ollama:11434}"
-      OLLAMA_MODEL: "llama3.2:3b"
-      RAG_SERVICE_URL: "http://paperless-server:8000"
-      RAG_SERVICE_ENABLED: true
-      SCAN_INTERVAL: '30 21 * * *'
-      PAPERLESS_URL: "http://paperless-server:8000"
-    depends_on:
-      paperless:
-        condition: service_healthy
-    volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/paperless/paperless-ai:/app/data
-    networks:
-      - paperless
-      - webinternal
-  
-  paperless-gpt:
-    restart: ${RESTART:-unless-stopped}
-    image: icereed/paperless-gpt:latest
-    container_name: paperless-gpt
-    hostname: paperless-gpt
-    labels:
-      traefik.enable: true
-      traefik.http.routers.paperless-gpt.tls: true
-      traefik.http.routers.paperless-gpt.tls.certresolver: cloudflare
-      traefik.http.routers.paperless-gpt.middlewares: authelia@docker,web-utils@docker
-      traefik.http.routers.paperless-gpt.entrypoints: websecure
-      traefik.http.routers.paperless-gpt.rule: Host(`paperless-gpt.${PERSONAL_DOMAIN_NAME}`)
-      traefik.http.routers.paperless-gpt.service: paperless-gpt
-      traefik.http.services.paperless-gpt.loadbalancer.server.port: 8080
-    environment:
-      TZ: Europe/Paris
-      PAPERLESS_BASE_URL: "http://paperless-server:8000"
-      PAPERLESS_PUBLIC_URL: "https://paperless.${PERSONAL_DOMAIN_NAME}"
-      PAPERLESS_API_TOKEN: ${PAPERLESS_API_TOKEN}
-      LLM_PROVIDER: "ollama"
-      LLM_MODEL: "llama3.2:3b"
-      OLLAMA_HOST: "${OLLAMA_HOST:-http://ollama:11434}"
-      OLLAMA_CONTEXT_LENGTH: "8192" # Sets Ollama NumCtx (context window)
-      TOKEN_LIMIT: 1000 # Recommended for smaller models
-      LLM_LANGUAGE: "English" # Optional, default: English
-      OCR_PROVIDER: "llm" # Default OCR provider
-      VISION_LLM_PROVIDER: "ollama" # openai, ollama, mistral, or anthropic
-      VISION_LLM_MODEL: "minicpm-v:8b" # minicpm-v (ollama) or gpt-4o (openai) or claude-sonnet-4-5 (anthropic/claude)
-      AUTO_OCR_TAG: "paperless-gpt-ocr-auto"
-      AUTO_TAG: "paperless-gpt-auto"
-      MANUAL_TAG: "paperless-gpt-manual"
-      PDF_OCR_TAGGING: "true"
-      PDF_OCR_COMPLETE_TAG: "paperless-gpt-ocr-complete"
-      PDF_UPLOAD: "false"
-      LOG_LEVEL: "DEBUG" 
-    depends_on:
-      paperless:
-        condition: service_healthy
-    volumes:
-      - /${DOCKER_DATA_DIRECTORY:?data path is required}/docker/docker-data/paperless/paperless-gpt:/app/prompts
-    networks:
-      - paperless
-      - webinternal
 
 volumes:
   paperless-postgres:
