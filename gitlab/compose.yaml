@@ -64,7 +64,7 @@ services:
         puma['worker_processes'] = 1
         letsencrypt['enable'] = false
         gitlab_rails['backup_archive_permissions'] = 0655
-        gitlab_rails['backup_keep_time'] = 86400 # 24h
+        gitlab_rails['backup_keep_time'] = 82800 # 23h
         prometheus_monitoring['enable'] = false
         gitlab_rails['gitlab_default_theme'] = 2
         gitlab_rails['gitlab_default_color_mode'] = 2
