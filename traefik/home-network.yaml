@@ -26,40 +26,6 @@ http:
         - authelia@docker
         - web-utils@docker
 
-    dns:
-      rule: "Host(`dns.${PERSONAL_DOMAIN_NAME}`)"
-      service: dns
-      tls:
-        certresolver: cloudflare
-      entrypoints:
-        - websecure
-      middlewares:
-        - authelia@docker
-        - web-utils@docker
-
-    duplicati:
-      rule: "Host(`duplicati.${PERSONAL_DOMAIN_NAME}`)"
-      service: duplicati
-      tls:
-        certresolver: cloudflare
-      entrypoints:
-        - websecure
-      middlewares:
-        - authelia@docker
-        - web-utils@docker
-
-    games-manager:
-      rule: "Host(`games-manager.${PERSONAL_DOMAIN_NAME}`)"
-      service: games-manager
-      tls:
-        certresolver: cloudflare
-      entrypoints:
-        - websecure
-      middlewares:
-        - authelia@docker
-        - sablier-games-manager@file
-        - web-utils@docker
-
     homeassistant:
       rule: "Host(`homeassistant.${PERSONAL_DOMAIN_NAME}`)"
       service: homeassistant
@@ -135,21 +101,6 @@ http:
       loadBalancer:
         servers:
           - url: "https://${PERSONAL_WAN_NETWORK}.1:443"
-
-    dns:
-      loadBalancer:
-        servers:
-          - url: "http://${PERSONAL_NETWORK}.2:81"
-
-    duplicati:
-      loadBalancer:
-        servers:
-          - url: "http://${PERSONAL_NETWORK}.2:8201"
-
-    games-manager:
-      loadBalancer:
-        servers:
-          - url: "http://${PERSONAL_NETWORK}.2:5000"
 
     homeassistant:
       loadBalancer:
