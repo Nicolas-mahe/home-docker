@@ -129,6 +129,7 @@ services:
       monitoring:
       webexpose:
       webinternal:
+      wireguard:
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:8082/ping"]
       interval: 30s
@@ -459,3 +460,5 @@ networks:
     name: webexpose
   webinternal:
     name: webinternal
+  wireguard:
+    name: wireguard
