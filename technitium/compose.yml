@@ -71,7 +71,9 @@ services:
 
 volumes:
     config:
+      name: technitium_config
     logs:
+      name: technitium_logs
 
 networks:
     webinternal:
