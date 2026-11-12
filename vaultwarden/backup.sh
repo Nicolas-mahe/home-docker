@@ -3,7 +3,7 @@
 
 /bin/docker exec -t vaultwarden /vaultwarden backup
 
-# purge old backups older than 7 days
-/bin/docker exec -t vaultwarden sh -c "cd /data && find . -type f -name 'db_*_*.sqlite3' ! -mtime -7 -exec rm {} +"
+# purge old backups older than 1 days
+/bin/docker exec -t vaultwarden sh -c "cd /data && find . -type f -name 'db_*_*.sqlite3' ! -mtime -1 -exec rm {} +"
 
 /bin/docker exec -t vaultwarden sh -c "cd /data && ls -al db_*_*.sqlite3"
