@@ -196,7 +196,7 @@ services:
 
       # Crowdsec definition
       - --experimental.plugins.bouncer.moduleName=github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
-      - --experimental.plugins.bouncer.version=${CROWDSEC_PLUGIN_VERSION:?bouncer version required}
+      - --experimental.plugins.bouncer.version=${CROWDSEC_PLUGIN_VERSION:?bouncer version required} #https://plugins.traefik.io/plugins/6335346ca4caa9ddeffda116/crowdsec-bouncer-traefik-plugin
 
       # Sablier
       - --experimental.plugins.sablier.moduleName=github.com/sablierapp/sablier #https://plugins.traefik.io/plugins/6715d1d37dd5a6c3095befd4/sablier
