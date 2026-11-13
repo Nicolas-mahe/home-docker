@@ -16,7 +16,7 @@ services:
       #sablier
       sablier.enable: true
       sablier.group: portabase
-      sablier.running-hours: "04:50-05:30"
+      sablier.running-hours: "04:50-06:30"
       traefik.docker.allownonrunning: true
       traefik.http.middlewares.sablier-portabase.plugin.sablier.group: portabase
       traefik.http.middlewares.sablier-portabase.plugin.sablier.dynamic.displayName: Portabase
@@ -79,7 +79,7 @@ services:
       #sablier
       sablier.enable: true
       sablier.group: portabase
-      sablier.running-hours: "04:50-05:30"
+      sablier.running-hours: "04:50-06:30"
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -103,7 +103,7 @@ services:
       #sablier
       sablier.enable: true
       sablier.group: portabase
-      sablier.running-hours: "04:50-05:30"
+      sablier.running-hours: "04:50-06:30"
     environment:
       TZ: Europe/Paris
       APP_ENV: production

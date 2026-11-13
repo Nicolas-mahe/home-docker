@@ -185,7 +185,7 @@ services:
       #sablier
       sablier.enable: true
       sablier.group: portabase
-      sablier.running-hours: "04:50-05:30"
+      sablier.running-hours: "04:50-06:30"
     environment:
       TZ: Europe/Paris
       APP_ENV: production
